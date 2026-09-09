@@ -116,12 +116,6 @@
   </header>
   <main class="table" id="table"></main>
   <script>
-    // ===========================================================
-    // AJOUTE UNE BD ICI
-    // slug = nom du dossier sur le serveur (sans espaces ni accents)
-    // title = titre affiché
-    // cover = chemin vers l'image de couverture
-    // ===========================================================
     const books = [
       {
         slug: "ardeche-2026",
@@ -154,8 +148,6 @@
       books.forEach((book, i) => {
         const a = document.createElement("a");
         a.className = "book";
-        // Le slash au début ("/" + book.slug + "/") force le retour à la racine du site
-        // et empêche l'empilement des URL en cas de navigation multiple.
         a.href = "/" + book.slug + "/";
         a.style.setProperty("--tilt", tilts[i % tilts.length]);
 
