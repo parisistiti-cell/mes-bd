@@ -16,9 +16,7 @@
     --cream: #f2ead9;
     --ink-soft: rgba(242, 234, 217, 0.72);
   }
-
   * { box-sizing: border-box; }
-
   body {
     margin: 0;
     min-height: 100vh;
@@ -26,7 +24,7 @@
     font-family: 'Karla', sans-serif;
     -webkit-font-smoothing: antialiased;
     background-color: var(--wood-2);
-    background-image:
+    background-image: 
       repeating-linear-gradient(
         90deg,
         rgba(0,0,0,0.06) 0px,
@@ -37,14 +35,12 @@
       linear-gradient(180deg, var(--wood-1) 0%, var(--wood-2) 45%, var(--wood-3) 100%);
     background-blend-mode: multiply, normal;
   }
-
   header {
     max-width: 900px;
     margin: 0 auto;
     padding: 64px 28px 20px;
     text-align: center;
   }
-
   header h1 {
     font-family: 'Cormorant Garamond', serif;
     font-weight: 600;
@@ -52,14 +48,12 @@
     margin: 0 0 8px;
     letter-spacing: 0.01em;
   }
-
   header p {
     color: var(--ink-soft);
     font-size: 0.95rem;
     margin: 0;
     font-style: italic;
   }
-
   .table {
     max-width: 1000px;
     margin: 0 auto;
@@ -70,7 +64,6 @@
     align-items: flex-end;
     gap: 36px 28px;
   }
-
   .book {
     display: block;
     text-decoration: none;
@@ -79,13 +72,11 @@
     transition: transform 0.2s ease, filter 0.2s ease;
     filter: drop-shadow(6px 10px 14px rgba(0,0,0,0.45));
   }
-
   .book:hover,
   .book:focus-visible {
     transform: rotate(0deg) translateY(-6px);
     filter: drop-shadow(4px 8px 18px rgba(0,0,0,0.55));
   }
-
   .book__cover {
     aspect-ratio: 3 / 4.2;
     border-radius: 2px;
@@ -93,14 +84,12 @@
     border: 1px solid rgba(0,0,0,0.35);
     box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
   }
-
   .book__cover img {
     display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
-
   .book__title {
     display: block;
     text-align: center;
@@ -110,7 +99,6 @@
     color: var(--cream);
     opacity: 0.88;
   }
-
   .empty-note {
     width: 100%;
     text-align: center;
@@ -122,47 +110,42 @@
 </style>
 </head>
 <body>
-
   <header>
     <h1>Mes BD</h1>
     <p>Choisis un livre sur la table.</p>
   </header>
-
   <main class="table" id="table"></main>
-
   <script>
     // ===========================================================
     // AJOUTE UNE BD ICI
-    // Une ligne par livre : slug = nom du dossier, title = titre affiché,
-    // cover = chemin vers l'image de couverture.
-    // La page s'enrichit automatiquement, pas besoin de toucher au reste.
+    // slug = nom du dossier sur le serveur (sans espaces ni accents)
+    // title = titre affiché
+    // cover = chemin vers l'image de couverture
     // ===========================================================
     const books = [
       {
-        slug: "Ardèche 2026",
+        slug: "ardeche-2026",
         title: "Ardèche 2026",
-        cover: "Ardèche 2026/images/00.jpg"
+        cover: "ardeche-2026/images/00.jpg"
       },
       {
         slug: "entre-deux-vies",
         title: "Entre deux vies",
         cover: "entre-deux-vies/images/00.jpg"
       },
-      
       {
         slug: "laffaire-de-la-souris",
         title: "L'affaire de la souris",
         cover: "laffaire-de-la-souris/images/00.jpg"
       },
       {
-        slug: "Tranches-de-vie",
+        slug: "tranches-de-vie",
         title: "Tranches de vie",
-        cover: "Tranches-de-vie/images/00.jpg"
+        cover: "tranches-de-vie/images/00.jpg"
       }
     ];
 
     const tilts = ["-3deg", "2deg", "-1.5deg", "2.5deg", "-2.5deg", "1.5deg"];
-
     const table = document.getElementById("table");
 
     if (books.length === 0) {
@@ -171,11 +154,14 @@
       books.forEach((book, i) => {
         const a = document.createElement("a");
         a.className = "book";
-        a.href = book.slug + "/";
+        // Le slash au début ("/" + book.slug + "/") force le retour à la racine du site
+        // et empêche l'empilement des URL en cas de navigation multiple.
+        a.href = "/" + book.slug + "/";
         a.style.setProperty("--tilt", tilts[i % tilts.length]);
 
         const cover = document.createElement("div");
         cover.className = "book__cover";
+
         const img = document.createElement("img");
         img.src = book.cover;
         img.alt = "Couverture — " + book.title;
@@ -192,6 +178,5 @@
       });
     }
   </script>
-
 </body>
 </html>
