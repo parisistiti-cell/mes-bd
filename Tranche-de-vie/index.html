@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>L'affaire de la souris</title>
-<meta name="description" content="L'affaire de la souris — les 40 ans d'une étrange habitude.">
+<title>Tranche de vie</title>
+<meta name="description" content="Tranches de vie">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
@@ -13,6 +13,9 @@
     --teal: #3d7d94;
     --teal-deep: #2b5c6e;
     --cream: #f2e9d3;
+    <div class="page">
+      <img src="images/01.jpg" alt="Planche 1">
+    </div>
     --wood: #c79a63;
     --rust: #c0503a;
     --rust-deep: #9c3d2c;
@@ -190,7 +193,7 @@
   </header>
 
   <div class="hero__caption">
-    <h1>L'affaire de la souris</h1>
+    <h1>Tranches de vie</h1>
     <p>Les 40 ans d'une étrange habitude.</p>
     <button id="pdf-btn" class="pdf-btn" onclick="downloadPDF()">Télécharger en PDF</button>
   </div>
@@ -260,7 +263,7 @@
           doc.addImage(dataUrl, 'JPEG', 0, 0, wmm, hmm);
         }
 
-        doc.save("L'affaire de la souris.pdf");
+        doc.save("Tranche de vie.pdf");
       } catch (err) {
         alert("Le PDF n'a pas pu être généré. Réessaie, ou vérifie que toutes les planches sont bien chargées.");
         console.error(err);
