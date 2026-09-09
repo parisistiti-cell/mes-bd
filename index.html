@@ -148,7 +148,8 @@
       books.forEach((book, i) => {
         const a = document.createElement("a");
         a.className = "book";
-        a.href = "/" + book.slug + "/";
+        // Utilisation d'un chemin absolu partant de la racine du domaine
+        a.href = window.location.origin + "/" + book.slug + "/";
         a.style.setProperty("--tilt", tilts[i % tilts.length]);
 
         const cover = document.createElement("div");
