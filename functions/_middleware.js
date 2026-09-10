@@ -14,7 +14,7 @@
 // ===========================================================
 
 // Ajoute ici le slug de chaque BD à protéger (le nom de son dossier).
-const PROTECTED_SLUGS = ["entre-deux-vies", "Tranche-de-vie"];
+const PROTECTED_SLUGS = ["entre-deux-vies", "Tranches-de-vie"];
 
 function isProtectedPath(pathname) {
   return PROTECTED_SLUGS.some((slug) => pathname === `/${slug}` || pathname.startsWith(`/${slug}/`));
@@ -42,7 +42,7 @@ function arrayBufferToBase64(buffer) {
 // version encodée directement dans le HTML (data URI), pour que la page
 // s'affiche entièrement en une seule réponse, sans requêtes séparées que
 // la protection bloquerait.
-async function servePageWithInlinedImages(url, env) {
+async function servePageWithInlinedImages(url, env, target) {
   const pageResponse = await env.ASSETS.fetch(new Request(url.toString(), { method: "GET" }));
   const contentType = pageResponse.headers.get("content-type") || "";
   if (!contentType.includes("text/html")) {
@@ -76,6 +76,16 @@ async function servePageWithInlinedImages(url, env) {
     html = html.replace(new RegExp(`src="${escaped}"`, "g"), `src="${dataUri}"`);
   }
 
+  // Si un lien pointait vers une planche précise (#page-5), on fait défiler
+  // la page jusqu'à cette planche une fois le contenu chargé.
+  if (target && /^#[a-zA-Z0-9_-]+$/.test(target)) {
+    const scrollScript = `<script>document.addEventListener("DOMContentLoaded", function () {
+  var el = document.querySelector(${JSON.stringify(target)});
+  if (el) el.scrollIntoView();
+});</script>`;
+    html = html.replace("</body>", `${scrollScript}</body>`);
+  }
+
   return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
 }
 
@@ -102,11 +112,18 @@ function renderForm(pathname, wrong) {
   <div class="box">
     <h1>Ce livre est protégé</h1>
     ${wrong ? '<p class="err">Code incorrect, réessaie.</p>' : ""}
-    <form method="POST" action="${pathname}">
+    <form method="POST" action="${pathname}" id="access-form">
       <input type="password" name="code" placeholder="Code d'accès" autofocus required>
+      <input type="hidden" name="target" id="target-field" value="">
       <button type="submit">Valider</button>
     </form>
   </div>
+  <script>
+    // Récupère l'ancre éventuelle de l'adresse (ex: #page-5) pour la
+    // transmettre au serveur via le formulaire, puisque les ancres ne sont
+    // normalement jamais envoyées avec une requête.
+    document.getElementById('target-field').value = window.location.hash || "";
+  </script>
 </body>
 </html>`;
   return new Response(html, { status: 401, headers: { "Content-Type": "text/html; charset=utf-8" } });
@@ -131,9 +148,10 @@ export async function onRequest(context) {
   if (request.method === "POST") {
     const form = await request.formData();
     const submitted = form.get("code");
+    const target = form.get("target") || "";
 
     if (submitted === ACCESS_CODE) {
-      return servePageWithInlinedImages(url, env);
+      return servePageWithInlinedImages(url, env, target);
     }
 
     return renderForm(url.pathname, true);
