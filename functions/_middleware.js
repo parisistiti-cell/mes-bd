@@ -14,7 +14,7 @@
 // ===========================================================
 
 // Ajoute ici le slug de chaque BD à protéger (le nom de son dossier).
-const PROTECTED_SLUGS = ["entre-deux-vies", "Tranches-de-vie"];
+const PROTECTED_SLUGS = ["entre-deux-vies", "Tranche-de-vie"];
 
 function isProtectedPath(pathname) {
   return PROTECTED_SLUGS.some((slug) => pathname === `/${slug}` || pathname.startsWith(`/${slug}/`));
