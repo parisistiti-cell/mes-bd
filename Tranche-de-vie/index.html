@@ -192,7 +192,31 @@
   <footer>
     Tranches de vie — mis à jour au fil des chapitres
   </footer>
-
+<script>
+    // N'affiche qu'une seule planche (masque le reste et bloque le
+    // défilement) quand on arrive via un lien direct #page-N.
+    // Pour ce livre (protégé), c'est le middleware qui appelle cette
+    // fonction une fois le code validé, via window.__isolatePage(...).
+    function __isolatePage(target) {
+      if (!target) return;
+      const el = document.querySelector(target);
+      if (!el) return;
+      document.querySelectorAll('.page').forEach((p) => {
+        if (p !== el) p.style.display = 'none';
+      });
+      const hero = document.querySelector('.hero');
+      const caption = document.querySelector('.hero__caption');
+      if (hero) hero.style.display = 'none';
+      if (caption) caption.style.display = 'none';
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+      el.scrollIntoView();
+    }
+    window.__isolatePage = __isolatePage;
+    if (window.location.hash) {
+      document.addEventListener('DOMContentLoaded', () => __isolatePage(window.location.hash));
+    }
+</script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
     async function downloadPDF() {
