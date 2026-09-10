@@ -1,1 +1,252 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ia</title>
+<meta name="description" content="ia.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Karla:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #f2ead9;
+    --cream-deep: #e8dcc3;
+    --ink: #3a2e28;
+    --ink-soft: #6b5c50;
+    --accent: #5a7d5e;
+    --accent-deep: #45624a;
+    --rule: rgba(58, 46, 40, 0.15);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Karla', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    background: rgba(242, 234, 217, 0.92);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--rule);
+  }
+  .topbar__title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.15rem;
+    letter-spacing: 0.02em;
+    color: var(--accent-deep);
+    text-decoration: none;
+  }
+  .topbar__home {
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+    text-decoration: none;
+    border-bottom: 1px solid var(--ink-soft);
+  }
+  .hero {
+    position: relative;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  .hero img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .hero__caption {
+    max-width: 560px;
+    margin: 40px auto 60px;
+    padding: 0 28px;
+    text-align: center;
+  }
+  .hero__caption h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 500;
+    font-size: clamp(2rem, 6vw, 2.6rem);
+    letter-spacing: 0.01em;
+    margin: 0 0 22px;
+    color: var(--accent-deep);
+  }
+  .pdf-btn {
+    font-family: 'Karla', sans-serif;
+    font-size: 0.85rem;
+    color: var(--accent-deep);
+    background: transparent;
+    border: 1px solid var(--accent-deep);
+    border-radius: 20px;
+    padding: 9px 20px;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .pdf-btn:hover:not(:disabled) {
+    background: var(--accent-deep);
+    color: var(--cream);
+  }
+  .pdf-btn:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+  .reader {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 0 100px;
+  }
+  .page {
+    display: block;
+    width: 100%;
+    margin: 0 auto;
+    scroll-margin-top: 64px;
+  }
+  .page img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .placeholder {
+    margin: 20px auto;
+    padding: 48px 28px;
+    max-width: 560px;
+    text-align: center;
+    border: 1px dashed var(--rule);
+    border-radius: 4px;
+    color: var(--ink-soft);
+  }
+  .placeholder p {
+    margin: 0 0 6px;
+    font-size: 0.92rem;
+    line-height: 1.6;
+  }
+  .placeholder ia {
+    background: var(--cream-deep);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.85rem;
+  }
+  footer {
+    text-align: center;
+    padding: 40px 24px 60px;
+    color: var(--ink-soft);
+    font-size: 0.8rem;
+    border-top: 1px solid var(--rule);
+  }
+</style>
+</head>
+<body>
 
+  <nav class="topbar">
+    <a class="topbar__title" href="#top">ia</a>
+    <a class="topbar__home" href="../">Toutes les BD</a>
+  </nav>
+
+  <div id="top"></div>
+
+  <header class="hero">
+    <img src="images/00-couverture.jpg" alt="Couverture — ia">
+  </header>
+
+  <div class="hero__caption">
+    <h1>ia</h1>
+    <button id="pdf-btn" class="pdf-btn" onclick="downloadPDF()">Télécharger en PDF</button>
+  </div>
+
+  <!--
+    ===========================================================
+    AJOUTE TES PLANCHES ICI
+
+    Pour chaque planche : dépose l'image dans le dossier images/
+    puis ajoute un bloc comme celui-ci (en gardant le même ordre
+    que ton histoire). L'attribut id permet un lien direct vers
+    cette planche précise :
+
+    <div class="page" id="page-1">
+      <img src="images/01.jpg" alt="Planche 1">
+    </div>
+
+    Lien vers cette planche : ton-site.pages.dev/Ardeche-2026/#page-1
+    ===========================================================
+  -->
+  <main class="reader">
+
+  <div class="page" id="page-0">
+      <img src="images/00-couverture.jpg" alt="Planche 0">
+    </div>
+<div class="page" id="page-1">
+      <img src="images/01.jpg" alt="Planche 1">
+    </div>
+<div class="page" id="page-2">
+      <img src="images/02.jpg" alt="Planche 2">
+    </div>
+<div class="page" id="page-3">
+      <img src="images/03.jpg" alt="Planche 3">
+    </div>
+<div class="page" id="page-4">
+      <img src="images/04.jpg" alt="Planche 4">
+    </div>
+<div class="page" id="page-5">
+      <img src="images/05.jpg" alt="Planche 5">
+    </div>
+<div class="page" id="page-6">
+      <img src="images/06.jpg" alt="Planche 6">
+    </div>
+
+
+  </main>
+
+  <footer>
+    ia — mis à jour au fil des chapitres
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    async function downloadPDF() {
+      const btn = document.getElementById('pdf-btn');
+      const originalLabel = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Préparation du PDF...';
+      try {
+        const { jsPDF } = window.jspdf;
+        const images = Array.from(document.querySelectorAll('.hero img, .page img'));
+        let doc;
+        for (let i = 0; i < images.length; i++) {
+          const img = images[i];
+          if (!img.complete) {
+            await new Promise((resolve) => { img.onload = resolve; img.onerror = resolve; });
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = img.naturalWidth;
+          canvas.height = img.naturalHeight;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+          const wmm = canvas.width * 0.264583;
+          const hmm = canvas.height * 0.264583;
+          const orientation = wmm > hmm ? 'landscape' : 'portrait';
+          if (i === 0) {
+            doc = new jsPDF({ orientation, unit: 'mm', format: [wmm, hmm] });
+          } else {
+            doc.addPage([wmm, hmm], orientation);
+          }
+          doc.addImage(dataUrl, 'JPEG', 0, 0, wmm, hmm);
+        }
+        doc.save('Ardeche.pdf');
+      } catch (err) {
+        alert("Le PDF n'a pas pu être généré. Réessaie, ou vérifie que toutes les planches sont bien chargées.");
+        console.error(err);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = originalLabel;
+      }
+    }
+  </script>
+
+</body>
+</html>
