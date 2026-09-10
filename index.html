@@ -3,202 +3,264 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mes BD</title>
-<meta name="description" content="Catalogue des bandes dessinées.">
+<title>Tranches de vie</title>
+<meta name="description" content="Tranches de vie.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400&family=Karla:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Karla:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --wood-1: #5a3a26;
-    --wood-2: #6e4a30;
-    --wood-3: #4a2f1e;
     --cream: #f2ead9;
-    --ink-soft: rgba(242, 234, 217, 0.72);
+    --cream-deep: #e8dcc3;
+    --ink: #3a2e28;
+    --ink-soft: #6b5c50;
+    --accent: #4a6b8a;
+    --accent-deep: #37516b;
+    --rule: rgba(58, 46, 40, 0.15);
   }
   * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
   body {
     margin: 0;
-    min-height: 100vh;
-    color: var(--cream);
+    background: var(--cream);
+    color: var(--ink);
     font-family: 'Karla', sans-serif;
     -webkit-font-smoothing: antialiased;
-    background-color: var(--wood-2);
-    background-image: 
-      repeating-linear-gradient(
-        90deg,
-        rgba(0,0,0,0.06) 0px,
-        rgba(0,0,0,0.06) 2px,
-        transparent 2px,
-        transparent 90px
-      ),
-      linear-gradient(180deg, var(--wood-1) 0%, var(--wood-2) 45%, var(--wood-3) 100%);
-    background-blend-mode: multiply, normal;
   }
-  header {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 64px 28px 20px;
-    text-align: center;
-  }
-  header h1 {
-    font-family: 'Cormorant Garamond', serif;
-    font-weight: 600;
-    font-size: clamp(2.1rem, 6vw, 2.8rem);
-    margin: 0 0 8px;
-    letter-spacing: 0.01em;
-  }
-  header p {
-    color: var(--ink-soft);
-    font-size: 0.95rem;
-    margin: 0;
-    font-style: italic;
-  }
-  .table {
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 40px 40px 100px;
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: flex-end;
-    gap: 36px 28px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    background: rgba(242, 234, 217, 0.92);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--rule);
   }
-  .book {
-    display: block;
-    text-decoration: none;
-    width: 180px;
-    transform: rotate(var(--tilt, -2deg));
-    transition: transform 0.2s ease, filter 0.2s ease;
-    filter: drop-shadow(6px 10px 14px rgba(0,0,0,0.45));
-  }
-  .book:hover,
-  .book:focus-visible {
-    transform: rotate(0deg) translateY(-6px);
-    filter: drop-shadow(4px 8px 18px rgba(0,0,0,0.55));
-  }
-  .book__cover {
-    aspect-ratio: 3 / 4.2;
-    border-radius: 2px;
-    overflow: hidden;
-    border: 1px solid rgba(0,0,0,0.35);
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
-  }
-  .book__cover img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  .book__title {
-    display: block;
-    text-align: center;
-    margin-top: 10px;
+  .topbar__title {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 0.95rem;
-    color: var(--cream);
-    opacity: 0.88;
+    font-size: 1.15rem;
+    letter-spacing: 0.02em;
+    color: var(--accent-deep);
+    text-decoration: none;
   }
-  .empty-note {
-    width: 100%;
-    text-align: center;
+  .topbar__home {
+    font-size: 0.8rem;
     color: var(--ink-soft);
+    text-decoration: none;
+    border-bottom: 1px solid var(--ink-soft);
+  }
+  .hero {
+    position: relative;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  .hero img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .hero__caption {
+    max-width: 560px;
+    margin: 40px auto 60px;
+    padding: 0 28px;
+    text-align: center;
+  }
+  .hero__caption h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 500;
+    font-size: clamp(2rem, 6vw, 2.6rem);
+    letter-spacing: 0.01em;
+    margin: 0 0 22px;
+    color: var(--accent-deep);
+  }
+  .pdf-btn {
+    font-family: 'Karla', sans-serif;
     font-size: 0.85rem;
-    font-style: italic;
-    padding: 20px 0;
+    color: var(--accent-deep);
+    background: transparent;
+    border: 1px solid var(--accent-deep);
+    border-radius: 20px;
+    padding: 9px 20px;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .pdf-btn:hover:not(:disabled) {
+    background: var(--accent-deep);
+    color: var(--cream);
+  }
+  .pdf-btn:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+  .reader {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 0 100px;
+  }
+  .page {
+    display: block;
+    width: 100%;
+    margin: 0 auto;
+    scroll-margin-top: 64px;
+  }
+  .page img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .placeholder {
+    margin: 20px auto;
+    padding: 48px 28px;
+    max-width: 560px;
+    text-align: center;
+    border: 1px dashed var(--rule);
+    border-radius: 4px;
+    color: var(--ink-soft);
+  }
+  .placeholder p {
+    margin: 0 0 6px;
+    font-size: 0.92rem;
+    line-height: 1.6;
+  }
+  .placeholder code {
+    background: var(--cream-deep);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.85rem;
+  }
+  footer {
+    text-align: center;
+    padding: 40px 24px 60px;
+    color: var(--ink-soft);
+    font-size: 0.8rem;
+    border-top: 1px solid var(--rule);
   }
 </style>
 </head>
 <body>
-  <header>
-    <h1>BD (Auteur TP et dessins IA diverses)</h1>
-    <p>Choisis un livre sur la table.</p>
+
+  <nav class="topbar">
+    <a class="topbar__title" href="#top">Tranches de vie</a>
+    <a class="topbar__home" href="../">Toutes les BD</a>
+  </nav>
+
+  <div id="top"></div>
+
+  <header class="hero">
+    <img src="images/00-couverture.jpg" alt="Couverture — Tranches de vie">
   </header>
-  <main class="table" id="table"></main>
+
+  <div class="hero__caption">
+    <h1>Tranches de vie</h1>
+    <button id="pdf-btn" class="pdf-btn" onclick="downloadPDF()">Télécharger en PDF</button>
+  </div>
+
+  <!--
+    ===========================================================
+    AJOUTE TES PLANCHES ICI
+
+    Pour chaque planche : dépose l'image dans le dossier images/
+    puis ajoute un bloc comme celui-ci (en gardant le même ordre
+    que ton histoire). L'attribut id permet un lien direct vers
+    cette planche précise :
+
+    <div class="page" id="page-1">
+      <img src="images/01.jpg" alt="Planche 1">
+    </div>
+
+    Lien vers cette planche : ton-site.pages.dev/Tranches-de-vie/#page-1
+    ===========================================================
+  -->
+  <main class="reader">
+
+     <div class="page" id="page-1">
+      <img src="images/00-couverture.jpg" alt="Planche 0">
+    </div>
+    <div class="page" id="page-1">
+      <img src="images/01.jpg" alt="Planche 1">
+    </div>
+    
+    <div class="page" id="page-2">
+      <img src="images/02.jpg" alt="Planche 2">
+    </div>
+
+  </main>
+
+  <footer>
+    Tranches de vie — mis à jour au fil des chapitres
+  </footer>
+
   <script>
-    const books = [
-      {
-        slug: "Ardèche 2026",
-        title: "Ardèche 2026",
-        cover: "Ardèche 2026/images/00-couverture.jpg"
-      },
-      
-      {
-        slug: "code",
-        title: "code",
-        cover: "code/images/00-couverture.jpg"
-      },
-      
-      {
-        slug: "ia",
-        title: "ia",
-        cover: "ia/images/00-couverture.jpg"
-      },
-      {
-        slug: "entre-deux-vies",
-        title: "Entre deux vies",
-        cover: "entre-deux-vies/images/00-couverture.jpg"
-      },
-      {
-        slug: "laffaire-de-la-souris",
-        title: "L'affaire de la souris",
-        cover: "laffaire-de-la-souris/images/00-couverture.jpg"
-      },
-      
-      {
-        slug: "Tranche-de-vie",
-        title: "Tranche de vie",
-        cover: "Tranche-de-vie/images/00-couverture.jpg"
-      },
-      {
-        slug: "reseaux",
-        title: "reseaux",
-        cover: "reseaux/images/00-couverture.jpg"
-      },
-      {
-        slug: "phrases",
-        title: "phrases",
-        cover: "phrases/images/00-couverture.jpg"
-      },
-      
-      {
-        slug: "meca",
-        title: "meca",
-        cover: "meca/images/00-couverture.jpg"
-    }
-    ];
-
-    const tilts = ["-3deg", "2deg", "-1.5deg", "2.5deg", "-2.5deg", "1.5deg"];
-    const table = document.getElementById("table");
-
-    if (books.length === 0) {
-      table.innerHTML = '<p class="empty-note">La table est vide pour l\'instant — la première BD arrive bientôt.</p>';
-    } else {
-      books.forEach((book, i) => {
-        const a = document.createElement("a");
-        a.className = "book";
-        // Utilisation d'un chemin absolu partant de la racine du domaine
-        a.href = window.location.origin + "/" + book.slug + "/";
-        a.style.setProperty("--tilt", tilts[i % tilts.length]);
-
-        const cover = document.createElement("div");
-        cover.className = "book__cover";
-
-        const img = document.createElement("img");
-        img.src = book.cover;
-        img.alt = "Couverture — " + book.title;
-        img.loading = "lazy";
-        cover.appendChild(img);
-
-        const title = document.createElement("span");
-        title.className = "book__title";
-        title.textContent = book.title;
-
-        a.appendChild(cover);
-        a.appendChild(title);
-        table.appendChild(a);
+    // N'affiche qu'une seule planche (masque le reste et bloque le
+    // défilement) quand on arrive via un lien direct #page-N.
+    // Pour ce livre (protégé), c'est le middleware qui appelle cette
+    // fonction une fois le code validé, via window.__isolatePage(...).
+    function __isolatePage(target) {
+      if (!target) return;
+      const el = document.querySelector(target);
+      if (!el) return;
+      document.querySelectorAll('.page').forEach((p) => {
+        if (p !== el) p.style.display = 'none';
       });
+      const hero = document.querySelector('.hero');
+      const caption = document.querySelector('.hero__caption');
+      if (hero) hero.style.display = 'none';
+      if (caption) caption.style.display = 'none';
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+      el.scrollIntoView();
+    }
+    window.__isolatePage = __isolatePage;
+    if (window.location.hash) {
+      document.addEventListener('DOMContentLoaded', () => __isolatePage(window.location.hash));
     }
   </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    async function downloadPDF() {
+      const btn = document.getElementById('pdf-btn');
+      const originalLabel = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Préparation du PDF...';
+      try {
+        const { jsPDF } = window.jspdf;
+        const images = Array.from(document.querySelectorAll('.hero img, .page img'));
+        let doc;
+        for (let i = 0; i < images.length; i++) {
+          const img = images[i];
+          if (!img.complete) {
+            await new Promise((resolve) => { img.onload = resolve; img.onerror = resolve; });
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = img.naturalWidth;
+          canvas.height = img.naturalHeight;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+          const wmm = canvas.width * 0.264583;
+          const hmm = canvas.height * 0.264583;
+          const orientation = wmm > hmm ? 'landscape' : 'portrait';
+          if (i === 0) {
+            doc = new jsPDF({ orientation, unit: 'mm', format: [wmm, hmm] });
+          } else {
+            doc.addPage([wmm, hmm], orientation);
+          }
+          doc.addImage(dataUrl, 'JPEG', 0, 0, wmm, hmm);
+        }
+        doc.save('Tranches de vie.pdf');
+      } catch (err) {
+        alert("Le PDF n'a pas pu être généré. Réessaie, ou vérifie que toutes les planches sont bien chargées.");
+        console.error(err);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = originalLabel;
+      }
+    }
+  </script>
+
 </body>
 </html>
