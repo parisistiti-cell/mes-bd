@@ -61,29 +61,64 @@ function renderForm(pathname, wrong) {
   body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
          background: #2f2a25; font-family: -apple-system, sans-serif; }
   .box { background: #f2ead9; padding: 40px 32px; border-radius: 8px; max-width: 320px; width: 90%; text-align: center; }
-  h1 { font-size: 1.1rem; margin: 0 0 18px; color: #2f2a25; }
-  input[type=password] { width: 100%; padding: 10px 12px; font-size: 1rem; border: 1px solid #ccc;
-                          border-radius: 6px; box-sizing: border-box; margin-bottom: 14px; }
-  button { width: 100%; padding: 10px; font-size: 1rem; background: #9c4a47; color: #f2ead9;
+  h1 { font-size: 1.1rem; margin: 0 0 18px; color: #2f2a25; display: flex; align-items: center;
+       justify-content: center; gap: 8px; }
+  h1 svg { flex-shrink: 0; }
+  .field { position: relative; margin-bottom: 14px; }
+  input[type=password], input[type=text].code-input {
+    width: 100%; padding: 10px 44px 10px 12px; font-size: 1rem; border: 1px solid #ccc;
+    border-radius: 6px; box-sizing: border-box; font-family: inherit;
+  }
+  .toggle-btn {
+    position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; cursor: pointer; padding: 6px;
+    display: flex; align-items: center; justify-content: center; color: #6b5c50;
+  }
+  .toggle-btn:hover { color: #2f2a25; }
+  button.submit-btn { width: 100%; padding: 10px; font-size: 1rem; background: #9c4a47; color: #f2ead9;
            border: none; border-radius: 6px; cursor: pointer; }
   .err { color: #9c4a47; font-size: 0.85rem; margin-bottom: 12px; }
 </style>
 </head>
 <body>
   <div class="box">
-    <h1>Ce livre est protégé</h1>
+    <h1>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="8" cy="15" r="4"></circle>
+        <path d="M10.5 12.5L20 3M20 3h-4M20 3v4"></path>
+      </svg>
+      Ce livre est protégé
+    </h1>
     ${wrong ? '<p class="err">Code incorrect, réessaie.</p>' : ""}
     <form method="POST" action="${pathname}" id="access-form">
-      <input type="password" name="code" placeholder="Code d'accès" autofocus required>
+      <div class="field">
+        <input type="password" name="code" id="code-input" placeholder="Code d'accès" autofocus required>
+        <button type="button" class="toggle-btn" id="toggle-btn" aria-label="Afficher le code">
+          <svg id="eye-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        </button>
+      </div>
       <input type="hidden" name="target" id="target-field" value="">
-      <button type="submit">Valider</button>
+      <button type="submit" class="submit-btn">Valider</button>
     </form>
   </div>
   <script>
-    // Récupère l'ancre éventuelle de l'adresse (ex: #page-5) pour la
-    // transmettre au serveur via le formulaire, puisque les ancres ne sont
-    // normalement jamais envoyées avec une requête.
     document.getElementById('target-field').value = window.location.hash || "";
+
+    const codeInput = document.getElementById('code-input');
+    const toggleBtn = document.getElementById('toggle-btn');
+    const eyeIcon = document.getElementById('eye-icon');
+    const eyeOpen = '<path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path><circle cx="12" cy="12" r="3"></circle>';
+    const eyeClosed = '<path d="M17.94 17.94A10.94 10.94 0 0112 19c-7 0-11-7-11-7a18.5 18.5 0 015.06-5.94M9.9 4.24A10.94 10.94 0 0112 4c7 0 11 7 11 7a18.5 18.5 0 01-2.16 3.19M14.12 14.12a3 3 0 11-4.24-4.24"></path><path d="M1 1l22 22"></path>';
+    toggleBtn.addEventListener('click', () => {
+      const isPassword = codeInput.type === 'password';
+      codeInput.type = isPassword ? 'text' : 'password';
+      codeInput.classList.toggle('code-input', isPassword);
+      eyeIcon.innerHTML = isPassword ? eyeClosed : eyeOpen;
+      toggleBtn.setAttribute('aria-label', isPassword ? 'Masquer le code' : 'Afficher le code');
+    });
   </script>
 </body>
 </html>`;
