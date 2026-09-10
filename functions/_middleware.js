@@ -5,8 +5,10 @@
 // - Le code correct est défini par la variable d'environnement ACCESS_CODE
 //   (à configurer dans le dashboard Cloudflare, jamais dans ce fichier).
 // - Aucun cookie n'est posé : le code est redemandé systématiquement à
-//   chaque nouvelle visite d'un livre protégé, même si tu l'as déjà
-//   entré une minute avant.
+//   chaque nouvelle visite d'un livre protégé.
+// - Une fois le bon code entré, la page (titre + planches) est renvoyée
+//   directement en une seule réponse, images comprises (intégrées dans le
+//   HTML), pour que rien ne redemande le code en cours de route.
 // - La vérification se fait entièrement côté serveur (Cloudflare) : le code
 //   n'est jamais visible dans le code source envoyé au navigateur.
 // ===========================================================
@@ -16,6 +18,57 @@ const PROTECTED_SLUGS = ["entre-deux-vies"];
 
 function isProtectedPath(pathname) {
   return PROTECTED_SLUGS.some((slug) => pathname === `/${slug}` || pathname.startsWith(`/${slug}/`));
+}
+
+function arrayBufferToBase64(buffer) {
+  const bytes = new Uint8Array(buffer);
+  let binary = "";
+  const chunkSize = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunkSize));
+  }
+  return btoa(binary);
+}
+
+// Récupère la page HTML demandée et remplace chaque image locale par sa
+// version encodée directement dans le HTML (data URI), pour que la page
+// s'affiche entièrement en une seule réponse, sans requêtes séparées que
+// la protection bloquerait.
+async function servePageWithInlinedImages(url, env) {
+  const pageResponse = await env.ASSETS.fetch(new Request(url.toString(), { method: "GET" }));
+  const contentType = pageResponse.headers.get("content-type") || "";
+  if (!contentType.includes("text/html")) {
+    return pageResponse;
+  }
+
+  let html = await pageResponse.text();
+  const imgRegex = /src="([^":]+\.(?:jpg|jpeg|png|gif|webp))"/gi;
+  const sources = [...new Set([...html.matchAll(imgRegex)].map((m) => m[1]))]
+    .filter((src) => !/^(https?:)?\/\//i.test(src));
+
+  const inlined = await Promise.all(
+    sources.map(async (src) => {
+      try {
+        const assetUrl = new URL(src, url).toString();
+        const imgRes = await env.ASSETS.fetch(new Request(assetUrl));
+        if (!imgRes.ok) return null;
+        const buffer = await imgRes.arrayBuffer();
+        const mime = imgRes.headers.get("content-type") || "image/jpeg";
+        return [src, `data:${mime};base64,${arrayBufferToBase64(buffer)}`];
+      } catch {
+        return null;
+      }
+    })
+  );
+
+  for (const entry of inlined) {
+    if (!entry) continue;
+    const [src, dataUri] = entry;
+    const escaped = src.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    html = html.replace(new RegExp(`src="${escaped}"`, "g"), `src="${dataUri}"`);
+  }
+
+  return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
 }
 
 function renderForm(pathname, wrong) {
@@ -72,11 +125,7 @@ export async function onRequest(context) {
     const submitted = form.get("code");
 
     if (submitted === ACCESS_CODE) {
-      // Code correct : on sert directement le contenu de la page pour
-      // cette visite, sans poser de cookie. La prochaine visite redemandera
-      // le code depuis le début.
-      const getRequest = new Request(url.toString(), { method: "GET", headers: request.headers });
-      return next(getRequest);
+      return servePageWithInlinedImages(url, env);
     }
 
     return renderForm(url.pathname, true);
