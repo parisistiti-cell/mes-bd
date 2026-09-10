@@ -129,11 +129,10 @@ export async function onRequest(context) {
       let html = await pageResponse.text();
 
       if (target && /^#[a-zA-Z0-9_-]+$/.test(target)) {
-        const scrollScript = `<script>document.addEventListener("DOMContentLoaded", function () {
-  var el = document.querySelector(${JSON.stringify(target)});
-  if (el) el.scrollIntoView();
+        const isolateScript = `<script>document.addEventListener("DOMContentLoaded", function () {
+  if (window.__isolatePage) { window.__isolatePage(${JSON.stringify(target)}); }
 });</script>`;
-        html = html.replace("</body>", `${scrollScript}</body>`);
+        html = html.replace("</body>", `${isolateScript}</body>`);
       }
 
       const headers = new Headers({ "Content-Type": "text/html; charset=utf-8" });
