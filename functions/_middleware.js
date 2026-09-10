@@ -20,6 +20,14 @@ function isProtectedPath(pathname) {
   return PROTECTED_SLUGS.some((slug) => pathname === `/${slug}` || pathname.startsWith(`/${slug}/`));
 }
 
+// La couverture (00-couverture.jpg) reste toujours visible, même pour une BD
+// protégée : c'est elle qui s'affiche sur la table d'accueil, avant que le
+// visiteur ait choisi un livre. Tout le reste (la page de lecture, les
+// planches) reste protégé normalement.
+function isPublicCover(pathname) {
+  return /\/images\/00-couverture\.jpg$/i.test(pathname);
+}
+
 function arrayBufferToBase64(buffer) {
   const bytes = new Uint8Array(buffer);
   let binary = "";
@@ -108,7 +116,7 @@ export async function onRequest(context) {
   const { request, next, env } = context;
   const url = new URL(request.url);
 
-  if (!isProtectedPath(url.pathname)) {
+  if (!isProtectedPath(url.pathname) || isPublicCover(url.pathname)) {
     return next();
   }
 
