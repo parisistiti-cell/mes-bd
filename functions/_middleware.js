@@ -4,11 +4,11 @@
 // Comment ça marche :
 // - Le code correct est défini par la variable d'environnement ACCESS_CODE
 //   (à configurer dans le dashboard Cloudflare, jamais dans ce fichier).
-// - Aucun cookie n'est posé : le code est redemandé systématiquement à
-//   chaque nouvelle visite d'un livre protégé.
-// - Une fois le bon code entré, la page (titre + planches) est renvoyée
-//   directement en une seule réponse, images comprises (intégrées dans le
-//   HTML), pour que rien ne redemande le code en cours de route.
+// - La page du livre elle-même redemande TOUJOURS le code à chaque visite.
+// - Une fois le bon code entré, un cookie très temporaire (5 minutes) est
+//   posé pour laisser les images de PLANCHES de cette page se charger
+//   normalement, sans redemander le code à chaque image. Passé ce délai,
+//   ou lors d'une nouvelle visite, le code est de nouveau demandé.
 // - La vérification se fait entièrement côté serveur (Cloudflare) : le code
 //   n'est jamais visible dans le code source envoyé au navigateur.
 // ===========================================================
@@ -16,77 +16,38 @@
 // Ajoute ici le slug de chaque BD à protéger (le nom de son dossier).
 const PROTECTED_SLUGS = ["entre-deux-vies", "Tranches-de-vie"];
 
+const COOKIE_NAME = "bd_temp_access";
+const COOKIE_MAX_AGE = 300; // 5 minutes, juste le temps de charger la page
+
 function isProtectedPath(pathname) {
   return PROTECTED_SLUGS.some((slug) => pathname === `/${slug}` || pathname.startsWith(`/${slug}/`));
 }
 
-// La couverture (00-couverture.jpg) reste toujours visible, même pour une BD
-// protégée : c'est elle qui s'affiche sur la table d'accueil, avant que le
-// visiteur ait choisi un livre. Tout le reste (la page de lecture, les
-// planches) reste protégé normalement.
+// La couverture reste toujours visible, même pour une BD protégée : c'est
+// elle qui s'affiche sur la table d'accueil, avant que le visiteur choisisse
+// un livre. Tout le reste (page de lecture, planches) reste protégé.
 function isPublicCover(pathname) {
   return /\/images\/00-couverture\.jpg$/i.test(pathname);
 }
 
-function arrayBufferToBase64(buffer) {
-  const bytes = new Uint8Array(buffer);
-  let binary = "";
-  const chunkSize = 0x8000;
-  for (let i = 0; i < bytes.length; i += chunkSize) {
-    binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunkSize));
-  }
-  return btoa(binary);
+// Une planche ou toute autre image du livre (pas la page HTML elle-même).
+function isImageAsset(pathname) {
+  return /\.(jpe?g|png|gif|webp)$/i.test(pathname);
 }
 
-// Récupère la page HTML demandée et remplace chaque image locale par sa
-// version encodée directement dans le HTML (data URI), pour que la page
-// s'affiche entièrement en une seule réponse, sans requêtes séparées que
-// la protection bloquerait.
-async function servePageWithInlinedImages(url, env, target) {
-  const pageResponse = await env.ASSETS.fetch(new Request(url.toString(), { method: "GET" }));
-  const contentType = pageResponse.headers.get("content-type") || "";
-  if (!contentType.includes("text/html")) {
-    return pageResponse;
-  }
-
-  let html = await pageResponse.text();
-  const imgRegex = /src="([^":]+\.(?:jpg|jpeg|png|gif|webp))"/gi;
-  const sources = [...new Set([...html.matchAll(imgRegex)].map((m) => m[1]))]
-    .filter((src) => !/^(https?:)?\/\//i.test(src));
-
-  const inlined = await Promise.all(
-    sources.map(async (src) => {
-      try {
-        const assetUrl = new URL(src, url).toString();
-        const imgRes = await env.ASSETS.fetch(new Request(assetUrl));
-        if (!imgRes.ok) return null;
-        const buffer = await imgRes.arrayBuffer();
-        const mime = imgRes.headers.get("content-type") || "image/jpeg";
-        return [src, `data:${mime};base64,${arrayBufferToBase64(buffer)}`];
-      } catch {
-        return null;
-      }
-    })
+async function sign(secret, value) {
+  const enc = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    "raw", enc.encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]
   );
+  const sig = await crypto.subtle.sign("HMAC", key, enc.encode(value));
+  return Array.from(new Uint8Array(sig)).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
 
-  for (const entry of inlined) {
-    if (!entry) continue;
-    const [src, dataUri] = entry;
-    const escaped = src.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    html = html.replace(new RegExp(`src="${escaped}"`, "g"), `src="${dataUri}"`);
-  }
-
-  // Si un lien pointait vers une planche précise (#page-5), on fait défiler
-  // la page jusqu'à cette planche une fois le contenu chargé.
-  if (target && /^#[a-zA-Z0-9_-]+$/.test(target)) {
-    const scrollScript = `<script>document.addEventListener("DOMContentLoaded", function () {
-  var el = document.querySelector(${JSON.stringify(target)});
-  if (el) el.scrollIntoView();
-});</script>`;
-    html = html.replace("</body>", `${scrollScript}</body>`);
-  }
-
-  return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
+function getCookie(request, name) {
+  const cookie = request.headers.get("Cookie") || "";
+  const match = cookie.match(new RegExp("(?:^|; )" + name + "=([^;]*)"));
+  return match ? decodeURIComponent(match[1]) : null;
 }
 
 function renderForm(pathname, wrong) {
@@ -145,13 +106,42 @@ export async function onRequest(context) {
     );
   }
 
+  const expectedToken = await sign(ACCESS_CODE, "granted");
+
+  // Planches et autres images : on vérifie juste le cookie temporaire posé
+  // au moment où le code a été validé pour cette page.
+  if (isImageAsset(url.pathname)) {
+    const token = getCookie(request, COOKIE_NAME);
+    if (token === expectedToken) {
+      return next();
+    }
+    return new Response("Accès refusé", { status: 403 });
+  }
+
+  // La page de lecture elle-même : toujours redemander le code.
   if (request.method === "POST") {
     const form = await request.formData();
     const submitted = form.get("code");
     const target = form.get("target") || "";
 
     if (submitted === ACCESS_CODE) {
-      return servePageWithInlinedImages(url, env, target);
+      const pageResponse = await env.ASSETS.fetch(new Request(url.toString(), { method: "GET" }));
+      let html = await pageResponse.text();
+
+      if (target && /^#[a-zA-Z0-9_-]+$/.test(target)) {
+        const scrollScript = `<script>document.addEventListener("DOMContentLoaded", function () {
+  var el = document.querySelector(${JSON.stringify(target)});
+  if (el) el.scrollIntoView();
+});</script>`;
+        html = html.replace("</body>", `${scrollScript}</body>`);
+      }
+
+      const headers = new Headers({ "Content-Type": "text/html; charset=utf-8" });
+      headers.append(
+        "Set-Cookie",
+        `${COOKIE_NAME}=${expectedToken}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${COOKIE_MAX_AGE}`
+      );
+      return new Response(html, { headers });
     }
 
     return renderForm(url.pathname, true);
