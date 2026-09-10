@@ -216,6 +216,11 @@
     if (window.location.hash) {
       document.addEventListener('DOMContentLoaded', () => __isolatePage(window.location.hash));
     }
+   // Cas où la page serait consultée sans passer par le code (ne devrait
+    // pas arriver pour un livre protégé, mais gardé par cohérence).
+    if (window.location.hash) {
+      document.addEventListener('DOMContentLoaded', () => __isolatePage(window.location.hash));
+    }
 </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
