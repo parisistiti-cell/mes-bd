@@ -172,7 +172,10 @@
 
   <nav class="topbar">
     <a class="topbar__title" href="#top">tp</a>
-    <a class="topbar__home" href="../" style="font-size:0.8rem;color:var(--ink-soft);text-decoration:none;border-bottom:1px solid var(--ink-soft);">Toutes les BD</a>
+    <div style="display: flex; align-items: center; gap: 16px;">
+      <span id="progress" class="topbar__progress">0%</span>
+      <a class="topbar__home" href="../" style="font-size:0.8rem;color:var(--ink-soft);text-decoration:none;border-bottom:1px solid var(--ink-soft);">Toutes les BD</a>
+    </div>
   </nav>
 
   <div id="top"></div>
@@ -183,24 +186,9 @@
 
   <div class="hero__caption">
     <h1>tp</h1>
-    
     <button id="pdf-btn" class="pdf-btn" onclick="downloadPDF()">Télécharger en PDF</button>
   </div>
 
-  <!--
-    ===========================================================
-    AJOUTE TES PLANCHES ICI
-
-    Pour chaque planche : dépose l'image dans le dossier images/
-    puis ajoute un bloc comme celui-ci (en gardant le même ordre
-    que ton histoire). N'oublie pas l'attribut id (ex: id="page-51")
-    pour que les liens directs vers cette planche fonctionnent :
-
-    <div class="page" id="page-51">
-      <img src="images/51.jpg" alt="Planche 51">
-    </div>
-    ===========================================================
-  -->
   <main class="reader">
     <div class="page" id="page-00">
       <img src="images/00-couverture.jpg" alt="Planche 0">
@@ -235,7 +223,7 @@
     </div>
 
     <div class="page" id="page-08">
-      <img src="images/08.jpg" alt="Planche 8">
+      <img src="images/08.jpg" alt="Planche 08">
     </div>
 
     <div class="page" id="page-09">
@@ -258,7 +246,6 @@
       <img src="images/13.jpg" alt="Planche 13">
     </div>
 
-  
     <div class="page" id="page-14">
       <img src="images/14.jpg" alt="Planche 14">
     </div>
@@ -274,8 +261,6 @@
     <div class="page" id="page-17">
       <img src="images/17.jpg" alt="Planche 17">
     </div>
-
-   
   </main>
 
   <footer>
@@ -285,6 +270,7 @@
   <script>
     const progressEl = document.getElementById('progress');
     function updateProgress() {
+      if (!progressEl) return;
       const scrollTop = window.scrollY;
       const docHeight = document.documentElement.scrollHeight - window.innerHeight;
       const pct = docHeight > 0 ? Math.round((scrollTop / docHeight) * 100) : 0;
@@ -293,8 +279,6 @@
     window.addEventListener('scroll', updateProgress, { passive: true });
     updateProgress();
   </script>
-
- 
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
@@ -306,14 +290,21 @@
 
       try {
         const { jsPDF } = window.jspdf;
-        const images = Array.from(document.querySelectorAll('.hero img, .page img'));
+        // On cible uniquement les images à l'intérieur de .reader pour éviter les doublons
+        const images = Array.from(document.querySelectorAll('.reader .page img'));
         let doc;
 
         for (let i = 0; i < images.length; i++) {
           const img = images[i];
-          if (!img.complete) {
-            await new Promise((resolve) => { img.onload = resolve; img.onerror = resolve; });
+          if (!img.complete || img.naturalWidth === 0) {
+            await new Promise((resolve) => { 
+              img.onload = resolve; 
+              img.onerror = resolve; 
+            });
           }
+
+          if (img.naturalWidth === 0 || img.naturalHeight === 0) continue;
+
           const canvas = document.createElement('canvas');
           canvas.width = img.naturalWidth;
           canvas.height = img.naturalHeight;
@@ -325,7 +316,7 @@
           const hmm = canvas.height * 0.264583;
           const orientation = wmm > hmm ? 'landscape' : 'portrait';
 
-          if (i === 0) {
+          if (!doc) {
             doc = new jsPDF({ orientation, unit: 'mm', format: [wmm, hmm] });
           } else {
             doc.addPage([wmm, hmm], orientation);
@@ -333,7 +324,11 @@
           doc.addImage(dataUrl, 'JPEG', 0, 0, wmm, hmm);
         }
 
-        doc.save('tp.pdf');
+        if (doc) {
+          doc.save('tp.pdf');
+        } else {
+          throw new Error("Aucune image valide trouvée pour générer le PDF.");
+        }
       } catch (err) {
         alert("Le PDF n'a pas pu être généré. Réessaie, ou vérifie que toutes les planches sont bien chargées.");
         console.error(err);
@@ -343,6 +338,9 @@
       }
     }
   </script>
+
+</body>
+</html>
 
 </body>
 </html>
