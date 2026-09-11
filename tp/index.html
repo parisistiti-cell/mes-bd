@@ -235,7 +235,7 @@
     </div>
 
     <div class="page" id="page-08">
-      <img src="images/09.jpg" alt="Planche 8">
+      <img src="images/08.jpg" alt="Planche 8">
     </div>
 
     <div class="page" id="page-09">
@@ -255,13 +255,10 @@
     </div>
 
     <div class="page" id="page-13">
-      <img src="images/13.jpg" alt="Planche 27">
+      <img src="images/13.jpg" alt="Planche 13">
     </div>
 
-    <div class="page" id="page-29">
-      <img src="images/29.jpg" alt="Planche 13">
-    </div>
-
+  
     <div class="page" id="page-14">
       <img src="images/14.jpg" alt="Planche 14">
     </div>
@@ -275,7 +272,7 @@
     </div>
 
     <div class="page" id="page-17">
-      <img src="images/7.jpg" alt="Planche 17">
+      <img src="images/17.jpg" alt="Planche 17">
     </div>
 
    
@@ -297,36 +294,7 @@
     updateProgress();
   </script>
 
-  <script>
-    // N'affiche qu'une seule planche (masque le reste et bloque le
-    // défilement) quand on arrive via un lien direct #page-N.
-    function __isolatePage(target) {
-      if (!target) return;
-      const el = document.querySelector(target);
-      if (!el) return;
-      document.querySelectorAll('.page').forEach((p) => {
-        if (p !== el) p.style.display = 'none';
-      });
-      const hero = document.querySelector('.hero');
-      const caption = document.querySelector('.hero__caption');
-      if (hero) hero.style.display = 'none';
-      if (caption) caption.style.display = 'none';
-      document.body.style.overflow = 'hidden';
-      document.documentElement.style.overflow = 'hidden';
-      el.scrollIntoView();
-    }
-    window.__isolatePage = __isolatePage;
-    if (window.location.hash) {
-      document.addEventListener('DOMContentLoaded', () => __isolatePage(window.location.hash));
-    }
-  </script>
-
-    // Cas où la page serait consultée sans passer par le code (ne devrait
-    // pas arriver pour un livre protégé, mais gardé par cohérence).
-    if (window.location.hash) {
-      document.addEventListener('DOMContentLoaded', () => __isolatePage(window.location.hash));
-    }
-  </script>
+ 
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
