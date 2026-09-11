@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mes BD</title>
+<meta name="description" content="Catalogue des bandes dessinées.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400&family=Karla:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --wood-1: #5a3a26;
+    --wood-2: #6e4a30;
+    --wood-3: #4a2f1e;
+    --cream: #f2ead9;
+    --ink-soft: rgba(242, 234, 217, 0.72);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    color: var(--cream);
+    font-family: 'Karla', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    background-color: var(--wood-2);
+    background-image: 
+      repeating-linear-gradient(
+        90deg,
+        rgba(0,0,0,0.06) 0px,
+        rgba(0,0,0,0.06) 2px,
+        transparent 2px,
+        transparent 90px
+      ),
+      linear-gradient(180deg, var(--wood-1) 0%, var(--wood-2) 45%, var(--wood-3) 100%);
+    background-blend-mode: multiply, normal;
+  }
+  header {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 64px 28px 20px;
+    text-align: center;
+  }
+  header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 600;
+    font-size: clamp(2.1rem, 6vw, 2.8rem);
+    margin: 0 0 8px;
+    letter-spacing: 0.01em;
+  }
+  header p {
+    color: var(--ink-soft);
+    font-size: 0.95rem;
+    margin: 0;
+    font-style: italic;
+  }
+  .table {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 40px 40px 100px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 36px 28px;
+  }
+  .book {
+    display: block;
+    text-decoration: none;
+    width: 180px;
+    transform: rotate(var(--tilt, -2deg));
+    transition: transform 0.2s ease, filter 0.2s ease;
+    filter: drop-shadow(6px 10px 14px rgba(0,0,0,0.45));
+  }
+  .book:hover,
+  .book:focus-visible {
+    transform: rotate(0deg) translateY(-6px);
+    filter: drop-shadow(4px 8px 18px rgba(0,0,0,0.55));
+  }
+  .book__cover {
+    aspect-ratio: 3 / 4.2;
+    border-radius: 2px;
+    overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.35);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
+  }
+  .book__cover img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .book__title {
+    display: block;
+    text-align: center;
+    margin-top: 10px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.95rem;
+    color: var(--cream);
+    opacity: 0.88;
+  }
+  .empty-note {
+    width: 100%;
+    text-align: center;
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+    font-style: italic;
+    padding: 20px 0;
+  }
+</style>
+</head>
+<body>
+  <header>
+    <h1>Mes BD</h1>
+    <p>Choisis un livre sur la table.</p>
+  </header>
+  <main class="table" id="table"></main>
+  <script>
+    const books = [
+      {
+        slug: "Ardèche 2026",
+        title: "Ardèche 2026",
+        cover: "Ardèche 2026/images/00-couverture.jpg"
+      },
+      {
+        slug: "entre-deux-vies",
+        title: "Entre deux vies",
+        cover: "entre-deux-vies/images/00-couverture.jpg"
+      },
+      {
+        slug: "laffaire-de-la-souris",
+        title: "L'affaire de la souris",
+        cover: "laffaire-de-la-souris/images/00-couverture.jpg"
+      },
+      {
+        slug: "Tranche-de-vie",
+        title: "Tranches de vie",
+        cover: "Tranche-de-vie/images/00-couverture.jpg"
+      }
+    ];
+
+    const tilts = ["-3deg", "2deg", "-1.5deg", "2.5deg", "-2.5deg", "1.5deg"];
+    const table = document.getElementById("table");
+
+    if (books.length === 0) {
+      table.innerHTML = '<p class="empty-note">La table est vide pour l\'instant — la première BD arrive bientôt.</p>';
+    } else {
+      books.forEach((book, i) => {
+        const a = document.createElement("a");
+        a.className = "book";
+        // Utilisation d'un chemin absolu partant de la racine du domaine
+        a.href = window.location.origin + "/" + encodeURIComponent(book.slug) + "/";
+        a.style.setProperty("--tilt", tilts[i % tilts.length]);
+
+        const cover = document.createElement("div");
+        cover.className = "book__cover";
+
+        const img = document.createElement("img");
+        img.src = encodeURI(book.cover);
+        img.alt = "Couverture — " + book.title;
+        img.loading = "lazy";
+        cover.appendChild(img);
+
+        const title = document.createElement("span");
+        title.className = "book__title";
+        title.textContent = book.title;
+
+        a.appendChild(cover);
+        a.appendChild(title);
+        table.appendChild(a);
+      });
+    }
+  </script>
+</body>
+</html>
