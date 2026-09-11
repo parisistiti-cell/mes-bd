@@ -300,8 +300,6 @@
   <script>
     // N'affiche qu'une seule planche (masque le reste et bloque le
     // défilement) quand on arrive via un lien direct #page-N.
-    // Pour ce livre (protégé), c'est le middleware qui appelle cette
-    // fonction une fois le code validé, via window.__isolatePage(...).
     function __isolatePage(target) {
       if (!target) return;
       const el = document.querySelector(target);
@@ -318,6 +316,10 @@
       el.scrollIntoView();
     }
     window.__isolatePage = __isolatePage;
+    if (window.location.hash) {
+      document.addEventListener('DOMContentLoaded', () => __isolatePage(window.location.hash));
+    }
+  </script>
 
     // Cas où la page serait consultée sans passer par le code (ne devrait
     // pas arriver pour un livre protégé, mais gardé par cohérence).
