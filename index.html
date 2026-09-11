@@ -111,16 +111,17 @@
 </head>
 <body>
   <header>
-    <h1>Mes BD</h1>
+    <h1>Des Bandes Dessinées</h1>
+    <h1>(Auteur TP, Illustrations IA diverses,)</h1>
     <p>Choisis un livre sur la table.</p>
   </header>
   <main class="table" id="table"></main>
   <script>
     const books = [
       {
-        slug: "Ardèche 2026",
+        slug: "Ardeche-2026",
         title: "Ardèche 2026",
-        cover: "Ardèche 2026/images/00-couverture.jpg"
+        cover: "Ardeche-2026/images/00-couverture.jpg"
       },
       {
         slug: "entre-deux-vies",
@@ -133,9 +134,39 @@
         cover: "laffaire-de-la-souris/images/00-couverture.jpg"
       },
       {
+        slug: "avance",
+        title: "avance",
+        cover: "avance/images/00-couverture.jpg"
+      },
+      {
+        slug: "code",
+        title: "code",
+        cover: "code/images/00-couverture.jpg"
+      },
+      {
+        slug: "ia",
+        title: "ia",
+        cover: "ia/images/00-couverture.jpg"
+      },
+      {
         slug: "Tranche-de-vie",
-        title: "Tranches de vie",
+        title: "Tranche de vie",
         cover: "Tranche-de-vie/images/00-couverture.jpg"
+      },
+      {
+        slug: "meca",
+        title: "meca",
+        cover: "meca/images/00-couverture.jpg"
+      },
+      {
+        slug: "phrases",
+        title: "phrases",
+        cover: "phrases/images/00-couverture.jpg"
+      },
+      {
+        slug: "reseaux",
+        title: "reseaux",
+        cover: "reseaux/images/00-couverture.jpg"
       }
     ];
 
@@ -148,7 +179,6 @@
       books.forEach((book, i) => {
         const a = document.createElement("a");
         a.className = "book";
-        // Utilisation d'un chemin absolu partant de la racine du domaine
         a.href = window.location.origin + "/" + encodeURIComponent(book.slug) + "/";
         a.style.setProperty("--tilt", tilts[i % tilts.length]);
 
