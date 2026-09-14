@@ -111,26 +111,6 @@
     width: 100%;
     height: auto;
   }
-  .placeholder {
-    margin: 20px auto;
-    padding: 48px 28px;
-    max-width: 560px;
-    text-align: center;
-    border: 1px dashed var(--rule);
-    border-radius: 4px;
-    color: var(--ink-soft);
-  }
-  .placeholder p {
-    margin: 0 0 6px;
-    font-size: 0.92rem;
-    line-height: 1.6;
-  }
-  .placeholder code {
-    background: var(--cream-deep);
-    padding: 2px 6px;
-    border-radius: 3px;
-    font-size: 0.85rem;
-  }
   footer {
     text-align: center;
     padding: 40px 24px 60px;
@@ -167,27 +147,26 @@
     que ton histoire). L'attribut id permet un lien direct vers
     cette planche précise :
 
-    <div class="page" id="page-1">
-      <img src="images/01.jpg" alt="Planche 1">
+    <div class="page" id="page-03">
+      <img src="images/03.jpg" alt="Planche 3">
     </div>
 
-    Lien vers cette planche : ton-site.pages.dev/Ardeche-2026/#page-1
+    Lien vers cette planche : ton-site.pages.dev/Ardeche-2026/#page-03
     ===========================================================
   -->
   <main class="reader">
 
-   <div class="page" id="page-00">
+    <div class="page" id="page-00">
       <img src="images/00-couverture.jpg" alt="Planche 0">
     </div>
-    
+
     <div class="page" id="page-01">
       <img src="images/01.jpg" alt="Planche 1">
     </div>
-    
+
     <div class="page" id="page-02">
       <img src="images/02.jpg" alt="Planche 2">
     </div>
-
 
   </main>
 
@@ -196,8 +175,6 @@
   </footer>
 
   <script>
-    // N'affiche qu'une seule planche (masque le reste et bloque le
-    // défilement) quand on arrive via un lien direct #page-N.
     function __isolatePage(target) {
       if (!target) return;
       const el = document.querySelector(target);
@@ -209,13 +186,80 @@
       const caption = document.querySelector('.hero__caption');
       if (hero) hero.style.display = 'none';
       if (caption) caption.style.display = 'none';
+      const pager = document.querySelector('.pager-controls');
+      if (pager) pager.remove();
       document.body.style.overflow = 'hidden';
       document.documentElement.style.overflow = 'hidden';
       el.scrollIntoView();
     }
     window.__isolatePage = __isolatePage;
+
     if (window.location.hash) {
+      // Lien partagé vers une planche précise : reste verrouillé dessus,
+      // sans navigation possible.
       document.addEventListener('DOMContentLoaded', () => __isolatePage(window.location.hash));
+    } else {
+      // Lecture normale : une planche à la fois, avec précédent/suivant.
+      document.addEventListener('DOMContentLoaded', () => {
+        const pages = Array.from(document.querySelectorAll('.reader .page'));
+        if (pages.length === 0) return;
+
+        let current = 0;
+
+        const style = document.createElement('style');
+        style.textContent = `
+          .pager-controls {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 14px; align-items: center; z-index: 30;
+            background: rgba(30,26,22,0.82); backdrop-filter: blur(6px);
+            padding: 8px 18px; border-radius: 30px; color: #f2ead9;
+            font-family: -apple-system, sans-serif; font-size: 0.85rem;
+          }
+          .pager-btn {
+            background: none; border: none; color: #f2ead9; font-size: 1.3rem;
+            cursor: pointer; padding: 2px 10px; line-height: 1;
+          }
+          .pager-btn:disabled { opacity: 0.3; cursor: default; }
+        `;
+        document.head.appendChild(style);
+
+        const controls = document.createElement('div');
+        controls.className = 'pager-controls';
+
+        const prevBtn = document.createElement('button');
+        prevBtn.className = 'pager-btn';
+        prevBtn.textContent = '‹';
+        prevBtn.setAttribute('aria-label', 'Planche précédente');
+
+        const counter = document.createElement('span');
+
+        const nextBtn = document.createElement('button');
+        nextBtn.className = 'pager-btn';
+        nextBtn.textContent = '›';
+        nextBtn.setAttribute('aria-label', 'Planche suivante');
+
+        function show(i) {
+          pages.forEach((p, idx) => { p.style.display = idx === i ? 'block' : 'none'; });
+          prevBtn.disabled = i === 0;
+          nextBtn.disabled = i === pages.length - 1;
+          counter.textContent = (i + 1) + ' / ' + pages.length;
+          window.scrollTo(0, 0);
+        }
+
+        prevBtn.addEventListener('click', () => { if (current > 0) { current--; show(current); } });
+        nextBtn.addEventListener('click', () => { if (current < pages.length - 1) { current++; show(current); } });
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'ArrowLeft') prevBtn.click();
+          if (e.key === 'ArrowRight') nextBtn.click();
+        });
+
+        controls.appendChild(prevBtn);
+        controls.appendChild(counter);
+        controls.appendChild(nextBtn);
+        document.body.appendChild(controls);
+
+        show(current);
+      });
     }
   </script>
 
@@ -235,6 +279,10 @@
           if (!img.complete) {
             await new Promise((resolve) => { img.onload = resolve; img.onerror = resolve; });
           }
+          if (!img.naturalWidth || !img.naturalHeight) {
+            console.warn('Image ignorée (introuvable) :', img.src);
+            continue;
+          }
           const canvas = document.createElement('canvas');
           canvas.width = img.naturalWidth;
           canvas.height = img.naturalHeight;
@@ -244,12 +292,15 @@
           const wmm = canvas.width * 0.264583;
           const hmm = canvas.height * 0.264583;
           const orientation = wmm > hmm ? 'landscape' : 'portrait';
-          if (i === 0) {
+          if (!doc) {
             doc = new jsPDF({ orientation, unit: 'mm', format: [wmm, hmm] });
           } else {
             doc.addPage([wmm, hmm], orientation);
           }
           doc.addImage(dataUrl, 'JPEG', 0, 0, wmm, hmm);
+        }
+        if (!doc) {
+          throw new Error('Aucune image valide trouvée.');
         }
         doc.save('Ardeche 2026.pdf');
       } catch (err) {
