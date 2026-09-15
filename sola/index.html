@@ -122,7 +122,9 @@
   }
 
   .page {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 100%;
     margin: 0 auto;
     scroll-margin-top: 64px;
@@ -130,8 +132,12 @@
 
   .page img {
     display: block;
-    width: 100%;
+    width: auto;
+    max-width: 100%;
     height: auto;
+    max-height: calc(100vh - 90px);
+    margin: 0 auto;
+    object-fit: contain;
   }
 
   .placeholder {
@@ -166,6 +172,17 @@
   }
 
   footer a { color: var(--terracotta-deep); }
+
+  .pager-controls .pdf-btn {
+    color: var(--cream);
+    border-color: var(--cream);
+    font-size: 0.75rem;
+    padding: 6px 14px;
+  }
+  .pager-controls .pdf-btn:hover:not(:disabled) {
+    background: var(--cream);
+    color: var(--ink);
+  }
 </style>
 </head>
 <body>
@@ -270,7 +287,111 @@
     updateProgress();
   </script>
 
- 
+  <script>
+    function __isolatePage(target) {
+      if (!target) return;
+      const el = document.querySelector(target);
+      if (!el) return;
+      document.querySelectorAll('.page').forEach((p) => {
+        if (p !== el) p.style.display = 'none';
+      });
+      const hero = document.querySelector('.hero');
+      const caption = document.querySelector('.hero__caption');
+      const foot = document.querySelector('footer');
+      if (hero) hero.style.display = 'none';
+      if (caption) caption.style.display = 'none';
+      if (foot) foot.style.display = 'none';
+      const pager = document.querySelector('.pager-controls');
+      if (pager) pager.remove();
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+      el.scrollIntoView();
+    }
+    window.__isolatePage = __isolatePage;
+
+    if (window.location.hash) {
+      // Lien partagé vers une planche précise : reste verrouillé dessus,
+      // sans navigation possible.
+      document.addEventListener('DOMContentLoaded', () => __isolatePage(window.location.hash));
+    } else {
+      // Lecture normale : une planche à la fois, avec précédent/suivant.
+      // La couverture, le titre et le pied de page sont masqués pendant
+      // la lecture ; le bouton PDF est déplacé dans la barre du bas.
+      document.addEventListener('DOMContentLoaded', () => {
+        const pages = Array.from(document.querySelectorAll('.reader .page'));
+        if (pages.length === 0) return;
+
+        let current = 0;
+
+        const hero = document.querySelector('.hero');
+        const caption = document.querySelector('.hero__caption');
+        const foot = document.querySelector('footer');
+        const pdfBtn = document.getElementById('pdf-btn');
+
+        if (hero) hero.style.display = 'none';
+        if (foot) foot.style.display = 'none';
+        document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
+
+        const style = document.createElement('style');
+        style.textContent = `
+          .pager-controls {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 14px; align-items: center; z-index: 30;
+            background: rgba(30,26,22,0.82); backdrop-filter: blur(6px);
+            padding: 8px 18px; border-radius: 30px; color: #f2ead9;
+            font-family: -apple-system, sans-serif; font-size: 0.85rem;
+          }
+          .pager-btn {
+            background: none; border: none; color: #f2ead9; font-size: 1.3rem;
+            cursor: pointer; padding: 2px 10px; line-height: 1;
+          }
+          .pager-btn:disabled { opacity: 0.3; cursor: default; }
+          .reader { padding-bottom: 0 !important; }
+        `;
+        document.head.appendChild(style);
+
+        const controls = document.createElement('div');
+        controls.className = 'pager-controls';
+
+        const prevBtn = document.createElement('button');
+        prevBtn.className = 'pager-btn';
+        prevBtn.textContent = '‹';
+        prevBtn.setAttribute('aria-label', 'Planche précédente');
+
+        const counter = document.createElement('span');
+
+        const nextBtn = document.createElement('button');
+        nextBtn.className = 'pager-btn';
+        nextBtn.textContent = '›';
+        nextBtn.setAttribute('aria-label', 'Planche suivante');
+
+        function show(i) {
+          pages.forEach((p, idx) => { p.style.display = idx === i ? 'flex' : 'none'; });
+          prevBtn.disabled = i === 0;
+          nextBtn.disabled = i === pages.length - 1;
+          counter.textContent = (i + 1) + ' / ' + pages.length;
+        }
+
+        prevBtn.addEventListener('click', () => { if (current > 0) { current--; show(current); } });
+        nextBtn.addEventListener('click', () => { if (current < pages.length - 1) { current++; show(current); } });
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'ArrowLeft') prevBtn.click();
+          if (e.key === 'ArrowRight') nextBtn.click();
+        });
+
+        controls.appendChild(prevBtn);
+        controls.appendChild(counter);
+        controls.appendChild(nextBtn);
+        if (pdfBtn) controls.appendChild(pdfBtn);
+        document.body.appendChild(controls);
+
+        if (caption) caption.style.display = 'none';
+
+        show(current);
+      });
+    }
+  </script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
