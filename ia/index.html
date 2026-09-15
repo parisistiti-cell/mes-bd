@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ia</title>
-<meta name="description" content="ia.">
+<title>Entre deux vies</title>
+<meta name="description" content="Entre deux vies — une rencontre au-delà du temps et des conventions.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Karla:wght@400;500&display=swap" rel="stylesheet">
@@ -14,8 +14,8 @@
     --cream-deep: #e8dcc3;
     --ink: #3a2e28;
     --ink-soft: #6b5c50;
-    --accent: #5a7d5e;
-    --accent-deep: #45624a;
+    --terracotta: #b9645f;
+    --terracotta-deep: #9c4a47;
     --rule: rgba(58, 46, 40, 0.15);
   }
   * { box-sizing: border-box; }
@@ -43,14 +43,8 @@
     font-family: 'Cormorant Garamond', serif;
     font-size: 1.15rem;
     letter-spacing: 0.02em;
-    color: var(--accent-deep);
+    color: var(--terracotta-deep);
     text-decoration: none;
-  }
-  .topbar__home {
-    font-size: 0.8rem;
-    color: var(--ink-soft);
-    text-decoration: none;
-    border-bottom: 1px solid var(--ink-soft);
   }
   .hero {
     position: relative;
@@ -73,22 +67,29 @@
     font-weight: 500;
     font-size: clamp(2rem, 6vw, 2.6rem);
     letter-spacing: 0.01em;
+    margin: 0 0 12px;
+    color: var(--terracotta-deep);
+  }
+  .hero__caption p {
+    font-style: italic;
+    color: var(--ink-soft);
+    font-size: 1.05rem;
+    line-height: 1.6;
     margin: 0 0 22px;
-    color: var(--accent-deep);
   }
   .pdf-btn {
     font-family: 'Karla', sans-serif;
     font-size: 0.85rem;
-    color: var(--accent-deep);
+    color: var(--terracotta-deep);
     background: transparent;
-    border: 1px solid var(--accent-deep);
+    border: 1px solid var(--terracotta-deep);
     border-radius: 20px;
     padding: 9px 20px;
     cursor: pointer;
     transition: background 0.15s ease, color 0.15s ease;
   }
   .pdf-btn:hover:not(:disabled) {
-    background: var(--accent-deep);
+    background: var(--terracotta-deep);
     color: var(--cream);
   }
   .pdf-btn:disabled {
@@ -111,26 +112,6 @@
     width: 100%;
     height: auto;
   }
-  .placeholder {
-    margin: 20px auto;
-    padding: 48px 28px;
-    max-width: 560px;
-    text-align: center;
-    border: 1px dashed var(--rule);
-    border-radius: 4px;
-    color: var(--ink-soft);
-  }
-  .placeholder p {
-    margin: 0 0 6px;
-    font-size: 0.92rem;
-    line-height: 1.6;
-  }
-  .placeholder ia {
-    background: var(--cream-deep);
-    padding: 2px 6px;
-    border-radius: 3px;
-    font-size: 0.85rem;
-  }
   footer {
     text-align: center;
     padding: 40px 24px 60px;
@@ -138,77 +119,240 @@
     font-size: 0.8rem;
     border-top: 1px solid var(--rule);
   }
+  footer a { color: var(--terracotta-deep); }
+  .pager-controls .pdf-btn {
+    color: var(--cream);
+    border-color: var(--cream);
+    font-size: 0.75rem;
+    padding: 6px 14px;
+  }
+  .pager-controls .pdf-btn:hover:not(:disabled) {
+    background: var(--cream);
+    color: var(--ink);
+  }
 </style>
 </head>
 <body>
 
   <nav class="topbar">
-    <a class="topbar__title" href="#top">ia</a>
-    <a class="topbar__home" href="../">Toutes les BD</a>
+    <a class="topbar__title" href="#top">Entre deux vies</a>
+    <a class="topbar__home" href="../" style="font-size:0.8rem;color:var(--ink-soft);text-decoration:none;border-bottom:1px solid var(--ink-soft);">Toutes les BD</a>
   </nav>
 
   <div id="top"></div>
 
   <header class="hero">
-    <img src="images/00-couverture.jpg" alt="Couverture — ia">
+    <img src="images/00-couverture.jpg" alt="Couverture — Entre deux vies">
   </header>
 
   <div class="hero__caption">
-    <h1>ia</h1>
+    <h1>Entre deux vies</h1>
+    <p>Une rencontre au-delà du temps et des conventions.</p>
     <button id="pdf-btn" class="pdf-btn" onclick="downloadPDF()">Télécharger en PDF</button>
   </div>
 
-  <!--
-    ===========================================================
-    AJOUTE TES PLANCHES ICI
-
-    Pour chaque planche : dépose l'image dans le dossier images/
-    puis ajoute un bloc comme celui-ci (en gardant le même ordre
-    que ton histoire). L'attribut id permet un lien direct vers
-    cette planche précise :
+  <main class="reader">
+    <div class="page" id="page-0">
+      <img src="images/00-couverture.jpg" alt="Planche 0">
+    </div>
 
     <div class="page" id="page-1">
       <img src="images/01.jpg" alt="Planche 1">
     </div>
 
-    Lien vers cette planche : ton-site.pages.dev/Ardeche-2026/#page-1
-    ===========================================================
-  -->
-  <main class="reader">
-
-  <div class="page" id="page-00">
-      <img src="images/00-couverture.jpg" alt="Planche 0">
-    </div>
-<div class="page" id="page-01">
-      <img src="images/01.jpg" alt="Planche 1">
-    </div>
-<div class="page" id="page-02">
-      <img src="images/02.jpg" alt="Planche 2">
-    </div>
-<div class="page" id="page-03">
-      <img src="images/03.jpg" alt="Planche 3">
-    </div>
-<div class="page" id="page-04">
-      <img src="images/04.jpg" alt="Planche 4">
-    </div>
-<div class="page" id="page-05">
+    <div class="page" id="page-5">
       <img src="images/05.jpg" alt="Planche 5">
     </div>
-<div class="page" id="page-06">
-      <img src="images/06.jpg" alt="Planche 6">
-    </div>
-    
-<div class="page" id="page-07">
+
+    <div class="page" id="page-7">
       <img src="images/07.jpg" alt="Planche 7">
     </div>
 
+    <div class="page" id="page-9">
+      <img src="images/09.jpg" alt="Planche 9">
+    </div>
 
+    <div class="page" id="page-11">
+      <img src="images/11.jpg" alt="Planche 11">
+    </div>
 
+    <div class="page" id="page-13">
+      <img src="images/13.jpg" alt="Planche 13">
+    </div>
+
+    <div class="page" id="page-15">
+      <img src="images/15.jpg" alt="Planche 15">
+    </div>
+
+    <div class="page" id="page-17">
+      <img src="images/17.jpg" alt="Planche 17">
+    </div>
+
+    <div class="page" id="page-19">
+      <img src="images/19.jpg" alt="Planche 19">
+    </div>
+
+    <div class="page" id="page-21">
+      <img src="images/21.jpg" alt="Planche 21">
+    </div>
+
+    <div class="page" id="page-25">
+      <img src="images/25.jpg" alt="Planche 25">
+    </div>
+
+    <div class="page" id="page-26">
+      <img src="images/26.jpg" alt="Planche 26">
+    </div>
+
+    <div class="page" id="page-27">
+      <img src="images/27.jpg" alt="Planche 27">
+    </div>
+
+    <div class="page" id="page-29">
+      <img src="images/29.jpg" alt="Planche 29">
+    </div>
+
+    <div class="page" id="page-31">
+      <img src="images/31.jpg" alt="Planche 31">
+    </div>
+
+    <div class="page" id="page-33">
+      <img src="images/33.jpg" alt="Planche 33">
+    </div>
+
+    <div class="page" id="page-35">
+      <img src="images/35.jpg" alt="Planche 35">
+    </div>
+
+    <div class="page" id="page-37">
+      <img src="images/37.jpg" alt="Planche 37">
+    </div>
+
+    <div class="page" id="page-41">
+      <img src="images/41.jpg" alt="Planche 41">
+    </div>
+
+    <div class="page" id="page-43">
+      <img src="images/43.jpg" alt="Planche 43">
+    </div>
+
+    <div class="page" id="page-45">
+      <img src="images/45.jpg" alt="Planche 45">
+    </div>
+
+    <div class="page" id="page-47">
+      <img src="images/47.jpg" alt="Planche 47">
+    </div>
+
+    <div class="page" id="page-49">
+      <img src="images/49.jpg" alt="Planche 49">
+    </div>
   </main>
 
   <footer>
-    ia — mis à jour au fil des chapitres
+    Entre deux vies — mis à jour au fil des chapitres
   </footer>
+
+  <script>
+    function __isolatePage(target) {
+      if (!target) return;
+      const el = document.querySelector(target);
+      if (!el) return;
+      document.querySelectorAll('.page').forEach((p) => {
+        if (p !== el) p.style.display = 'none';
+      });
+      const hero = document.querySelector('.hero');
+      const caption = document.querySelector('.hero__caption');
+      const foot = document.querySelector('footer');
+      if (hero) hero.style.display = 'none';
+      if (caption) caption.style.display = 'none';
+      if (foot) foot.style.display = 'none';
+      const pager = document.querySelector('.pager-controls');
+      if (pager) pager.remove();
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+      el.scrollIntoView();
+    }
+    window.__isolatePage = __isolatePage;
+
+    if (window.location.hash) {
+      document.addEventListener('DOMContentLoaded', () => __isolatePage(window.location.hash));
+    } else {
+      document.addEventListener('DOMContentLoaded', () => {
+        const pages = Array.from(document.querySelectorAll('.reader .page'));
+        if (pages.length === 0) return;
+
+        let current = 0;
+
+        const hero = document.querySelector('.hero');
+        const caption = document.querySelector('.hero__caption');
+        const foot = document.querySelector('footer');
+        const pdfBtn = document.getElementById('pdf-btn');
+
+        if (hero) hero.style.display = 'none';
+        if (foot) foot.style.display = 'none';
+        document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
+
+        const style = document.createElement('style');
+        style.textContent = `
+          .pager-controls {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 14px; align-items: center; z-index: 30;
+            background: rgba(30,26,22,0.82); backdrop-filter: blur(6px);
+            padding: 8px 18px; border-radius: 30px; color: #f2ead9;
+            font-family: -apple-system, sans-serif; font-size: 0.85rem;
+          }
+          .pager-btn {
+            background: none; border: none; color: #f2ead9; font-size: 1.3rem;
+            cursor: pointer; padding: 2px 10px; line-height: 1;
+          }
+          .pager-btn:disabled { opacity: 0.3; cursor: default; }
+          .reader { padding-bottom: 0 !important; }
+        `;
+        document.head.appendChild(style);
+
+        const controls = document.createElement('div');
+        controls.className = 'pager-controls';
+
+        const prevBtn = document.createElement('button');
+        prevBtn.className = 'pager-btn';
+        prevBtn.textContent = '‹';
+        prevBtn.setAttribute('aria-label', 'Planche précédente');
+
+        const counter = document.createElement('span');
+
+        const nextBtn = document.createElement('button');
+        nextBtn.className = 'pager-btn';
+        nextBtn.textContent = '›';
+        nextBtn.setAttribute('aria-label', 'Planche suivante');
+
+        function show(i) {
+          pages.forEach((p, idx) => { p.style.display = idx === i ? 'block' : 'none'; });
+          prevBtn.disabled = i === 0;
+          nextBtn.disabled = i === pages.length - 1;
+          counter.textContent = (i + 1) + ' / ' + pages.length;
+        }
+
+        prevBtn.addEventListener('click', () => { if (current > 0) { current--; show(current); } });
+        nextBtn.addEventListener('click', () => { if (current < pages.length - 1) { current++; show(current); } });
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'ArrowLeft') prevBtn.click();
+          if (e.key === 'ArrowRight') nextBtn.click();
+        });
+
+        controls.appendChild(prevBtn);
+        controls.appendChild(counter);
+        controls.appendChild(nextBtn);
+        if (pdfBtn) controls.appendChild(pdfBtn);
+        document.body.appendChild(controls);
+
+        if (caption) caption.style.display = 'none';
+
+        show(current);
+      });
+    }
+  </script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
@@ -217,14 +361,20 @@
       const originalLabel = btn.textContent;
       btn.disabled = true;
       btn.textContent = 'Préparation du PDF...';
+
       try {
         const { jsPDF } = window.jspdf;
         const images = Array.from(document.querySelectorAll('.hero img, .page img'));
         let doc;
+
         for (let i = 0; i < images.length; i++) {
           const img = images[i];
           if (!img.complete) {
             await new Promise((resolve) => { img.onload = resolve; img.onerror = resolve; });
+          }
+          if (!img.naturalWidth || !img.naturalHeight) {
+            console.warn('Image ignorée (introuvable) :', img.src);
+            continue;
           }
           const canvas = document.createElement('canvas');
           canvas.width = img.naturalWidth;
@@ -232,17 +382,24 @@
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0);
           const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+
           const wmm = canvas.width * 0.264583;
           const hmm = canvas.height * 0.264583;
           const orientation = wmm > hmm ? 'landscape' : 'portrait';
-          if (i === 0) {
+
+          if (!doc) {
             doc = new jsPDF({ orientation, unit: 'mm', format: [wmm, hmm] });
           } else {
             doc.addPage([wmm, hmm], orientation);
           }
           doc.addImage(dataUrl, 'JPEG', 0, 0, wmm, hmm);
         }
-        doc.save('Ardeche.pdf');
+
+        if (!doc) {
+          throw new Error('Aucune image valide trouvée.');
+        }
+
+        doc.save('Entre deux vies.pdf');
       } catch (err) {
         alert("Le PDF n'a pas pu être généré. Réessaie, ou vérifie que toutes les planches sont bien chargées.");
         console.error(err);
