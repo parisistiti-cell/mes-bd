@@ -95,7 +95,6 @@
     opacity: 0.6;
     cursor: default;
   }
-  /* Style du bouton PDF quand il est déplacé dans la barre de pagination */
   .pager-controls .pdf-btn {
     color: var(--cream);
     border-color: var(--cream);
@@ -112,15 +111,23 @@
     padding: 0 0 100px;
   }
   .page {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 100%;
     margin: 0 auto;
     scroll-margin-top: 64px;
   }
+  /* La planche s'adapte à la hauteur de l'écran (jamais besoin de
+     scroller ni de dézoomer, même si l'image est très haute) */
   .page img {
     display: block;
-    width: 100%;
+    width: auto;
+    max-width: 100%;
     height: auto;
+    max-height: calc(100vh - 90px);
+    margin: 0 auto;
+    object-fit: contain;
   }
   footer {
     text-align: center;
@@ -171,12 +178,12 @@
       <img src="images/00-couverture.jpg" alt="Planche 0">
     </div>
 
-    <div class="page" id="page-02">
-      <img src="images/02.jpg" alt="Planche 2">
-    </div>
-    
     <div class="page" id="page-01">
       <img src="images/01.jpg" alt="Planche 1">
+    </div>
+
+    <div class="page" id="page-02">
+      <img src="images/02.jpg" alt="Planche 2">
     </div>
 
   </main>
@@ -265,7 +272,7 @@
         nextBtn.setAttribute('aria-label', 'Planche suivante');
 
         function show(i) {
-          pages.forEach((p, idx) => { p.style.display = idx === i ? 'block' : 'none'; });
+          pages.forEach((p, idx) => { p.style.display = idx === i ? 'flex' : 'none'; });
           prevBtn.disabled = i === 0;
           nextBtn.disabled = i === pages.length - 1;
           counter.textContent = (i + 1) + ' / ' + pages.length;
@@ -284,9 +291,6 @@
         if (pdfBtn) controls.appendChild(pdfBtn);
         document.body.appendChild(controls);
 
-        // Le caption ne sert plus qu'à contenir le titre (maintenant vide
-        // visuellement puisque le bouton a été déplacé) ; on peut le
-        // masquer une fois le bouton récupéré.
         if (caption) caption.style.display = 'none';
 
         show(current);
