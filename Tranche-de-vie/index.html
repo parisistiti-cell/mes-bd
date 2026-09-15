@@ -138,10 +138,6 @@
     font-size: 0.8rem;
     border-top: 1px solid var(--rule);
   }
-  BLOC 1 — CSS à ajouter dans la balise <style> de chaque livre
-(n'importe où à l'intérieur de <style>...</style>, par exemple
-juste avant la ligne "</style>")
-===========================================================
 
   .pager-controls .pdf-btn {
     color: var(--cream);
@@ -208,17 +204,6 @@ juste avant la ligne "</style>")
   <footer>
     Tranches de vie — mis à jour au fil des chapitres
   </footer>
-
-  ===========================================================
-BLOC 2 — Script à REMPLACER
-
-Cherche (Ctrl+F) le bloc qui commence par :
-  function __isolatePage(target) {
-et se termine par le </script> juste après.
-
-Supprime tout ce bloc (de <script> à </script>) et remplace-le
-par celui-ci :
-===========================================================
 
   <script>
     function __isolatePage(target) {
