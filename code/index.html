@@ -111,26 +111,6 @@
     width: 100%;
     height: auto;
   }
-  .placeholder {
-    margin: 20px auto;
-    padding: 48px 28px;
-    max-width: 560px;
-    text-align: center;
-    border: 1px dashed var(--rule);
-    border-radius: 4px;
-    color: var(--ink-soft);
-  }
-  .placeholder p {
-    margin: 0 0 6px;
-    font-size: 0.92rem;
-    line-height: 1.6;
-  }
-  .placeholder code {
-    background: var(--cream-deep);
-    padding: 2px 6px;
-    border-radius: 3px;
-    font-size: 0.85rem;
-  }
   footer {
     text-align: center;
     padding: 40px 24px 60px;
@@ -168,58 +148,41 @@
     <button id="pdf-btn" class="pdf-btn" onclick="downloadPDF()">Télécharger en PDF</button>
   </div>
 
-  <!--
-    ===========================================================
-    AJOUTE TES PLANCHES ICI
-
-    Pour chaque planche : dépose l'image dans le dossier images/
-    puis ajoute un bloc comme celui-ci (en gardant le même ordre
-    que ton histoire). L'attribut id permet un lien direct vers
-    cette planche précise :
-
-    <div class="page" id="page-1">
-      <img src="images/01.jpg" alt="Planche 1">
-    </div>
-
-    Lien vers cette planche : ton-site.pages.dev/Ardeche-2026/#page-1
-    ===========================================================
-  -->
   <main class="reader">
 
-  <div class="page" id="page-00">
+    <div class="page" id="page-00">
       <img src="images/00-couverture.jpg" alt="Planche 0">
     </div>
-<div class="page" id="page-01">
+    <div class="page" id="page-01">
       <img src="images/01.jpg" alt="Planche 1">
     </div>
-<div class="page" id="page-02">
+    <div class="page" id="page-02">
       <img src="images/02.jpg" alt="Planche 2">
     </div>
-<div class="page" id="page-03">
+    <div class="page" id="page-03">
       <img src="images/03.jpg" alt="Planche 3">
     </div>
-<div class="page" id="page-04">
+    <div class="page" id="page-04">
       <img src="images/04.jpg" alt="Planche 4">
     </div>
-<div class="page" id="page-05">
+    <div class="page" id="page-05">
       <img src="images/05.jpg" alt="Planche 5">
     </div>
-<div class="page" id="page-06">
+    <div class="page" id="page-06">
       <img src="images/06.jpg" alt="Planche 6">
     </div>
-<div class="page" id="page-07">
+    <div class="page" id="page-07">
       <img src="images/07.jpg" alt="Planche 7">
     </div>
-<div class="page" id="page-08">
+    <div class="page" id="page-08">
       <img src="images/08.jpg" alt="Planche 8">
     </div>
-<div class="page" id="page-09">
+    <div class="page" id="page-09">
       <img src="images/09.jpg" alt="Planche 9">
-</div>
-    
-<div class="page" id="page-10">
+    </div>
+    <div class="page" id="page-10">
       <img src="images/10.jpg" alt="Planche 10">
-</div>
+    </div>
   </main>
 
   <footer>
@@ -250,13 +213,8 @@
     window.__isolatePage = __isolatePage;
 
     if (window.location.hash) {
-      // Lien partagé vers une planche précise : reste verrouillé dessus,
-      // sans navigation possible.
       document.addEventListener('DOMContentLoaded', () => __isolatePage(window.location.hash));
     } else {
-      // Lecture normale : une planche à la fois, avec précédent/suivant.
-      // La couverture, le titre et le pied de page sont masqués pendant
-      // la lecture ; le bouton PDF est déplacé dans la barre du bas.
       document.addEventListener('DOMContentLoaded', () => {
         const pages = Array.from(document.querySelectorAll('.reader .page'));
         if (pages.length === 0) return;
@@ -330,6 +288,55 @@
 
         show(current);
       });
+    }
+  </script>
+
+  <script>
+    async function downloadPDF() {
+      const btn = document.getElementById('pdf-btn');
+      const originalLabel = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Préparation...';
+      try {
+        const { jsPDF } = window.jspdf;
+        const images = Array.from(document.querySelectorAll('.hero img, .page img'));
+        let doc;
+        for (let i = 0; i < images.length; i++) {
+          const img = images[i];
+          if (!img.complete) {
+            await new Promise((resolve) => { img.onload = resolve; img.onerror = resolve; });
+          }
+          if (!img.naturalWidth || !img.naturalHeight) {
+            console.warn('Image ignorée (introuvable) :', img.src);
+            continue;
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = img.naturalWidth;
+          canvas.height = img.naturalHeight;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+          const wmm = canvas.width * 0.264583;
+          const hmm = canvas.height * 0.264583;
+          const orientation = wmm > hmm ? 'landscape' : 'portrait';
+          if (!doc) {
+            doc = new jsPDF({ orientation, unit: 'mm', format: [wmm, hmm] });
+          } else {
+            doc.addPage([wmm, hmm], orientation);
+          }
+          doc.addImage(dataUrl, 'JPEG', 0, 0, wmm, hmm);
+        }
+        if (!doc) {
+          throw new Error('Aucune image valide trouvée.');
+        }
+        doc.save('code.pdf');
+      } catch (err) {
+        alert("Le PDF n'a pas pu être généré. Réessaie, ou vérifie que toutes les planches sont bien chargées.");
+        console.error(err);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = originalLabel;
+      }
     }
   </script>
 
