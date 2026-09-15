@@ -95,6 +95,17 @@
     opacity: 0.6;
     cursor: default;
   }
+  /* Style du bouton PDF quand il est déplacé dans la barre de pagination */
+  .pager-controls .pdf-btn {
+    color: var(--cream);
+    border-color: var(--cream);
+    font-size: 0.75rem;
+    padding: 6px 14px;
+  }
+  .pager-controls .pdf-btn:hover:not(:disabled) {
+    background: var(--cream);
+    color: var(--ink);
+  }
   .reader {
     max-width: 720px;
     margin: 0 auto;
@@ -203,7 +214,7 @@
     } else {
       // Lecture normale : une planche à la fois, avec précédent/suivant.
       // La couverture, le titre et le pied de page sont masqués pendant
-      // la lecture pour qu'il n'y ait rien à faire défiler.
+      // la lecture ; le bouton PDF est déplacé dans la barre du bas.
       document.addEventListener('DOMContentLoaded', () => {
         const pages = Array.from(document.querySelectorAll('.reader .page'));
         if (pages.length === 0) return;
@@ -213,8 +224,9 @@
         const hero = document.querySelector('.hero');
         const caption = document.querySelector('.hero__caption');
         const foot = document.querySelector('footer');
+        const pdfBtn = document.getElementById('pdf-btn');
+
         if (hero) hero.style.display = 'none';
-        if (caption) caption.style.display = 'none';
         if (foot) foot.style.display = 'none';
         document.body.style.overflow = 'hidden';
         document.documentElement.style.overflow = 'hidden';
@@ -269,7 +281,13 @@
         controls.appendChild(prevBtn);
         controls.appendChild(counter);
         controls.appendChild(nextBtn);
+        if (pdfBtn) controls.appendChild(pdfBtn);
         document.body.appendChild(controls);
+
+        // Le caption ne sert plus qu'à contenir le titre (maintenant vide
+        // visuellement puisque le bouton a été déplacé) ; on peut le
+        // masquer une fois le bouton récupéré.
+        if (caption) caption.style.display = 'none';
 
         show(current);
       });
@@ -282,7 +300,7 @@
       const btn = document.getElementById('pdf-btn');
       const originalLabel = btn.textContent;
       btn.disabled = true;
-      btn.textContent = 'Préparation du PDF...';
+      btn.textContent = 'Préparation...';
       try {
         const { jsPDF } = window.jspdf;
         const images = Array.from(document.querySelectorAll('.hero img, .page img'));
