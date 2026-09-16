@@ -264,9 +264,10 @@
       if (!target) return;
       const el = document.querySelector(target);
       if (!el) return;
-      document.querySelectorAll('.page').forEach((p) => {
-        if (p !== el) p.style.display = 'none';
-      });
+      
+document.querySelectorAll('.page').forEach((p) => {
+  p.style.display = (p === el) ? '' : 'none';
+});
       const hero = document.querySelector('.hero');
       const caption = document.querySelector('.hero__caption');
       const foot = document.querySelector('footer');
