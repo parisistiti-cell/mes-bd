@@ -117,6 +117,18 @@
     max-height: calc(100vh - 90px);
     margin: 0 auto;
     object-fit: contain;
+    cursor: zoom-in;
+    transition: transform 0.25s ease;
+  }
+  .page.zoomed {
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .page.zoomed img {
+    max-width: none;
+    max-height: none;
+    cursor: zoom-out;
+    transform: scale(2.2);
   }
   footer {
     text-align: center;
@@ -274,7 +286,10 @@
         nextBtn.setAttribute('aria-label', 'Planche suivante');
 
         function show(i) {
-          pages.forEach((p, idx) => { p.style.display = idx === i ? 'flex' : 'none'; });
+          pages.forEach((p, idx) => {
+            p.style.display = idx === i ? 'flex' : 'none';
+            p.classList.remove('zoomed');
+          });
           prevBtn.disabled = i === 0;
           nextBtn.disabled = i === pages.length - 1;
           counter.textContent = (i + 1) + ' / ' + pages.length;
@@ -298,6 +313,16 @@
         show(current);
       });
     }
+  </script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.reader .page img').forEach((img) => {
+        img.addEventListener('click', () => {
+          img.closest('.page').classList.toggle('zoomed');
+        });
+      });
+    });
   </script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
