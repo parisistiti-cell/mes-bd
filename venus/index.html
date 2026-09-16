@@ -285,6 +285,7 @@
   <script>
     const progressEl = document.getElementById('progress');
     function updateProgress() {
+      if (!progressEl) return;
       const scrollTop = window.scrollY;
       const docHeight = document.documentElement.scrollHeight - window.innerHeight;
       const pct = docHeight > 0 ? Math.round((scrollTop / docHeight) * 100) : 0;
