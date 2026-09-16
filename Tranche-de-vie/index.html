@@ -101,15 +101,21 @@
     padding: 0 0 100px;
   }
   .page {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 100%;
     margin: 0 auto;
     scroll-margin-top: 64px;
   }
   .page img {
     display: block;
-    width: 100%;
+    width: auto;
+    max-width: 100%;
     height: auto;
+    max-height: calc(100vh - 90px);
+    margin: 0 auto;
+    object-fit: contain;
   }
   .placeholder {
     margin: 20px auto;
@@ -210,10 +216,9 @@
       if (!target) return;
       const el = document.querySelector(target);
       if (!el) return;
-      
-document.querySelectorAll('.page').forEach((p) => {
-  p.style.display = (p === el) ? '' : 'none';
-});
+      document.querySelectorAll('.page').forEach((p) => {
+        if (p !== el) p.style.display = 'none';
+      });
       const hero = document.querySelector('.hero');
       const caption = document.querySelector('.hero__caption');
       const foot = document.querySelector('footer');
@@ -286,7 +291,7 @@ document.querySelectorAll('.page').forEach((p) => {
         nextBtn.setAttribute('aria-label', 'Planche suivante');
 
         function show(i) {
-          pages.forEach((p, idx) => { p.style.display = idx === i ? 'block' : 'none'; });
+          pages.forEach((p, idx) => { p.style.display = idx === i ? 'flex' : 'none'; });
           prevBtn.disabled = i === 0;
           nextBtn.disabled = i === pages.length - 1;
           counter.textContent = (i + 1) + ' / ' + pages.length;
