@@ -301,7 +301,7 @@
       const el = document.querySelector(target);
       if (!el) return;
       document.querySelectorAll('.page').forEach((p) => {
-        if (p !== el) p.style.display = 'none';
+        p.style.display = (p === el) ? 'flex' : 'none';
       });
       const hero = document.querySelector('.hero');
       const caption = document.querySelector('.hero__caption');
