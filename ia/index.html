@@ -108,6 +108,29 @@
     width: 100%;
     margin: 0 auto;
     scroll-margin-top: 64px;
+    position: relative;
+  }
+  .zoom-hint {
+    position: absolute;
+    bottom: 14px;
+    right: 14px;
+    display: none;
+    align-items: center;
+    gap: 6px;
+    background: rgba(30, 26, 22, 0.78);
+    color: #f2ead9;
+    font-family: 'Karla', sans-serif;
+    font-size: 0.78rem;
+    padding: 6px 12px;
+    border-radius: 20px;
+    pointer-events: none;
+    z-index: 5;
+    white-space: nowrap;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .page:hover .zoom-hint {
+      display: flex;
+    }
   }
   .page img {
     display: block;
@@ -291,6 +314,8 @@
             p.classList.remove('zoomed');
             const im = p.querySelector('img');
             if (im) im.style.transform = '';
+            const hint = p.querySelector('.zoom-hint');
+            if (hint) hint.textContent = '🔍 Cliquer pour zoomer';
           });
           prevBtn.disabled = i === 0;
           nextBtn.disabled = i === pages.length - 1;
@@ -325,12 +350,23 @@
         const img = page.querySelector('img');
         if (!img) return;
 
+        const hint = document.createElement('div');
+        hint.className = 'zoom-hint';
+        hint.textContent = '🔍 Cliquer pour zoomer';
+        page.appendChild(hint);
+
         let panX = 0, panY = 0;
         let isDown = false;
         let dragged = false;
         let startX, startY, startPanX, startPanY;
 
         function isZoomed() { return page.classList.contains('zoomed'); }
+
+        function updateHint() {
+          hint.textContent = isZoomed()
+            ? '✋ Glisser pour déplacer · cliquer pour dézoomer'
+            : '🔍 Cliquer pour zoomer';
+        }
 
         function applyTransform() {
           img.style.transform = isZoomed()
@@ -354,6 +390,7 @@
           panX = 0;
           panY = 0;
           applyTransform();
+          updateHint();
         });
 
         page.addEventListener('mousedown', (e) => {
