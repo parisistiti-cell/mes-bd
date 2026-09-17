@@ -107,6 +107,29 @@
     width: 100%;
     margin: 0 auto;
     scroll-margin-top: 64px;
+    position: relative;
+  }
+  .zoom-hint {
+    position: absolute;
+    bottom: 14px;
+    right: 14px;
+    display: none;
+    align-items: center;
+    gap: 6px;
+    background: rgba(30, 26, 22, 0.78);
+    color: #f2ead9;
+    font-family: 'Karla', sans-serif;
+    font-size: 0.78rem;
+    padding: 6px 12px;
+    border-radius: 20px;
+    pointer-events: none;
+    z-index: 5;
+    white-space: nowrap;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .page:hover .zoom-hint {
+      display: flex;
+    }
   }
   .page img {
     display: block;
@@ -116,6 +139,18 @@
     max-height: calc(100vh - 90px);
     margin: 0 auto;
     object-fit: contain;
+    cursor: zoom-in;
+    transition: transform 0.25s ease;
+  }
+  .page.zoomed {
+    overflow: hidden;
+    cursor: grab;
+  }
+  .page.zoomed.dragging {
+    cursor: grabbing;
+  }
+  .page.zoomed.dragging img {
+    transition: none;
   }
   .placeholder {
     margin: 20px auto;
@@ -237,7 +272,7 @@
       const el = document.querySelector(target);
       if (!el) return;
       document.querySelectorAll('.page').forEach((p) => {
-        if (p !== el) p.style.display = 'none';
+        p.style.display = (p === el) ? 'flex' : 'none';
       });
       const hero = document.querySelector('.hero');
       const caption = document.querySelector('.hero__caption');
@@ -311,7 +346,14 @@
         nextBtn.setAttribute('aria-label', 'Planche suivante');
 
         function show(i) {
-          pages.forEach((p, idx) => { p.style.display = idx === i ? 'flex' : 'none'; });
+          pages.forEach((p, idx) => {
+            p.style.display = idx === i ? 'flex' : 'none';
+            p.classList.remove('zoomed');
+            const im = p.querySelector('img');
+            if (im) im.style.transform = '';
+            const hint = p.querySelector('.zoom-hint');
+            if (hint) hint.textContent = '🔍 Cliquer pour zoomer';
+          });
           prevBtn.disabled = i === 0;
           nextBtn.disabled = i === pages.length - 1;
           counter.textContent = (i + 1) + ' / ' + pages.length;
@@ -335,6 +377,87 @@
         show(current);
       });
     }
+  </script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const ZOOM = 2.2;
+
+      document.querySelectorAll('.reader .page').forEach((page) => {
+        const img = page.querySelector('img');
+        if (!img) return;
+
+        const hint = document.createElement('div');
+        hint.className = 'zoom-hint';
+        hint.textContent = '🔍 Cliquer pour zoomer';
+        page.appendChild(hint);
+
+        let panX = 0, panY = 0;
+        let isDown = false;
+        let dragged = false;
+        let startX, startY, startPanX, startPanY;
+
+        function isZoomed() { return page.classList.contains('zoomed'); }
+
+        function updateHint() {
+          hint.textContent = isZoomed()
+            ? '✋ Glisser pour déplacer · cliquer pour dézoomer'
+            : '🔍 Cliquer pour zoomer';
+        }
+
+        function applyTransform() {
+          img.style.transform = isZoomed()
+            ? `translate(${panX}px, ${panY}px) scale(${ZOOM})`
+            : '';
+        }
+
+        function clampPan() {
+          const pageRect = page.getBoundingClientRect();
+          const scaledW = img.offsetWidth * ZOOM;
+          const scaledH = img.offsetHeight * ZOOM;
+          const maxX = Math.max(0, (scaledW - pageRect.width) / 2);
+          const maxY = Math.max(0, (scaledH - pageRect.height) / 2);
+          panX = Math.min(maxX, Math.max(-maxX, panX));
+          panY = Math.min(maxY, Math.max(-maxY, panY));
+        }
+
+        img.addEventListener('click', () => {
+          if (dragged) { dragged = false; return; }
+          page.classList.toggle('zoomed');
+          panX = 0;
+          panY = 0;
+          applyTransform();
+          updateHint();
+        });
+
+        page.addEventListener('mousedown', (e) => {
+          if (!isZoomed()) return;
+          isDown = true;
+          dragged = false;
+          page.classList.add('dragging');
+          startX = e.pageX;
+          startY = e.pageY;
+          startPanX = panX;
+          startPanY = panY;
+        });
+
+        document.addEventListener('mousemove', (e) => {
+          if (!isDown) return;
+          const dx = e.pageX - startX;
+          const dy = e.pageY - startY;
+          if (Math.abs(dx) > 3 || Math.abs(dy) > 3) dragged = true;
+          panX = startPanX + dx;
+          panY = startPanY + dy;
+          clampPan();
+          applyTransform();
+        });
+
+        document.addEventListener('mouseup', () => {
+          isDown = false;
+          page.classList.remove('dragging');
+        });
+      });
+    });
   </script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
