@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>drone</title>
-<meta name="description" content="drone.">
+<title>code</title>
+<meta name="description" content="code.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Karla:wght@400;500&display=swap" rel="stylesheet">
@@ -14,8 +14,8 @@
     --cream-deep: #e8dcc3;
     --ink: #3a2e28;
     --ink-soft: #6b5c50;
-    --terracotta: #b9645f;
-    --terracotta-deep: #9c4a47;
+    --accent: #5a7d5e;
+    --accent-deep: #45624a;
     --rule: rgba(58, 46, 40, 0.15);
   }
   * { box-sizing: border-box; }
@@ -43,8 +43,14 @@
     font-family: 'Cormorant Garamond', serif;
     font-size: 1.15rem;
     letter-spacing: 0.02em;
-    color: var(--terracotta-deep);
+    color: var(--accent-deep);
     text-decoration: none;
+  }
+  .topbar__home {
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+    text-decoration: none;
+    border-bottom: 1px solid var(--ink-soft);
   }
   .hero {
     position: relative;
@@ -67,22 +73,22 @@
     font-weight: 500;
     font-size: clamp(2rem, 6vw, 2.6rem);
     letter-spacing: 0.01em;
-    margin: 0 0 12px;
-    color: var(--terracotta-deep);
+    margin: 0 0 22px;
+    color: var(--accent-deep);
   }
   .pdf-btn {
     font-family: 'Karla', sans-serif;
     font-size: 0.85rem;
-    color: var(--terracotta-deep);
+    color: var(--accent-deep);
     background: transparent;
-    border: 1px solid var(--terracotta-deep);
+    border: 1px solid var(--accent-deep);
     border-radius: 20px;
     padding: 9px 20px;
     cursor: pointer;
     transition: background 0.15s ease, color 0.15s ease;
   }
   .pdf-btn:hover:not(:disabled) {
-    background: var(--terracotta-deep);
+    background: var(--accent-deep);
     color: var(--cream);
   }
   .pdf-btn:disabled {
@@ -95,16 +101,59 @@
     padding: 0 0 100px;
   }
   .page {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 100%;
     margin: 0 auto;
     scroll-margin-top: 64px;
+    position: relative;
   }
+  .zoom-hint {
+    position: absolute;
+    bottom: 14px;
+    right: 14px;
+    display: none;
+    align-items: center;
+    gap: 6px;
+    background: rgba(30, 26, 22, 0.78);
+    color: #f2ead9;
+    font-family: 'Karla', sans-serif;
+    font-size: 0.78rem;
+    padding: 6px 12px;
+    border-radius: 20px;
+    pointer-events: none;
+    z-index: 5;
+    white-space: nowrap;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .page:hover .zoom-hint {
+      display: flex;
+    }
+  }
+
   .page img {
     display: block;
-    width: 100%;
+    width: auto;
+    max-width: 100%;
     height: auto;
+    max-height: calc(100vh - 90px);
+    margin: 0 auto;
+    object-fit: contain;
+    cursor: zoom-in;
+    transition: transform 0.25s ease;
   }
+  .page.zoomed {
+    overflow: hidden;
+    cursor: grab;
+  }
+  .page.zoomed.dragging {
+    cursor: grabbing;
+  }
+  .page.zoomed.dragging img {
+    transition: none;
+  }
+
   footer {
     text-align: center;
     padding: 40px 24px 60px;
@@ -112,7 +161,6 @@
     font-size: 0.8rem;
     border-top: 1px solid var(--rule);
   }
-  footer a { color: var(--terracotta-deep); }
   .pager-controls .pdf-btn {
     color: var(--cream);
     border-color: var(--cream);
@@ -128,81 +176,79 @@
 <body>
 
   <nav class="topbar">
-    <a class="topbar__title" href="#top">drone</a>
-    <a class="topbar__home" href="../" style="font-size:0.8rem;color:var(--ink-soft);text-decoration:none;border-bottom:1px solid var(--ink-soft);">Toutes les BD</a>
+    <a class="topbar__title" href="#top">code</a>
+    <a class="topbar__home" href="../">Toutes les BD</a>
   </nav>
 
   <div id="top"></div>
 
   <header class="hero">
-    <img src="images/00-couverture.jpg" alt="Couverture — drone">
+    <img src="images/00-couverture.jpg" alt="Couverture — code">
   </header>
 
   <div class="hero__caption">
-    <h1>drone</h1>
+    <h1>code</h1>
     <button id="pdf-btn" class="pdf-btn" onclick="downloadPDF()">Télécharger en PDF</button>
   </div>
 
   <main class="reader">
+
     <div class="page" id="page-00">
       <img src="images/00-couverture.jpg" alt="Planche 0">
     </div>
-
     <div class="page" id="page-01">
       <img src="images/01.jpg" alt="Planche 1">
     </div>
-
     <div class="page" id="page-02">
       <img src="images/02.jpg" alt="Planche 2">
     </div>
-
     <div class="page" id="page-03">
       <img src="images/03.jpg" alt="Planche 3">
     </div>
-
     <div class="page" id="page-04">
       <img src="images/04.jpg" alt="Planche 4">
     </div>
-
     <div class="page" id="page-05">
       <img src="images/05.jpg" alt="Planche 5">
     </div>
-
     <div class="page" id="page-06">
       <img src="images/06.jpg" alt="Planche 6">
     </div>
-
     <div class="page" id="page-07">
       <img src="images/07.jpg" alt="Planche 7">
     </div>
-
     <div class="page" id="page-08">
       <img src="images/08.jpg" alt="Planche 8">
     </div>
-
     <div class="page" id="page-09">
       <img src="images/09.jpg" alt="Planche 9">
     </div>
-
     <div class="page" id="page-10">
       <img src="images/10.jpg" alt="Planche 10">
     </div>
-
+    
     <div class="page" id="page-11">
       <img src="images/11.jpg" alt="Planche 11">
     </div>
-
     <div class="page" id="page-12">
       <img src="images/12.jpg" alt="Planche 12">
     </div>
-    
     <div class="page" id="page-13">
       <img src="images/13.jpg" alt="Planche 13">
+    </div>
+    <div class="page" id="page-14">
+      <img src="images/14.jpg" alt="Planche 14">
+    </div>
+    <div class="page" id="page-15">
+      <img src="images/15.jpg" alt="Planche 15">
+    </div>
+    <div class="page" id="page-16">
+      <img src="images/16.jpg" alt="Planche 16">
     </div>
   </main>
 
   <footer>
-    drone — mis à jour au fil des chapitres
+    code — mis à jour au fil des chapitres
   </footer>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -212,7 +258,7 @@
       const el = document.querySelector(target);
       if (!el) return;
       document.querySelectorAll('.page').forEach((p) => {
-        if (p !== el) p.style.display = 'none';
+        p.style.display = (p === el) ? 'flex' : 'none';
       });
       const hero = document.querySelector('.hero');
       const caption = document.querySelector('.hero__caption');
@@ -281,7 +327,14 @@
         nextBtn.setAttribute('aria-label', 'Planche suivante');
 
         function show(i) {
-          pages.forEach((p, idx) => { p.style.display = idx === i ? 'block' : 'none'; });
+          pages.forEach((p, idx) => {
+            p.style.display = idx === i ? 'flex' : 'none';
+            p.classList.remove('zoomed');
+            const im = p.querySelector('img');
+            if (im) im.style.transform = '';
+            const hint = p.querySelector('.zoom-hint');
+            if (hint) hint.textContent = '🔍 Cliquer pour zoomer';
+          });
           prevBtn.disabled = i === 0;
           nextBtn.disabled = i === pages.length - 1;
           counter.textContent = (i + 1) + ' / ' + pages.length;
@@ -308,17 +361,96 @@
   </script>
 
   <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const ZOOM = 2.2;
+
+      document.querySelectorAll('.reader .page').forEach((page) => {
+        const img = page.querySelector('img');
+        if (!img) return;
+
+        const hint = document.createElement('div');
+        hint.className = 'zoom-hint';
+        hint.textContent = '🔍 Cliquer pour zoomer';
+        page.appendChild(hint);
+
+        let panX = 0, panY = 0;
+        let isDown = false;
+        let dragged = false;
+        let startX, startY, startPanX, startPanY;
+
+        function isZoomed() { return page.classList.contains('zoomed'); }
+
+        function updateHint() {
+          hint.textContent = isZoomed()
+            ? '✋ Glisser pour déplacer · cliquer pour dézoomer'
+            : '🔍 Cliquer pour zoomer';
+        }
+
+        function applyTransform() {
+          img.style.transform = isZoomed()
+            ? `translate(${panX}px, ${panY}px) scale(${ZOOM})`
+            : '';
+        }
+
+        function clampPan() {
+          const pageRect = page.getBoundingClientRect();
+          const scaledW = img.offsetWidth * ZOOM;
+          const scaledH = img.offsetHeight * ZOOM;
+          const maxX = Math.max(0, (scaledW - pageRect.width) / 2);
+          const maxY = Math.max(0, (scaledH - pageRect.height) / 2);
+          panX = Math.min(maxX, Math.max(-maxX, panX));
+          panY = Math.min(maxY, Math.max(-maxY, panY));
+        }
+
+        img.addEventListener('click', () => {
+          if (dragged) { dragged = false; return; }
+          page.classList.toggle('zoomed');
+          panX = 0;
+          panY = 0;
+          applyTransform();
+          updateHint();
+        });
+
+        page.addEventListener('mousedown', (e) => {
+          if (!isZoomed()) return;
+          isDown = true;
+          dragged = false;
+          page.classList.add('dragging');
+          startX = e.pageX;
+          startY = e.pageY;
+          startPanX = panX;
+          startPanY = panY;
+        });
+
+        document.addEventListener('mousemove', (e) => {
+          if (!isDown) return;
+          const dx = e.pageX - startX;
+          const dy = e.pageY - startY;
+          if (Math.abs(dx) > 3 || Math.abs(dy) > 3) dragged = true;
+          panX = startPanX + dx;
+          panY = startPanY + dy;
+          clampPan();
+          applyTransform();
+        });
+
+        document.addEventListener('mouseup', () => {
+          isDown = false;
+          page.classList.remove('dragging');
+        });
+      });
+    });
+  </script>
+
+  <script>
     async function downloadPDF() {
       const btn = document.getElementById('pdf-btn');
       const originalLabel = btn.textContent;
       btn.disabled = true;
-      btn.textContent = 'Préparation du PDF...';
-
+      btn.textContent = 'Préparation...';
       try {
         const { jsPDF } = window.jspdf;
         const images = Array.from(document.querySelectorAll('.hero img, .page img'));
         let doc;
-
         for (let i = 0; i < images.length; i++) {
           const img = images[i];
           if (!img.complete) {
@@ -334,11 +466,9 @@
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0);
           const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
-
           const wmm = canvas.width * 0.264583;
           const hmm = canvas.height * 0.264583;
           const orientation = wmm > hmm ? 'landscape' : 'portrait';
-
           if (!doc) {
             doc = new jsPDF({ orientation, unit: 'mm', format: [wmm, hmm] });
           } else {
@@ -346,12 +476,10 @@
           }
           doc.addImage(dataUrl, 'JPEG', 0, 0, wmm, hmm);
         }
-
         if (!doc) {
           throw new Error('Aucune image valide trouvée.');
         }
-
-        doc.save('drone.pdf');
+        doc.save('code.pdf');
       } catch (err) {
         alert("Le PDF n'a pas pu être généré. Réessaie, ou vérifie que toutes les planches sont bien chargées.");
         console.error(err);
