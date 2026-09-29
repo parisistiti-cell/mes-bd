@@ -194,7 +194,6 @@
   </div>
 
   <main class="reader">
-
     <div class="page" id="page-00">
       <img src="images/00-couverture.jpg" alt="Planche 0">
     </div>
@@ -228,7 +227,6 @@
     <div class="page" id="page-10">
       <img src="images/10.jpg" alt="Planche 10">
     </div>
-    
     <div class="page" id="page-11">
       <img src="images/11.jpg" alt="Planche 11">
     </div>
@@ -247,7 +245,6 @@
     <div class="page" id="page-16">
       <img src="images/16.jpg" alt="Planche 16">
     </div>
-    
     <div class="page" id="page-17">
       <img src="images/17.jpg" alt="Planche 17">
     </div>
@@ -260,7 +257,6 @@
     clis — mis à jour au fil des chapitres
   </footer>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
     function __isolatePage(target) {
       if (!target) return;
@@ -452,16 +448,19 @@
     });
   </script>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
     async function downloadPDF() {
       const btn = document.getElementById('pdf-btn');
       const originalLabel = btn.textContent;
       btn.disabled = true;
-      btn.textContent = 'Préparation...';
+      btn.textContent = 'Préparation du PDF...';
+
       try {
         const { jsPDF } = window.jspdf;
         const images = Array.from(document.querySelectorAll('.hero img, .page img'));
         let doc;
+
         for (let i = 0; i < images.length; i++) {
           const img = images[i];
           if (!img.complete) {
@@ -477,9 +476,11 @@
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0);
           const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+
           const wmm = canvas.width * 0.264583;
           const hmm = canvas.height * 0.264583;
           const orientation = wmm > hmm ? 'landscape' : 'portrait';
+
           if (!doc) {
             doc = new jsPDF({ orientation, unit: 'mm', format: [wmm, hmm] });
           } else {
@@ -487,9 +488,11 @@
           }
           doc.addImage(dataUrl, 'JPEG', 0, 0, wmm, hmm);
         }
+
         if (!doc) {
           throw new Error('Aucune image valide trouvée.');
         }
+
         doc.save('clis.pdf');
       } catch (err) {
         alert("Le PDF n'a pas pu être généré. Réessaie, ou vérifie que toutes les planches sont bien chargées.");
