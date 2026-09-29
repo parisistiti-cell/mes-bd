@@ -96,10 +96,6 @@
     cursor: default;
   }
   .carte-btn { display: inline-block; text-decoration: none; margin-left: 8px; }
-  .pdf-btn:disabled {
-    opacity: 0.6;
-    cursor: default;
-  }
   .reader {
     max-width: 720px;
     margin: 0 auto;
@@ -194,7 +190,7 @@
   <div class="hero__caption">
     <h1>clis</h1>
     <button id="pdf-btn" class="pdf-btn" onclick="downloadPDF()">Télécharger en PDF</button>
-     <a id="carte-btn" class="pdf-btn carte-btn" href="https://parisistiti-cell.github.io/Se-baigner-en-Dordogne/indexsudbretagne.html" target="_blank" rel="noopener">🗺️ Carte</a>
+    <a id="carte-btn" class="pdf-btn carte-btn" href="https://parisistiti-cell.github.io/Se-baigner-en-Dordogne/indexsudbretagne.html" target="_blank" rel="noopener">🗺️ Carte</a>
   </div>
 
   <main class="reader">
@@ -364,6 +360,8 @@
         controls.appendChild(counter);
         controls.appendChild(nextBtn);
         if (pdfBtn) controls.appendChild(pdfBtn);
+        const carteBtn = document.getElementById('carte-btn');
+        if (carteBtn) controls.appendChild(carteBtn);
         document.body.appendChild(controls);
 
         if (caption) caption.style.display = 'none';
@@ -505,5 +503,3 @@
 
 </body>
 </html>
-
-
