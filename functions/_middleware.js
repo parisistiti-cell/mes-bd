@@ -14,7 +14,7 @@
 // ===========================================================
 
 // Ajoute ici le slug de chaque BD à protéger (le nom de son dossier).
-const PROTECTED_SLUGS = ["entre-deux-vies", "entre-deux-vies-solo", "Tranche-de-vie", "venus", "tp", "avance"];
+const PROTECTED_SLUGS = ["entre-deux-vies", "entre-deux-vies-solo", "Tranche-de-vie", "Tranche-de-vie-solo", "venus", "tp", "avance"];
 
 const COOKIE_NAME = "bd_temp_access";
 const COOKIE_MAX_AGE = 300; // 5 minutes, juste le temps de charger la page
