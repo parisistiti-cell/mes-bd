@@ -2,9 +2,10 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
+<meta name="robots" content="noindex">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>corezlot</title>
-<meta name="description" content="corezlot.">
+<title>corezlot — solo</title>
+<meta name="description" content="corezlot — version solo.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Karla:wght@400;500&display=swap" rel="stylesheet">
@@ -172,13 +173,12 @@
 
   <nav class="topbar">
     <a class="topbar__title" href="#top">corezlot</a>
-    <a class="topbar__home" href="../" style="font-size:0.8rem;color:var(--ink-soft);text-decoration:none;border-bottom:1px solid var(--ink-soft);">Toutes les BD</a>
   </nav>
 
   <div id="top"></div>
 
   <header class="hero">
-    <img src="images/00-couverture.jpg" alt="Couverture — corezlot">
+    <img src="../corezlot/images/00-couverture.jpg" alt="Couverture — corezlot">
   </header>
 
   <div class="hero__caption">
@@ -188,88 +188,88 @@
   </div>
 
   <main class="reader">
-    <div class="page" id="page-00">
-      <img src="images/00-couverture.jpg" alt="Planche 0">
+    <div class="page" id="page-00-couverture">
+      <img src="../corezlot/images/00-couverture.jpg" alt="Planche 0">
     </div>
 
     <div class="page" id="page-01">
-      <img src="images/01.jpg" alt="Planche 1">
+      <img src="../corezlot/images/01.jpg" alt="Planche 1">
     </div>
 
     <div class="page" id="page-02">
-      <img src="images/02.jpg" alt="Planche 2">
+      <img src="../corezlot/images/02.jpg" alt="Planche 2">
     </div>
 
     <div class="page" id="page-03">
-      <img src="images/03.jpg" alt="Planche 3">
+      <img src="../corezlot/images/03.jpg" alt="Planche 3">
     </div>
 
     <div class="page" id="page-04">
-      <img src="images/04.jpg" alt="Planche 4">
+      <img src="../corezlot/images/04.jpg" alt="Planche 4">
     </div>
 
     <div class="page" id="page-05">
-      <img src="images/05.jpg" alt="Planche 5">
+      <img src="../corezlot/images/05.jpg" alt="Planche 5">
     </div>
 
     <div class="page" id="page-06">
-      <img src="images/06.jpg" alt="Planche 6">
+      <img src="../corezlot/images/06.jpg" alt="Planche 6">
     </div>
 
     <div class="page" id="page-07">
-      <img src="images/07.jpg" alt="Planche 7">
+      <img src="../corezlot/images/07.jpg" alt="Planche 7">
     </div>
 
     <div class="page" id="page-08">
-      <img src="images/08.jpg" alt="Planche 8">
+      <img src="../corezlot/images/08.jpg" alt="Planche 8">
     </div>
 
     <div class="page" id="page-09">
-      <img src="images/09.jpg" alt="Planche 9">
+      <img src="../corezlot/images/09.jpg" alt="Planche 9">
     </div>
 
     <div class="page" id="page-10">
-      <img src="images/10.jpg" alt="Planche 10">
+      <img src="../corezlot/images/10.jpg" alt="Planche 10">
     </div>
 
     <div class="page" id="page-11">
-      <img src="images/11.jpg" alt="Planche 11">
+      <img src="../corezlot/images/11.jpg" alt="Planche 11">
     </div>
 
     <div class="page" id="page-12">
-      <img src="images/12.jpg" alt="Planche 12">
+      <img src="../corezlot/images/12.jpg" alt="Planche 12">
     </div>
 
     <div class="page" id="page-13">
-      <img src="images/13.jpg" alt="Planche 13">
+      <img src="../corezlot/images/13.jpg" alt="Planche 13">
     </div>
 
     <div class="page" id="page-14">
-      <img src="images/14.jpg" alt="Planche 14">
+      <img src="../corezlot/images/14.jpg" alt="Planche 14">
     </div>
 
     <div class="page" id="page-15">
-      <img src="images/15.jpg" alt="Planche 15">
+      <img src="../corezlot/images/15.jpg" alt="Planche 15">
     </div>
 
     <div class="page" id="page-16">
-      <img src="images/16.jpg" alt="Planche 16">
+      <img src="../corezlot/images/16.jpg" alt="Planche 16">
     </div>
 
     <div class="page" id="page-17">
-      <img src="images/17.jpg" alt="Planche 17">
+      <img src="../corezlot/images/17.jpg" alt="Planche 17">
     </div>
 
     <div class="page" id="page-18">
-      <img src="images/18.jpg" alt="Planche 18">
+      <img src="../corezlot/images/18.jpg" alt="Planche 18">
     </div>
 
     <div class="page" id="page-19">
-      <img src="images/19.jpg" alt="Planche 19">
+      <img src="../corezlot/images/19.jpg" alt="Planche 19">
     </div>
 
     <div class="page" id="page-20">
-      <img src="images/20.jpg" alt="Planche 20">
+      <img src="../corezlot/images/20.jpg" alt="Planche 20">
     </div>
 
     
@@ -521,7 +521,7 @@
           throw new Error('Aucune image valide trouvée.');
         }
 
-        doc.save('corezlot.pdf');
+        doc.save('corezlot - solo.pdf');
       } catch (err) {
         alert("Le PDF n'a pas pu être généré. Réessaie, ou vérifie que toutes les planches sont bien chargées.");
         console.error(err);
