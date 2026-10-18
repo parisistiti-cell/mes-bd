@@ -938,6 +938,7 @@
     #tools-modal section { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--rule); }
     #tools-modal h4 { margin: 0 0 8px; font-size: 0.95rem; font-weight: 500; }
     #tools-modal .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    #hint-input { flex: 1 1 100%; padding: 8px 10px; font: inherit; color: var(--ink); background: #fff8; border: 1px solid var(--ink-soft); border-radius: 8px; }
     #page-num {
       width: 110px; padding: 8px 10px; font: inherit; color: var(--ink);
       background: #fff8; border: 1px solid var(--ink-soft); border-radius: 8px;
@@ -966,7 +967,7 @@
   <div id="tools-modal" role="dialog" aria-modal="true" aria-label="Recherche">
     <div class="tools-box">
       <div class="tools-head">
-        <h3><span class="full-only">🔍 Recherche</span><span class="simple-only">🔎 Identifier la planche</span></h3>
+        <h3><span class="full-only">🔍 Recherche</span><span class="simple-only">🔎 Essayer d’identifier la planche !</span></h3>
         <button id="tools-close" type="button" aria-label="Fermer">×</button>
       </div>
 
@@ -987,7 +988,9 @@
         </div>
         <img id="paste-preview" alt="Image à identifier">
         <div id="lens-actions" class="row">
+          <input id="hint-input" type="text" maxlength="120" autocomplete="off" placeholder="Indice facultatif : lieu, pays, monument…" aria-label="Indice facultatif">
           <button id="lens-go" class="pdf-btn" type="button">📋 Copier et ouvrir Google Lens</button>
+          <button id="photo-go" class="pdf-btn" type="button" disabled title="Saisissez d’abord un indice">📷 Chercher des photos</button>
           <a id="dl-img" class="pdf-btn carte-btn" style="margin:0" download="planche.png">Télécharger l’image</a>
           <a id="lens-link" class="pdf-btn carte-btn" style="margin:0;display:none" href="https://lens.google.com/" target="_blank" rel="noopener">Ouvrir Google Lens</a>
         </div>
@@ -1041,6 +1044,21 @@
       });
 
       // ---- Image à identifier ----
+      var hintEl = document.getElementById('hint-input');
+      var photoBtn = document.getElementById('photo-go');
+      function resetHint() { hintEl.value = ''; photoBtn.disabled = true; }
+      hintEl.addEventListener('input', function () { photoBtn.disabled = !hintEl.value.trim(); });
+      hintEl.addEventListener('keydown', function (e) {
+        e.stopPropagation(); // pas de changement de page avec les flèches
+        if (e.key === 'Enter') { e.preventDefault(); document.getElementById('lens-go').click(); }
+      });
+      // Recherche d'images classique (photos réelles) à partir de l'indice
+      photoBtn.addEventListener('click', function () {
+        var h = hintEl.value.trim();
+        if (!h) return;
+        window.open('https://www.google.com/search?tbm=isch&hl=fr&q=' + encodeURIComponent(h + ' photo'), '_blank');
+        msg(lensMsg, 'Recherche de photos ouverte dans un nouvel onglet.');
+      });
       function isPublic(u) {
         try {
           var x = new URL(u);
@@ -1049,7 +1067,7 @@
       }
       function setImage(file, publicUrl) {
         if (!file || file.type.indexOf('image/') !== 0) { msg(lensMsg, "Ce n'est pas une image.", true); return; }
-        currentFile = file; currentPng = null;
+        currentFile = file; currentPng = null; resetHint();
         currentUrl = publicUrl && isPublic(publicUrl) ? publicUrl : null;
         document.getElementById('lens-go').textContent = currentUrl ? '🔎 Identifier avec Google Lens' : '📋 Copier et ouvrir Google Lens';
         var url = URL.createObjectURL(file);
@@ -1098,8 +1116,10 @@
         if (!currentFile) return;
         // Planche hébergée sur le site : Lens l'ouvre directement par son adresse, sans collage
         if (currentUrl) {
-          window.open('https://lens.google.com/uploadbyurl?url=' + encodeURIComponent(currentUrl) + '&hl=fr', '_blank');
-          msg(lensMsg, "Google Lens est ouvert dans un nouvel onglet avec cette planche.");
+          var h = hintEl.value.trim();
+          window.open('https://lens.google.com/uploadbyurl?url=' + encodeURIComponent(currentUrl) + '&hl=fr' + (h ? '&q=' + encodeURIComponent(h) : ''), '_blank');
+          msg(lensMsg, h ? "Google Lens est ouvert avec cette planche et votre indice. Pour des photos réelles, utilisez aussi « Chercher des photos »."
+                          : "Google Lens est ouvert dans un nouvel onglet avec cette planche.");
           return;
         }
         var link = document.getElementById('lens-link');
@@ -1140,7 +1160,7 @@
         var src = img.currentSrc || img.src;
         // Planche en ligne : Lens la récupère par son adresse -> aucun encodage, ouverture immédiate
         if (isPublic(src)) {
-          currentFile = { byUrl: true }; currentPng = null; currentUrl = src;
+          currentFile = { byUrl: true }; currentPng = null; currentUrl = src; resetHint();
           open(true);
           preview.src = src;
           preview.style.display = 'block';
@@ -1232,7 +1252,7 @@
     document.addEventListener('DOMContentLoaded', function () {
       var btn = document.createElement('button');
       btn.id = 'film-btn'; btn.type = 'button'; btn.setAttribute('aria-pressed', 'false');
-      btn.innerHTML = '🎞️<span class="lbl"> Bande</span>'; btn.setAttribute('aria-label', 'Bande de miniatures'); btn.title = 'Bande de miniatures';
+      btn.title = 'Afficher ou masquer la bande de miniatures';
       var actions = document.querySelector('.topbar__actions');
       actions.insertBefore(btn, document.getElementById('chat-btn'));
 
@@ -1276,16 +1296,21 @@
       }
       window.__onShow = function (id) { mark(id); if (previousHook) previousHook(id); };
 
-      btn.addEventListener('click', function () {
-        var open = document.body.classList.toggle('film-open');
+      function setOpen(open) {
+        document.body.classList.toggle('film-open', open);
         btn.setAttribute('aria-pressed', open ? 'true' : 'false');
+        btn.innerHTML = '🎞️<span class="lbl"> ' + (open ? 'Bande visible' : 'Bande masquée') + '</span>';
+        btn.setAttribute('aria-label', open ? 'Bande de miniatures visible, cliquer pour la masquer' : 'Bande de miniatures masquée, cliquer pour l’afficher');
         if (open) {
           if (!built) build();
           setFilmH();
           mark(activeId);
           var cur = thumbs[activeId]; if (cur) cur.scrollIntoView({ block: 'nearest', inline: 'center' });
         }
-      });
+      }
+      btn.addEventListener('click', function () { setOpen(!document.body.classList.contains('film-open')); });
+      setOpen(true); // visible par défaut
+      window.addEventListener('load', function () { if (document.body.classList.contains('film-open')) setFilmH(); });
 
       document.getElementById('film-copy').addEventListener('click', function () { window.__copyCurrent(); });
       document.getElementById('film-ident').addEventListener('click', function () { window.__identifyCurrent(); });
@@ -1318,7 +1343,7 @@
       #film-info { display: none; }
       #film .film-tools { padding-bottom: 6px; }
     }
-    @media (max-width: 400px) {
+    @media (max-width: 480px) {
       .lbl { display: none; }
     }
   </style>
