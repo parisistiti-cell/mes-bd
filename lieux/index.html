@@ -981,7 +981,7 @@
       var lensMsg = document.getElementById('lens-msg');
       var gotoMsg = document.getElementById('goto-msg');
       var input = document.getElementById('page-num');
-      var currentFile = null, currentPng = null;
+      var currentFile = null, currentPng = null, currentUrl = null;
 
       function open(simple) {
         modal.classList.toggle('simple', simple === true);
@@ -1012,9 +1012,17 @@
       });
 
       // ---- Image à identifier ----
-      function setImage(file) {
+      function isPublic(u) {
+        try {
+          var x = new URL(u);
+          return /^https?:$/.test(x.protocol) && !/^(localhost|127\.|192\.168\.|10\.)/.test(x.hostname);
+        } catch (e) { return false; }
+      }
+      function setImage(file, publicUrl) {
         if (!file || file.type.indexOf('image/') !== 0) { msg(lensMsg, "Ce n'est pas une image.", true); return; }
         currentFile = file; currentPng = null;
+        currentUrl = publicUrl && isPublic(publicUrl) ? publicUrl : null;
+        document.getElementById('lens-go').textContent = currentUrl ? '🔎 Identifier avec Google Lens' : '📋 Copier et ouvrir Google Lens';
         var url = URL.createObjectURL(file);
         preview.src = url;
         preview.style.display = 'block';
@@ -1059,12 +1067,18 @@
       // le focus à cette page, et Firefox refuserait alors la copie)
       document.getElementById('lens-go').addEventListener('click', function () {
         if (!currentFile) return;
+        // Planche hébergée sur le site : Lens l'ouvre directement par son adresse, sans collage
+        if (currentUrl) {
+          window.open('https://lens.google.com/uploadbyurl?url=' + encodeURIComponent(currentUrl) + '&hl=fr', '_blank');
+          msg(lensMsg, "Google Lens est ouvert dans un nouvel onglet avec cette planche.");
+          return;
+        }
         var link = document.getElementById('lens-link');
         function openLens() {
           var w = window.open('https://lens.google.com/', '_blank');
           if (!w) link.style.display = 'inline-block'; // fenêtre bloquée : lien manuel
         }
-        function done() { msg(lensMsg, "Image copiée. Dans l'onglet Google Lens, faites Ctrl+V (⌘V sur Mac) pour la coller."); openLens(); }
+        function done() { msg(lensMsg, "Image copiée. Dans l'onglet Google Lens, cliquez d'abord dans la zone en pointillés, puis Ctrl+V. Si rien ne se colle : « Télécharger l'image », puis « importez un fichier » dans Lens."); openLens(); }
         function fail(e) {
           msg(lensMsg, "Copie impossible" + (e && e.name ? " (" + e.name + ")" : "") + " : utilisez « Télécharger l'image », puis importez le fichier dans Google Lens.", true);
           link.style.display = 'inline-block';
@@ -1100,8 +1114,8 @@
         c.toBlob(function (blob) {
           if (!blob) { if (window.__toast) window.__toast('Image illisible.'); return; }
           open(true);
-          setImage(new File([blob], 'planche.png', { type: 'image/png' }));
-          msg(lensMsg, "Planche chargée. Cliquez sur « Copier et ouvrir Google Lens », puis Ctrl+V dans Lens.");
+          setImage(new File([blob], 'planche.png', { type: 'image/png' }), img.currentSrc || img.src);
+          msg(lensMsg, currentUrl ? "Planche chargée. Cliquez sur « Identifier avec Google Lens »." : "Planche chargée. Cliquez sur « Copier et ouvrir Google Lens », puis Ctrl+V dans Lens.");
         }, 'image/png');
       };
       document.getElementById('other-img').addEventListener('click', function () { open(false); });
