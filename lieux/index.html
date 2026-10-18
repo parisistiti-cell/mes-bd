@@ -1137,6 +1137,19 @@
       window.__identifyCurrent = function () {
         var img = window.__pager ? window.__pager.currentImg() : null;
         if (!img || !img.naturalWidth) { if (window.__toast) window.__toast('Aucune planche chargée.'); return; }
+        var src = img.currentSrc || img.src;
+        // Planche en ligne : Lens la récupère par son adresse -> aucun encodage, ouverture immédiate
+        if (isPublic(src)) {
+          currentFile = { byUrl: true }; currentPng = null; currentUrl = src;
+          open(true);
+          preview.src = src;
+          preview.style.display = 'block';
+          actions.style.display = 'flex';
+          document.getElementById('dl-img').href = src;
+          document.getElementById('lens-go').textContent = '🔎 Identifier avec Google Lens';
+          msg(lensMsg, 'Planche chargée. Cliquez sur « Identifier avec Google Lens ».');
+          return;
+        }
         var c = document.createElement('canvas');
         c.width = img.naturalWidth; c.height = img.naturalHeight;
         c.getContext('2d').drawImage(img, 0, 0);
