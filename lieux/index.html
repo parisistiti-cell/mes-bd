@@ -958,11 +958,11 @@
         </div>
         <img id="paste-preview" alt="Image à identifier">
         <div id="lens-actions" class="row">
-          <button id="lens-go" class="pdf-btn" type="button">Identifier avec Google Lens</button>
+          <button id="lens-go" class="pdf-btn" type="button">📋 Copier et ouvrir Google Lens</button>
+          <a id="dl-img" class="pdf-btn carte-btn" style="margin:0" download="planche.png">Télécharger l’image</a>
         </div>
         <div class="row" style="margin-top:10px">
           <button id="copy-page" class="pdf-btn" type="button">Copier la planche affichée</button>
-          <a class="pdf-btn carte-btn" style="margin:0" href="https://lens.google.com/" target="_blank" rel="noopener">Ouvrir Google Lens</a>
         </div>
         <p id="lens-msg" class="msg"></p>
         <p class="simple-only msg"><button id="other-img" type="button">Identifier une autre image (coller / fichier)</button></p>
@@ -970,9 +970,6 @@
     </div>
   </div>
 
-  <form id="lens-form" method="POST" action="https://lens.google.com/v3/upload?hl=fr" enctype="multipart/form-data" target="_blank" hidden>
-    <input type="file" name="encoded_image" id="lens-file">
-  </form>
 
   <script>
     (function () {
@@ -983,7 +980,7 @@
       var lensMsg = document.getElementById('lens-msg');
       var gotoMsg = document.getElementById('goto-msg');
       var input = document.getElementById('page-num');
-      var currentFile = null;
+      var currentFile = null, currentPng = null;
 
       function open(simple) {
         modal.classList.toggle('simple', simple === true);
@@ -1016,11 +1013,20 @@
       // ---- Image à identifier ----
       function setImage(file) {
         if (!file || file.type.indexOf('image/') !== 0) { msg(lensMsg, "Ce n'est pas une image.", true); return; }
-        currentFile = file;
-        preview.src = URL.createObjectURL(file);
+        currentFile = file; currentPng = null;
+        var url = URL.createObjectURL(file);
+        preview.src = url;
         preview.style.display = 'block';
         actions.style.display = 'flex';
+        document.getElementById('dl-img').href = url;
         msg(lensMsg, 'Image prête.');
+        // version PNG prête d'avance : le presse-papiers exige un clic immédiat
+        createImageBitmap(file).then(function (bmp) {
+          var c = document.createElement('canvas');
+          c.width = bmp.width; c.height = bmp.height;
+          c.getContext('2d').drawImage(bmp, 0, 0);
+          c.toBlob(function (png) { if (currentFile === file) currentPng = png; }, 'image/png');
+        }).catch(function () {});
       }
       function fileFromClipboard(cd) {
         if (!cd) return null;
@@ -1045,18 +1051,16 @@
       });
       zone.addEventListener('drop', function (e) { setImage(e.dataTransfer.files[0]); });
 
-      // Envoi vers Google Lens (nouvel onglet)
+      // Copie l'image puis ouvre Google Lens : il suffit de faire Ctrl+V (⌘V) dans Lens
       document.getElementById('lens-go').addEventListener('click', function () {
         if (!currentFile) return;
+        window.open('https://lens.google.com/', '_blank', 'noopener');
+        var done = function () { msg(lensMsg, "Image copiée. Dans l'onglet Google Lens, faites Ctrl+V (⌘V sur Mac) pour la coller."); };
+        var fail = function () { msg(lensMsg, "Copie impossible : utilisez « Télécharger l'image », puis importez le fichier dans Google Lens.", true); };
         try {
-          var dt = new DataTransfer();
-          dt.items.add(currentFile);
-          document.getElementById('lens-file').files = dt.files;
-          document.getElementById('lens-form').submit();
-          msg(lensMsg, "Envoyé à Google Lens dans un nouvel onglet. Si rien ne s'affiche, utilisez « Ouvrir Google Lens » et collez l'image (Ctrl+V).");
-        } catch (err) {
-          msg(lensMsg, "Envoi impossible : utilisez « Ouvrir Google Lens » puis collez l'image.", true);
-        }
+          if (!currentPng) { fail(); return; }
+          navigator.clipboard.write([new ClipboardItem({ 'image/png': currentPng })]).then(done).catch(fail);
+        } catch (e) { fail(); }
       });
 
       // Copier la planche affichée dans le presse-papiers
@@ -1085,15 +1089,9 @@
         c.toBlob(function (blob) {
           if (!blob) { if (window.__toast) window.__toast('Image illisible.'); return; }
           open(true);
-          setImage(new File([blob], 'planche.jpg', { type: 'image/jpeg' }));
-          // copie aussi dans le presse-papiers : un simple Ctrl+V suffit si l'envoi direct échoue
-          try {
-            c.toBlob(function (png) {
-              navigator.clipboard.write([new ClipboardItem({ 'image/png': png })]).catch(function () {});
-            }, 'image/png');
-          } catch (e) {}
-          msg(lensMsg, "Planche chargée. Cliquez sur « Identifier avec Google Lens » (elle est aussi copiée : Ctrl+V dans Lens).");
-        }, 'image/jpeg', 0.92);
+          setImage(new File([blob], 'planche.png', { type: 'image/png' }));
+          msg(lensMsg, "Planche chargée. Cliquez sur « Copier et ouvrir Google Lens », puis Ctrl+V dans Lens.");
+        }, 'image/png');
       };
       document.getElementById('other-img').addEventListener('click', function () { open(false); });
       document.getElementById('copy-page').addEventListener('click', copyCurrent);
