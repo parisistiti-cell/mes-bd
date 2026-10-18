@@ -960,6 +960,7 @@
         <div id="lens-actions" class="row">
           <button id="lens-go" class="pdf-btn" type="button">📋 Copier et ouvrir Google Lens</button>
           <a id="dl-img" class="pdf-btn carte-btn" style="margin:0" download="planche.png">Télécharger l’image</a>
+          <a id="lens-link" class="pdf-btn carte-btn" style="margin:0;display:none" href="https://lens.google.com/" target="_blank" rel="noopener">Ouvrir Google Lens</a>
         </div>
         <div class="row" style="margin-top:10px">
           <button id="copy-page" class="pdf-btn" type="button">Copier la planche affichée</button>
@@ -1020,13 +1021,16 @@
         actions.style.display = 'flex';
         document.getElementById('dl-img').href = url;
         msg(lensMsg, 'Image prête.');
-        // version PNG prête d'avance : le presse-papiers exige un clic immédiat
-        createImageBitmap(file).then(function (bmp) {
-          var c = document.createElement('canvas');
-          c.width = bmp.width; c.height = bmp.height;
-          c.getContext('2d').drawImage(bmp, 0, 0);
-          c.toBlob(function (png) { if (currentFile === file) currentPng = png; }, 'image/png');
-        }).catch(function () {});
+        // PNG préparé en promesse : accepté directement par le presse-papiers
+        currentPng = createImageBitmap(file).then(function (bmp) {
+          return new Promise(function (resolve, reject) {
+            var c = document.createElement('canvas');
+            c.width = bmp.width; c.height = bmp.height;
+            c.getContext('2d').drawImage(bmp, 0, 0);
+            c.toBlob(function (png) { png ? resolve(png) : reject(new Error('png')); }, 'image/png');
+          });
+        });
+        currentPng.catch(function () {});
       }
       function fileFromClipboard(cd) {
         if (!cd) return null;
@@ -1051,16 +1055,23 @@
       });
       zone.addEventListener('drop', function (e) { setImage(e.dataTransfer.files[0]); });
 
-      // Copie l'image puis ouvre Google Lens : il suffit de faire Ctrl+V (⌘V) dans Lens
+      // Copie l'image PUIS ouvre Google Lens (ouvrir l'onglet d'abord ferait perdre
+      // le focus à cette page, et Firefox refuserait alors la copie)
       document.getElementById('lens-go').addEventListener('click', function () {
         if (!currentFile) return;
-        window.open('https://lens.google.com/', '_blank', 'noopener');
-        var done = function () { msg(lensMsg, "Image copiée. Dans l'onglet Google Lens, faites Ctrl+V (⌘V sur Mac) pour la coller."); };
-        var fail = function () { msg(lensMsg, "Copie impossible : utilisez « Télécharger l'image », puis importez le fichier dans Google Lens.", true); };
+        var link = document.getElementById('lens-link');
+        function openLens() {
+          var w = window.open('https://lens.google.com/', '_blank');
+          if (!w) link.style.display = 'inline-block'; // fenêtre bloquée : lien manuel
+        }
+        function done() { msg(lensMsg, "Image copiée. Dans l'onglet Google Lens, faites Ctrl+V (⌘V sur Mac) pour la coller."); openLens(); }
+        function fail(e) {
+          msg(lensMsg, "Copie impossible" + (e && e.name ? " (" + e.name + ")" : "") + " : utilisez « Télécharger l'image », puis importez le fichier dans Google Lens.", true);
+          link.style.display = 'inline-block';
+        }
         try {
-          if (!currentPng) { fail(); return; }
           navigator.clipboard.write([new ClipboardItem({ 'image/png': currentPng })]).then(done).catch(fail);
-        } catch (e) { fail(); }
+        } catch (e) { fail(e); }
       });
 
       // Copier la planche affichée dans le presse-papiers
