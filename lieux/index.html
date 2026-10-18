@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>lieux</title>
 <meta name="description" content="lieux.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -150,6 +150,7 @@
     max-width: 100%;
     height: auto;
     max-height: calc(100vh - 90px);
+    max-height: calc(100dvh - 90px);
     margin: 0 auto;
     object-fit: contain;
     cursor: zoom-in;
@@ -179,7 +180,7 @@
   <nav class="topbar">
     <a class="topbar__title" href="#top">lieux</a>
     <div class="topbar__actions">
-      <button id="chat-btn" type="button" title="Ouvrir le chat" aria-label="Ouvrir le chat">💬 Chat</button>
+      <button id="chat-btn" type="button" title="Ouvrir le chat" aria-label="Ouvrir le chat">💬<span class="lbl"> Chat</span></button>
       <a class="topbar__home" href="../">Toutes les BD</a>
     </div>
   </nav>
@@ -681,6 +682,11 @@
             if (i < 0) return false;
             current = i; show(i); return true;
           },
+          step: function (d) {
+            var n = current + d;
+            if (n < 0 || n >= pages.length) return;
+            current = n; show(n);
+          },
           currentImg: function () { return pages[current].querySelector('img'); }
         };
 
@@ -766,6 +772,29 @@
           isDown = false;
           page.classList.remove('dragging');
         });
+
+        // Déplacement au doigt dans l'image zoomée
+        page.addEventListener('touchstart', (e) => {
+          dragged = false;
+          if (!isZoomed() || e.touches.length !== 1) return;
+          isDown = true;
+          startX = e.touches[0].pageX;
+          startY = e.touches[0].pageY;
+          startPanX = panX;
+          startPanY = panY;
+        }, { passive: true });
+        page.addEventListener('touchmove', (e) => {
+          if (!isDown || !isZoomed() || e.touches.length !== 1) return;
+          e.preventDefault();
+          const dx = e.touches[0].pageX - startX;
+          const dy = e.touches[0].pageY - startY;
+          if (Math.abs(dx) > 3 || Math.abs(dy) > 3) dragged = true;
+          panX = startPanX + dx;
+          panY = startPanY + dy;
+          clampPan();
+          applyTransform();
+        }, { passive: false });
+        page.addEventListener('touchend', () => { isDown = false; });
       });
     });
   </script>
@@ -927,7 +956,7 @@
     #tools-modal.simple #paste-zone,
     #tools-modal.simple #copy-page { display: none !important; }
     #tools-modal.simple section { border-top: none; margin-top: 8px; padding-top: 0; }
-    #tools-modal.simple #paste-preview { max-height: 55vh; margin-top: 0; }
+    #tools-modal.simple #paste-preview { max-height: 55vh; max-height: 55dvh; margin-top: 0; }
     #tools-modal .simple-only { display: none; }
     #tools-modal.simple .simple-only { display: inline; }
     #tools-modal.simple .full-only { display: none; }
@@ -1138,7 +1167,7 @@
     #film {
       display: none; position: fixed; left: 0; right: 0; bottom: 0; z-index: 25;
       background: rgba(30,26,22,0.92); backdrop-filter: blur(6px);
-      padding: 8px 0 10px; color: #f2ead9; font-family: 'Karla', sans-serif;
+      padding: 8px 0 calc(10px + env(safe-area-inset-bottom, 0px)); color: #f2ead9; font-family: 'Karla', sans-serif;
     }
     body.film-open #film { display: block; }
     #film .film-tools { display: flex; gap: 8px; padding: 0 12px 8px; align-items: center; flex-wrap: wrap; }
@@ -1165,10 +1194,10 @@
     .thumb:hover img { opacity: 1; }
     .thumb.active { border-color: #9fc9a3; }
     .thumb.active img { opacity: 1; }
-    body.film-open .pager-controls { bottom: 150px; }
-    body.film-open .page img { max-height: calc(100vh - 90px - 130px); }
+    body.film-open .pager-controls { bottom: calc(var(--film-h, 134px) + 14px); }
+    body.film-open .page img { max-height: calc(100vh - 90px - var(--film-h, 134px)); max-height: calc(100dvh - 90px - var(--film-h, 134px)); }
     #film-toast {
-      position: fixed; left: 50%; bottom: 210px; transform: translateX(-50%); z-index: 40;
+      position: fixed; left: 50%; bottom: calc(var(--film-h, 134px) + 74px); transform: translateX(-50%); z-index: 40;
       background: #f2ead9; color: var(--ink); padding: 8px 16px; border-radius: 20px;
       font: 0.85rem 'Karla', sans-serif; box-shadow: 0 4px 14px rgba(0,0,0,0.35);
       opacity: 0; pointer-events: none; transition: opacity 0.2s; max-width: 90vw; text-align: center;
@@ -1190,7 +1219,7 @@
     document.addEventListener('DOMContentLoaded', function () {
       var btn = document.createElement('button');
       btn.id = 'film-btn'; btn.type = 'button'; btn.setAttribute('aria-pressed', 'false');
-      btn.textContent = '🎞️ Bande';
+      btn.innerHTML = '🎞️<span class="lbl"> Bande</span>'; btn.setAttribute('aria-label', 'Bande de miniatures'); btn.title = 'Bande de miniatures';
       var actions = document.querySelector('.topbar__actions');
       actions.insertBefore(btn, document.getElementById('chat-btn'));
 
@@ -1219,6 +1248,9 @@
         info.textContent = Object.keys(thumbs).length + ' planches';
       }
 
+      var film = document.getElementById('film');
+      function setFilmH() { document.documentElement.style.setProperty('--film-h', film.offsetHeight + 'px'); }
+      window.addEventListener('resize', function () { if (document.body.classList.contains('film-open')) setFilmH(); });
       var activeId = document.querySelector('.reader .page').id; // la 1re planche est affichée au départ
       var previousHook = window.__onShow;
       function mark(id) {
@@ -1236,6 +1268,7 @@
         btn.setAttribute('aria-pressed', open ? 'true' : 'false');
         if (open) {
           if (!built) build();
+          setFilmH();
           mark(activeId);
           var cur = thumbs[activeId]; if (cur) cur.scrollIntoView({ block: 'nearest', inline: 'center' });
         }
@@ -1250,6 +1283,52 @@
         clearTimeout(timer); timer = setTimeout(function () { toast.classList.remove('on'); }, 2500);
       };
     });
+  </script>
+
+  <!-- ===== Adaptation smartphone ===== -->
+  <style>
+    .page { touch-action: manipulation; }
+    .page.zoomed { touch-action: none; }
+    @media (max-width: 520px) {
+      .topbar { padding: 10px 12px; }
+      .topbar__actions { gap: 8px; }
+      #chat-btn, #film-btn { padding: 6px 11px; font-size: 0.85rem; }
+      .topbar__home { font-size: 0.75rem; }
+      body .pager-controls {
+        flex-wrap: wrap; justify-content: center; gap: 6px 10px;
+        width: max-content; max-width: calc(100vw - 16px);
+        padding: 6px 12px; border-radius: 22px;
+        bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+      }
+      body .pager-controls .pdf-btn { font-size: 0.7rem; padding: 5px 10px; margin: 0; }
+      .thumb { width: 52px; height: 68px; }
+      #film-info { display: none; }
+      #film .film-tools { padding-bottom: 6px; }
+    }
+    @media (max-width: 400px) {
+      .lbl { display: none; }
+    }
+  </style>
+
+  <script>
+    // Balayage gauche/droite sur la planche pour tourner les pages (planche non zoomée)
+    (function () {
+      var x0, y0, t0, ok = false;
+      document.addEventListener('touchstart', function (e) {
+        ok = false;
+        if (!window.__pager || e.touches.length !== 1) return;
+        var page = e.target.closest && e.target.closest('.reader .page');
+        if (!page || page.classList.contains('zoomed')) return;
+        x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; t0 = Date.now(); ok = true;
+      }, { passive: true });
+      document.addEventListener('touchend', function (e) {
+        if (!ok) return;
+        ok = false;
+        var t = e.changedTouches[0], dx = t.clientX - x0, dy = t.clientY - y0;
+        if (Math.abs(dx) < 50 || Math.abs(dy) > Math.abs(dx) * 0.6 || Date.now() - t0 > 700) return;
+        window.__pager.step(dx < 0 ? 1 : -1);
+      }, { passive: true });
+    })();
   </script>
 </body>
 </html>
