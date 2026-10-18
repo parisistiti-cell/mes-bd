@@ -179,7 +179,6 @@
   <nav class="topbar">
     <a class="topbar__title" href="#top">lieux</a>
     <div class="topbar__actions">
-      <button id="tools-btn" type="button" title="Rechercher une page / identifier une image" aria-label="Recherche">🔍 Recherche</button>
       <button id="chat-btn" type="button" title="Ouvrir le chat" aria-label="Ouvrir le chat">💬 Chat</button>
       <a class="topbar__home" href="../">Toutes les BD</a>
     </div>
@@ -924,12 +923,21 @@
     #paste-zone:focus, #paste-zone.over { border-color: var(--accent-deep); background: rgba(90,125,94,0.08); }
     #paste-preview { display: none; max-width: 100%; max-height: 220px; margin: 10px auto 0; border-radius: 6px; }
     #lens-actions { display: none; margin-top: 10px; }
+    #tools-modal.simple #goto-section,
+    #tools-modal.simple #paste-zone,
+    #tools-modal.simple #copy-page { display: none !important; }
+    #tools-modal.simple section { border-top: none; margin-top: 8px; padding-top: 0; }
+    #tools-modal.simple #paste-preview { max-height: 55vh; margin-top: 0; }
+    #tools-modal .simple-only { display: none; }
+    #tools-modal.simple .simple-only { display: inline; }
+    #tools-modal.simple .full-only { display: none; }
+    #other-img { background: none; border: none; padding: 0; font: inherit; font-size: 0.8rem; color: var(--ink-soft); text-decoration: underline; cursor: pointer; }
   </style>
 
   <div id="tools-modal" role="dialog" aria-modal="true" aria-label="Recherche">
     <div class="tools-box">
       <div class="tools-head">
-        <h3>🔍 Recherche</h3>
+        <h3><span class="full-only">🔍 Recherche</span><span class="simple-only">🔎 Identifier la planche</span></h3>
         <button id="tools-close" type="button" aria-label="Fermer">×</button>
       </div>
 
@@ -943,7 +951,7 @@
       </section>
 
       <section>
-        <h4>Identifier une image avec Google</h4>
+        <h4 class="full-only">Identifier une image avec Google</h4>
         <div id="paste-zone" tabindex="0">
           Cliquez ici puis collez une image (Ctrl+V / ⌘V),<br>glissez-la, ou
           <label style="text-decoration:underline;cursor:pointer">choisissez un fichier<input id="img-file" type="file" accept="image/*" hidden></label>
@@ -957,6 +965,7 @@
           <a class="pdf-btn carte-btn" style="margin:0" href="https://lens.google.com/" target="_blank" rel="noopener">Ouvrir Google Lens</a>
         </div>
         <p id="lens-msg" class="msg"></p>
+        <p class="simple-only msg"><button id="other-img" type="button">Identifier une autre image (coller / fichier)</button></p>
       </section>
     </div>
   </div>
@@ -976,8 +985,10 @@
       var input = document.getElementById('page-num');
       var currentFile = null;
 
-      function open() {
+      function open(simple) {
+        modal.classList.toggle('simple', simple === true);
         modal.classList.add('visible');
+        if (simple === true) return;
         var hasPager = !!window.__pager;
         document.getElementById('goto-section').style.display = hasPager ? '' : 'none';
         (hasPager ? input : zone).focus();
@@ -1022,7 +1033,7 @@
         var f = fileFromClipboard(e.clipboardData);
         if (!f) return;
         e.preventDefault();
-        if (!modal.classList.contains('visible')) open();
+        if (!modal.classList.contains('visible')) open(false);
         setImage(f);
       });
       document.getElementById('img-file').addEventListener('change', function (e) { setImage(e.target.files[0]); });
@@ -1064,10 +1075,29 @@
         }, 'image/png');
       }
       window.__copyCurrent = copyCurrent;
-      window.__openTools = open;
+      window.__openTools = function () { open(false); };
+      window.__identifyCurrent = function () {
+        var img = window.__pager ? window.__pager.currentImg() : null;
+        if (!img || !img.naturalWidth) { if (window.__toast) window.__toast('Aucune planche chargée.'); return; }
+        var c = document.createElement('canvas');
+        c.width = img.naturalWidth; c.height = img.naturalHeight;
+        c.getContext('2d').drawImage(img, 0, 0);
+        c.toBlob(function (blob) {
+          if (!blob) { if (window.__toast) window.__toast('Image illisible.'); return; }
+          open(true);
+          setImage(new File([blob], 'planche.jpg', { type: 'image/jpeg' }));
+          // copie aussi dans le presse-papiers : un simple Ctrl+V suffit si l'envoi direct échoue
+          try {
+            c.toBlob(function (png) {
+              navigator.clipboard.write([new ClipboardItem({ 'image/png': png })]).catch(function () {});
+            }, 'image/png');
+          } catch (e) {}
+          msg(lensMsg, "Planche chargée. Cliquez sur « Identifier avec Google Lens » (elle est aussi copiée : Ctrl+V dans Lens).");
+        }, 'image/jpeg', 0.92);
+      };
+      document.getElementById('other-img').addEventListener('click', function () { open(false); });
       document.getElementById('copy-page').addEventListener('click', copyCurrent);
 
-      document.getElementById('tools-btn').addEventListener('click', open);
       document.getElementById('tools-close').addEventListener('click', close);
       modal.addEventListener('click', function (e) { if (e.target === modal) close(); });
       document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
@@ -1126,7 +1156,7 @@
   <div id="film" aria-label="Miniatures des planches">
     <div class="film-tools">
       <button type="button" id="film-copy">📋 Copier cette planche</button>
-      <button type="button" id="film-ident">🔎 Identifier une image (Google)</button>
+      <button type="button" id="film-ident">🔎 Identifier l’image affichée</button>
       <span id="film-info"></span>
     </div>
     <div id="film-track" role="listbox"></div>
@@ -1139,7 +1169,7 @@
       btn.id = 'film-btn'; btn.type = 'button'; btn.setAttribute('aria-pressed', 'false');
       btn.textContent = '🎞️ Bande';
       var actions = document.querySelector('.topbar__actions');
-      actions.insertBefore(btn, document.getElementById('tools-btn'));
+      actions.insertBefore(btn, document.getElementById('chat-btn'));
 
       // Lien direct vers une planche : navigation verrouillée, pas de bande
       if (!window.__pager) { btn.style.display = 'none'; return; }
@@ -1189,7 +1219,7 @@
       });
 
       document.getElementById('film-copy').addEventListener('click', function () { window.__copyCurrent(); });
-      document.getElementById('film-ident').addEventListener('click', function () { window.__openTools(); });
+      document.getElementById('film-ident').addEventListener('click', function () { window.__identifyCurrent(); });
 
       var toast = document.getElementById('film-toast'), timer;
       window.__toast = function (t) {
