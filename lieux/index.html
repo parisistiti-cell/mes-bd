@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>lieux</title>
+<meta name="description" content="lieux.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Karla:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #f2ead9;
+    --cream-deep: #e8dcc3;
+    --ink: #3a2e28;
+    --ink-soft: #6b5c50;
+    --accent: #5a7d5e;
+    --accent-deep: #45624a;
+    --rule: rgba(58, 46, 40, 0.15);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Karla', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    background: rgba(242, 234, 217, 0.92);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--rule);
+  }
+  .topbar__title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.15rem;
+    letter-spacing: 0.02em;
+    color: var(--accent-deep);
+    text-decoration: none;
+  }
+  .topbar__home {
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+    text-decoration: none;
+    border-bottom: 1px solid var(--ink-soft);
+  }
+  .hero {
+    position: relative;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  .hero img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .hero__caption {
+    max-width: 560px;
+    margin: 40px auto 60px;
+    padding: 0 28px;
+    text-align: center;
+  }
+  .hero__caption h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 500;
+    font-size: clamp(2rem, 6vw, 2.6rem);
+    letter-spacing: 0.01em;
+    margin: 0 0 22px;
+    color: var(--accent-deep);
+  }
+  .pdf-btn {
+    font-family: 'Karla', sans-serif;
+    font-size: 0.85rem;
+    color: var(--accent-deep);
+    background: transparent;
+    border: 1px solid var(--accent-deep);
+    border-radius: 20px;
+    padding: 9px 20px;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .pdf-btn:hover:not(:disabled) {
+    background: var(--accent-deep);
+    color: var(--cream);
+  }
+  .carte-btn { display: inline-block; text-decoration: none; margin-left: 8px; }
+  .pdf-btn:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+  .pager-controls .pdf-btn {
+    color: var(--cream);
+    border-color: var(--cream);
+    font-size: 0.75rem;
+    padding: 6px 14px;
+  }
+  .pager-controls .pdf-btn:hover:not(:disabled) {
+    background: var(--cream);
+    color: var(--ink);
+  }
+  .reader {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 0 100px;
+  }
+  .page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin: 0 auto;
+    scroll-margin-top: 64px;
+    position: relative;
+  }
+  .zoom-hint {
+    position: absolute;
+    bottom: 14px;
+    right: 14px;
+    display: none;
+    align-items: center;
+    gap: 6px;
+    background: rgba(30, 26, 22, 0.78);
+    color: #f2ead9;
+    font-family: 'Karla', sans-serif;
+    font-size: 0.78rem;
+    padding: 6px 12px;
+    border-radius: 20px;
+    pointer-events: none;
+    z-index: 5;
+    white-space: nowrap;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .page:hover .zoom-hint {
+      display: flex;
+    }
+  }
+  /* La planche s'adapte à la hauteur de l'écran (jamais besoin de
+     scroller ni de dézoomer, même si l'image est très haute) */
+  .page img {
+    display: block;
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    max-height: calc(100vh - 90px);
+    margin: 0 auto;
+    object-fit: contain;
+    cursor: zoom-in;
+    transition: transform 0.25s ease;
+  }
+  .page.zoomed {
+    overflow: hidden;
+    cursor: grab;
+  }
+  .page.zoomed.dragging {
+    cursor: grabbing;
+  }
+  .page.zoomed.dragging img {
+    transition: none;
+  }
+  footer {
+    text-align: center;
+    padding: 40px 24px 60px;
+    color: var(--ink-soft);
+    font-size: 0.8rem;
+    border-top: 1px solid var(--rule);
+  }
+</style>
+</head>
+<body>
+
+  <nav class="topbar">
+    <a class="topbar__title" href="#top">lieux</a>
+    <div class="topbar__actions">
+      <button id="tools-btn" type="button" title="Rechercher une page / identifier une image" aria-label="Recherche">🔍 Recherche</button>
+      <button id="chat-btn" type="button" title="Ouvrir le chat" aria-label="Ouvrir le chat">💬 Chat</button>
+      <a class="topbar__home" href="../">Toutes les BD</a>
+    </div>
+  </nav>
+
+  <div id="top"></div>
+
+  <header class="hero">
+    <img src="images/00-couverture.jpg" alt="Couverture — lieux">
+  </header>
+
+  <div class="hero__caption">
+    <h1>lieux</h1>
+    <button id="pdf-btn" class="pdf-btn" onclick="downloadPDF()">Télécharger en PDF</button>
+    <a id="carte-btn" class="pdf-btn carte-btn" href="https://parisistiti-cell.github.io/Se-baigner-en-Dordogne/indexbdou.html" target="_blank" rel="noopener">🗺️ Carte</a>
+  </div>
+
+  <!--
+    ===========================================================
+    AJOUTE TES PLANCHES ICI
+
+    Pour chaque planche : dépose l'image dans le dossier images/
+    puis ajoute un bloc comme celui-ci (en gardant le même ordre
+    que ton histoire). L'attribut id permet un lien direct vers
+    cette planche précise :
+
+    <div class="page" id="page-03">
+      <img src="images/03.jpg" alt="Planche 3">
+    </div>
+
+    Lien vers cette planche : ton-site.pages.dev/lieux/#page-03
+    ===========================================================
+  -->
+  <main class="reader">
+
+    <div class="page" id="page-00">
+      <img src="images/00-couverture.jpg" alt="Planche 0">
+    </div>
+
+    <div class="page" id="page-02">
+      <img src="images/02.jpg" alt="Planche 2">
+    </div>
+
+    <div class="page" id="page-01">
+      <img src="images/01.jpg" alt="Planche 1">
+    </div>
+    
+
+    <div class="page" id="page-03">
+      <img src="images/03.jpg" alt="Planche 3">
+    </div>
+
+    <div class="page" id="page-04">
+      <img src="images/04.jpg" alt="Planche 4">
+    </div>
+
+    <div class="page" id="page-05">
+      <img src="images/05.jpg" alt="Planche 5">
+    </div>
+
+    <div class="page" id="page-06">
+      <img src="images/06.jpg" alt="Planche 6">
+    </div>
+
+    <div class="page" id="page-07">
+      <img src="images/07.jpg" alt="Planche 7">
+    </div>
+    
+    <div class="page" id="page-08">
+      <img src="images/08.jpg" alt="Planche 8">
+    </div>
+    
+    <div class="page" id="page-09">
+      <img src="images/09.jpg" alt="Planche 9">
+    </div>
+    
+    <div class="page" id="page-10">
+      <img src="images/10.jpg" alt="Planche 10">
+    </div>
+    <div class="page" id="page-11">
+      <img src="images/11.jpg" alt="Planche 11">
+    </div>
+    
+    <div class="page" id="page-12">
+      <img src="images/12.jpg" alt="Planche 12">
+    </div>
+    
+    <div class="page" id="page-13">
+      <img src="images/13.jpg" alt="Planche 13">
+    </div>
+    
+    <div class="page" id="page-14">
+      <img src="images/14.jpg" alt="Planche 14">
+    </div>
+    
+    <div class="page" id="page-15">
+      <img src="images/15.jpg" alt="Planche 15">
+    </div>
+    
+    <div class="page" id="page-16">
+      <img src="images/16.jpg" alt="Planche 16">
+    </div>
+    
+
+    <div class="page" id="page-17">
+      <img src="images/17.jpg" alt="Planche 17">
+    </div>
+
+    <div class="page" id="page-18">
+      <img src="images/18.jpg" alt="Planche 18">
+    </div>
+
+    <div class="page" id="page-19">
+      <img src="images/19.jpg" alt="Planche 19">
+    </div>
+
+    <div class="page" id="page-20">
+      <img src="images/20.jpg" alt="Planche 20">
+    </div>
+    
+    <div class="page" id="page-21">
+      <img src="images/21.jpg" alt="Planche 21">
+    </div>
+    
+    <div class="page" id="page-22">
+      <img src="images/22.jpg" alt="Planche 22">
+    </div>
+    
+    <div class="page" id="page-23">
+      <img src="images/23.jpg" alt="Planche 23">
+    </div>
+    <div class="page" id="page-24">
+      <img src="images/24.jpg" alt="Planche 24">
+    </div>
+    
+    <div class="page" id="page-25">
+      <img src="images/25.jpg" alt="Planche 25">
+    </div>
+    
+    <div class="page" id="page-26">
+      <img src="images/26.jpg" alt="Planche 26">
+    </div>
+    
+    <div class="page" id="page-27">
+      <img src="images/27.jpg" alt="Planche 27">
+    </div>
+    
+    <div class="page" id="page-28">
+      <img src="images/28.jpg" alt="Planche 28">
+    </div>
+    
+    <div class="page" id="page-29">
+      <img src="images/29.jpg" alt="Planche 29">
+    </div>
+   
+
+
+    <div class="page" id="page-30">
+      <img src="images/30.jpg" alt="Planche 30">
+    </div>
+
+    <div class="page" id="page-31">
+      <img src="images/31.jpg" alt="Planche 31">
+    </div>
+
+    <div class="page" id="page-32">
+      <img src="images/32.jpg" alt="Planche 32">
+    </div>
+    
+    <div class="page" id="page-33">
+      <img src="images/33.jpg" alt="Planche 33">
+    </div>
+    
+    <div class="page" id="page-34">
+      <img src="images/34.jpg" alt="Planche 34">
+    </div>
+    
+    <div class="page" id="page-35">
+      <img src="images/35.jpg" alt="Planche 35">
+    </div>
+    <div class="page" id="page-36">
+      <img src="images/36.jpg" alt="Planche 36">
+    </div>
+    
+    <div class="page" id="page-37">
+      <img src="images/37.jpg" alt="Planche 37">
+    </div>
+    
+    <div class="page" id="page-38">
+      <img src="images/38.jpg" alt="Planche 38">
+    </div>
+    
+    <div class="page" id="page-39">
+      <img src="images/39.jpg" alt="Planche 39">
+    </div>
+    
+    <div class="page" id="page-40">
+      <img src="images/40.jpg" alt="Planche 40">
+    </div>
+    
+    <div class="page" id="page-41">
+      <img src="images/41.jpg" alt="Planche 41">
+    </div>
+
+    <div class="page" id="page-42">
+      <img src="images/42.jpg" alt="Planche 42">
+    </div>
+    
+    <div class="page" id="page-43">
+      <img src="images/43.jpg" alt="Planche 43">
+    </div>
+    
+    <div class="page" id="page-44">
+      <img src="images/44.jpg" alt="Planche 44">
+    </div>
+    
+    <div class="page" id="page-45">
+      <img src="images/45.jpg" alt="Planche 45">
+    </div>
+    
+    <div class="page" id="page-46">
+      <img src="images/46.jpg" alt="Planche 46">
+    </div>
+    
+    <div class="page" id="page-47">
+      <img src="images/47.jpg" alt="Planche 47">
+    </div>
+   
+
+
+    <div class="page" id="page-48">
+      <img src="images/48.jpg" alt="Planche 48">
+    </div>
+
+    <div class="page" id="page-49">
+      <img src="images/49.jpg" alt="Planche 49">
+    </div>
+
+    <div class="page" id="page-50">
+      <img src="images/50.jpg" alt="Planche 50">
+    </div>
+    
+    <div class="page" id="page-51">
+      <img src="images/51.jpg" alt="Planche 51">
+    </div>
+    
+    <div class="page" id="page-52">
+      <img src="images/52.jpg" alt="Planche 52">
+    </div>
+    
+    <div class="page" id="page-53">
+      <img src="images/53.jpg" alt="Planche 53">
+    </div>
+    <div class="page" id="page-54">
+      <img src="images/54.jpg" alt="Planche 54">
+    </div>
+    
+    <div class="page" id="page-55">
+      <img src="images/55.jpg" alt="Planche 55">
+    </div>
+    
+    <div class="page" id="page-56">
+      <img src="images/56.jpg" alt="Planche 56">
+    </div>
+    
+    <div class="page" id="page-57">
+      <img src="images/57.jpg" alt="Planche 57">
+    </div>
+    
+    <div class="page" id="page-58">
+      <img src="images/58.jpg" alt="Planche 58">
+    </div>
+    
+    <div class="page" id="page-59">
+      <img src="images/59.jpg" alt="Planche 59">
+    </div>
+    
+    
+
+    <div class="page" id="page-60">
+      <img src="images/60.jpg" alt="Planche 60">
+    </div>
+    
+    <div class="page" id="page-61">
+      <img src="images/61.jpg" alt="Planche 61">
+    </div>
+    
+    <div class="page" id="page-62">
+      <img src="images/62.jpg" alt="Planche 62">
+    </div>
+    
+    <div class="page" id="page-63">
+      <img src="images/63.jpg" alt="Planche 63">
+    </div>
+    <div class="page" id="page-64">
+      <img src="images/64.jpg" alt="Planche 64">
+    </div>
+    
+    <div class="page" id="page-65">
+      <img src="images/65.jpg" alt="Planche 65">
+    </div>
+    
+    <div class="page" id="page-66">
+      <img src="images/66.jpg" alt="Planche 66">
+    </div>
+    
+    <div class="page" id="page-67">
+      <img src="images/67.jpg" alt="Planche 67">
+    </div>
+    
+    <div class="page" id="page-68">
+      <img src="images/68.jpg" alt="Planche 68">
+    </div>
+    
+    <div class="page" id="page-69">
+      <img src="images/69.jpg" alt="Planche 69">
+    </div>
+    
+    <div class="page" id="page-70">
+      <img src="images/70.jpg" alt="Planche 70">
+    </div>
+    
+    <div class="page" id="page-71">
+      <img src="images/71.jpg" alt="Planche 71">
+    </div>
+    
+
+    <div class="page" id="page-72">
+      <img src="images/72.jpg" alt="Planche 72">
+    </div>
+    
+    <div class="page" id="page-73">
+      <img src="images/73.jpg" alt="Planche 73">
+    </div>
+    <div class="page" id="page-74">
+      <img src="images/74.jpg" alt="Planche 74">
+    </div>
+    
+    <div class="page" id="page-75">
+      <img src="images/75.jpg" alt="Planche 75">
+    </div>
+    
+    <div class="page" id="page-76">
+      <img src="images/76.jpg" alt="Planche 76">
+    </div>
+    
+    <div class="page" id="page-77">
+      <img src="images/77.jpg" alt="Planche 77">
+    </div>
+    
+    <div class="page" id="page-78">
+      <img src="images/78.jpg" alt="Planche 78">
+    </div>
+    
+    <div class="page" id="page-79">
+      <img src="images/79.jpg" alt="Planche 79">
+    </div>
+    
+    
+
+    <div class="page" id="page-80">
+      <img src="images/80.jpg" alt="Planche 80">
+    </div>
+    
+    <div class="page" id="page-81">
+      <img src="images/81.jpg" alt="Planche 81">
+    </div>
+    
+    <div class="page" id="page-82">
+      <img src="images/82.jpg" alt="Planche 82">
+    </div>
+    
+    <div class="page" id="page-83">
+      <img src="images/83.jpg" alt="Planche 83">
+    </div>
+    <div class="page" id="page-84">
+      <img src="images/84.jpg" alt="Planche 84">
+    </div>
+  </main>
+
+  <footer>
+    lieux — mis à jour au fil des chapitres
+  </footer>
+
+  <script>
+    function __isolatePage(target) {
+      if (!target) return;
+      const el = document.querySelector(target);
+      if (!el) return;
+      document.querySelectorAll('.page').forEach((p) => {
+        if (p !== el) p.style.display = 'none';
+      });
+      const hero = document.querySelector('.hero');
+      const caption = document.querySelector('.hero__caption');
+      const foot = document.querySelector('footer');
+      if (hero) hero.style.display = 'none';
+      if (caption) caption.style.display = 'none';
+      if (foot) foot.style.display = 'none';
+      const pager = document.querySelector('.pager-controls');
+      if (pager) pager.remove();
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+      el.scrollIntoView();
+    }
+    window.__isolatePage = __isolatePage;
+
+    if (window.location.hash) {
+      // Lien partagé vers une planche précise : reste verrouillé dessus,
+      // sans navigation possible.
+      document.addEventListener('DOMContentLoaded', () => __isolatePage(window.location.hash));
+    } else {
+      // Lecture normale : une planche à la fois, avec précédent/suivant.
+      // La couverture, le titre et le pied de page sont masqués pendant
+      // la lecture ; le bouton PDF est déplacé dans la barre du bas.
+      document.addEventListener('DOMContentLoaded', () => {
+        const pages = Array.from(document.querySelectorAll('.reader .page'));
+        if (pages.length === 0) return;
+
+        let current = 0;
+
+        const hero = document.querySelector('.hero');
+        const caption = document.querySelector('.hero__caption');
+        const foot = document.querySelector('footer');
+        const pdfBtn = document.getElementById('pdf-btn');
+
+        if (hero) hero.style.display = 'none';
+        if (foot) foot.style.display = 'none';
+        document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
+
+        const style = document.createElement('style');
+        style.textContent = `
+          .pager-controls {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 14px; align-items: center; z-index: 30;
+            background: rgba(30,26,22,0.82); backdrop-filter: blur(6px);
+            padding: 8px 18px; border-radius: 30px; color: #f2ead9;
+            font-family: -apple-system, sans-serif; font-size: 0.85rem;
+          }
+          .pager-btn {
+            background: none; border: none; color: #f2ead9; font-size: 1.3rem;
+            cursor: pointer; padding: 2px 10px; line-height: 1;
+          }
+          .pager-btn:disabled { opacity: 0.3; cursor: default; }
+          .reader { padding-bottom: 0 !important; }
+        `;
+        document.head.appendChild(style);
+
+        const controls = document.createElement('div');
+        controls.className = 'pager-controls';
+
+        const prevBtn = document.createElement('button');
+        prevBtn.className = 'pager-btn';
+        prevBtn.textContent = '‹';
+        prevBtn.setAttribute('aria-label', 'Planche précédente');
+
+        const counter = document.createElement('span');
+
+        const nextBtn = document.createElement('button');
+        nextBtn.className = 'pager-btn';
+        nextBtn.textContent = '›';
+        nextBtn.setAttribute('aria-label', 'Planche suivante');
+
+        function show(i) {
+          pages.forEach((p, idx) => {
+            p.style.display = idx === i ? 'flex' : 'none';
+            p.classList.remove('zoomed');
+            const im = p.querySelector('img');
+            if (im) im.style.transform = '';
+            const hint = p.querySelector('.zoom-hint');
+            if (hint) hint.textContent = '🔍 Cliquer pour zoomer';
+          });
+          prevBtn.disabled = i === 0;
+          nextBtn.disabled = i === pages.length - 1;
+          counter.textContent = (i + 1) + ' / ' + pages.length;
+          if (window.__onShow) window.__onShow(pages[i].id);
+        }
+
+        prevBtn.addEventListener('click', () => { if (current > 0) { current--; show(current); } });
+        nextBtn.addEventListener('click', () => { if (current < pages.length - 1) { current++; show(current); } });
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'ArrowLeft') prevBtn.click();
+          if (e.key === 'ArrowRight') nextBtn.click();
+        });
+
+        controls.appendChild(prevBtn);
+        controls.appendChild(counter);
+        controls.appendChild(nextBtn);
+        if (pdfBtn) controls.appendChild(pdfBtn);
+        const carteBtn = document.getElementById('carte-btn');
+        if (carteBtn) controls.appendChild(carteBtn);
+        document.body.appendChild(controls);
+
+        if (caption) caption.style.display = 'none';
+
+        window.__pager = {
+          goTo: function (num) {
+            var id = 'page-' + String(num).padStart(2, '0');
+            var i = pages.findIndex(function (p) { return p.id === id; });
+            if (i < 0) return false;
+            current = i; show(i); return true;
+          },
+          currentImg: function () { return pages[current].querySelector('img'); }
+        };
+
+        show(current);
+      });
+    }
+  </script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const ZOOM = 2.2;
+
+      document.querySelectorAll('.reader .page').forEach((page) => {
+        const img = page.querySelector('img');
+        if (!img) return;
+
+        const hint = document.createElement('div');
+        hint.className = 'zoom-hint';
+        hint.textContent = '🔍 Cliquer pour zoomer';
+        page.appendChild(hint);
+
+        let panX = 0, panY = 0;
+        let isDown = false;
+        let dragged = false;
+        let startX, startY, startPanX, startPanY;
+
+        function isZoomed() { return page.classList.contains('zoomed'); }
+
+        function updateHint() {
+          hint.textContent = isZoomed()
+            ? '✋ Glisser pour déplacer · cliquer pour dézoomer'
+            : '🔍 Cliquer pour zoomer';
+        }
+
+        function applyTransform() {
+          img.style.transform = isZoomed()
+            ? `translate(${panX}px, ${panY}px) scale(${ZOOM})`
+            : '';
+        }
+
+        function clampPan() {
+          const pageRect = page.getBoundingClientRect();
+          const scaledW = img.offsetWidth * ZOOM;
+          const scaledH = img.offsetHeight * ZOOM;
+          const maxX = Math.max(0, (scaledW - pageRect.width) / 2);
+          const maxY = Math.max(0, (scaledH - pageRect.height) / 2);
+          panX = Math.min(maxX, Math.max(-maxX, panX));
+          panY = Math.min(maxY, Math.max(-maxY, panY));
+        }
+
+        img.addEventListener('click', () => {
+          if (dragged) { dragged = false; return; }
+          page.classList.toggle('zoomed');
+          panX = 0;
+          panY = 0;
+          applyTransform();
+          updateHint();
+        });
+
+        page.addEventListener('mousedown', (e) => {
+          if (!isZoomed()) return;
+          isDown = true;
+          dragged = false;
+          page.classList.add('dragging');
+          startX = e.pageX;
+          startY = e.pageY;
+          startPanX = panX;
+          startPanY = panY;
+        });
+
+        document.addEventListener('mousemove', (e) => {
+          if (!isDown) return;
+          const dx = e.pageX - startX;
+          const dy = e.pageY - startY;
+          if (Math.abs(dx) > 3 || Math.abs(dy) > 3) dragged = true;
+          panX = startPanX + dx;
+          panY = startPanY + dy;
+          clampPan();
+          applyTransform();
+        });
+
+        document.addEventListener('mouseup', () => {
+          isDown = false;
+          page.classList.remove('dragging');
+        });
+      });
+    });
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    async function downloadPDF() {
+      const btn = document.getElementById('pdf-btn');
+      const originalLabel = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Préparation...';
+      try {
+        const { jsPDF } = window.jspdf;
+        const images = Array.from(document.querySelectorAll('.hero img, .page img'));
+        let doc;
+        for (let i = 0; i < images.length; i++) {
+          const img = images[i];
+          if (!img.complete) {
+            await new Promise((resolve) => { img.onload = resolve; img.onerror = resolve; });
+          }
+          if (!img.naturalWidth || !img.naturalHeight) {
+            console.warn('Image ignorée (introuvable) :', img.src);
+            continue;
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = img.naturalWidth;
+          canvas.height = img.naturalHeight;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+          const wmm = canvas.width * 0.264583;
+          const hmm = canvas.height * 0.264583;
+          const orientation = wmm > hmm ? 'landscape' : 'portrait';
+          if (!doc) {
+            doc = new jsPDF({ orientation, unit: 'mm', format: [wmm, hmm] });
+          } else {
+            doc.addPage([wmm, hmm], orientation);
+          }
+          doc.addImage(dataUrl, 'JPEG', 0, 0, wmm, hmm);
+        }
+        if (!doc) {
+          throw new Error('Aucune image valide trouvée.');
+        }
+        doc.save('Ardeche 2026.pdf');
+      } catch (err) {
+        alert("Le PDF n'a pas pu être généré. Réessaie, ou vérifie que toutes les planches sont bien chargées.");
+        console.error(err);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = originalLabel;
+      }
+    }
+  </script>
+
+  <!-- ===== Chat public (Cbox) : fenêtre chargée à la première ouverture ===== -->
+  <style>
+    .topbar__actions { display: flex; align-items: center; gap: 14px; }
+    #chat-btn {
+      border: 1px solid var(--accent-deep); border-radius: 18px;
+      background: var(--accent); color: #fff; cursor: pointer;
+      padding: 6px 14px; font-family: 'Karla', sans-serif; font-size: 0.9rem;
+    }
+    #chat-btn:hover, #chat-btn:focus-visible { background: var(--accent-deep); }
+    #chat-modal {
+      display: none; position: fixed; inset: 0; z-index: 10000;
+      background: rgba(30,26,22,0.7); overflow: auto; padding: 12px;
+    }
+    #chat-modal.visible { display: block; }
+    #chat-modal .chat-box {
+      max-width: 700px; margin: 4vh auto; background: var(--cream); color: var(--ink);
+      border-radius: 10px; padding: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+    #chat-modal .chat-head { display: flex; justify-content: space-between; align-items: center; }
+    #chat-modal .chat-head h3 { margin: 0; font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; color: var(--accent-deep); }
+    #chat-close { border: none; background: none; font-size: 28px; line-height: 1; cursor: pointer; color: var(--ink); }
+    #chat-modal .chat-note { font-size: 0.8rem; color: var(--ink-soft); margin: 6px 0 10px; }
+    #chat-container iframe { width: 100%; height: 450px; border: 0; }
+  </style>
+
+  <div id="chat-modal" role="dialog" aria-modal="true" aria-label="Chat public">
+    <div class="chat-box">
+      <div class="chat-head">
+        <h3>💬 Discussion</h3>
+        <button id="chat-close" type="button" aria-label="Fermer le chat">×</button>
+      </div>
+      <p class="chat-note">Chat public hébergé par Cbox : aucun compte requis, seul un nom ou pseudo suffit. Les messages sont visibles de tous, ne communiquez aucune information personnelle. Connexion Internet requise.</p>
+      <div id="chat-container"></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var CHAT_URL = 'https://www5.cbox.ws/box/?boxid=967777&boxtag=Yceynw';
+      var modal = document.getElementById('chat-modal');
+      var loaded = false;
+      function ouvrir() {
+        modal.classList.add('visible');
+        if (loaded) return;
+        if (!navigator.onLine) {
+          document.getElementById('chat-container').textContent = '📡 Le chat nécessite une connexion Internet.';
+          return;
+        }
+        loaded = true;
+        var f = document.createElement('iframe');
+        f.src = CHAT_URL;
+        f.setAttribute('allowtransparency', 'yes');
+        f.setAttribute('allow', 'autoplay');
+        f.setAttribute('frameborder', '0');
+        f.setAttribute('scrolling', 'auto');
+        f.setAttribute('title', 'Chat Cbox');
+        document.getElementById('chat-container').appendChild(f);
+      }
+      function fermer() { modal.classList.remove('visible'); }
+      document.getElementById('chat-btn').addEventListener('click', ouvrir);
+      document.getElementById('chat-close').addEventListener('click', fermer);
+      modal.addEventListener('click', function (e) { if (e.target === modal) fermer(); });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') fermer(); });
+    })();
+  </script>
+
+  <!-- ===== Recherche de page + identification d'image (Google Lens) ===== -->
+  <style>
+    #tools-btn {
+      border: 1px solid var(--accent-deep); border-radius: 18px;
+      background: transparent; color: var(--accent-deep); cursor: pointer;
+      padding: 6px 14px; font-family: 'Karla', sans-serif; font-size: 0.9rem;
+    }
+    #tools-btn:hover, #tools-btn:focus-visible { background: var(--accent-deep); color: var(--cream); }
+    #tools-modal {
+      display: none; position: fixed; inset: 0; z-index: 10000;
+      background: rgba(30,26,22,0.7); overflow: auto; padding: 12px;
+    }
+    #tools-modal.visible { display: block; }
+    #tools-modal .tools-box {
+      max-width: 480px; margin: 8vh auto; background: var(--cream); color: var(--ink);
+      border-radius: 10px; padding: 16px 18px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+    #tools-modal .tools-head { display: flex; justify-content: space-between; align-items: center; }
+    #tools-modal h3 { margin: 0; font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; color: var(--accent-deep); }
+    #tools-close { border: none; background: none; font-size: 28px; line-height: 1; cursor: pointer; color: var(--ink); }
+    #tools-modal section { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--rule); }
+    #tools-modal h4 { margin: 0 0 8px; font-size: 0.95rem; font-weight: 500; }
+    #tools-modal .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    #page-num {
+      width: 110px; padding: 8px 10px; font: inherit; color: var(--ink);
+      background: #fff8; border: 1px solid var(--ink-soft); border-radius: 8px;
+    }
+    #tools-modal .pdf-btn { margin: 0; }
+    #tools-modal .msg { font-size: 0.8rem; color: var(--ink-soft); margin: 8px 0 0; min-height: 1em; }
+    #tools-modal .msg.err { color: #a03a2a; }
+    #paste-zone {
+      border: 2px dashed var(--ink-soft); border-radius: 10px; padding: 18px 12px;
+      text-align: center; font-size: 0.85rem; color: var(--ink-soft); outline: none;
+    }
+    #paste-zone:focus, #paste-zone.over { border-color: var(--accent-deep); background: rgba(90,125,94,0.08); }
+    #paste-preview { display: none; max-width: 100%; max-height: 220px; margin: 10px auto 0; border-radius: 6px; }
+    #lens-actions { display: none; margin-top: 10px; }
+  </style>
+
+  <div id="tools-modal" role="dialog" aria-modal="true" aria-label="Recherche">
+    <div class="tools-box">
+      <div class="tools-head">
+        <h3>🔍 Recherche</h3>
+        <button id="tools-close" type="button" aria-label="Fermer">×</button>
+      </div>
+
+      <section id="goto-section" style="border-top:none;margin-top:8px;padding-top:0">
+        <h4>Aller à une page</h4>
+        <div class="row">
+          <input id="page-num" type="number" inputmode="numeric" min="0" placeholder="N° de page" aria-label="Numéro de page">
+          <button id="page-go" class="pdf-btn" type="button">Aller</button>
+        </div>
+        <p id="goto-msg" class="msg"></p>
+      </section>
+
+      <section>
+        <h4>Identifier une image avec Google</h4>
+        <div id="paste-zone" tabindex="0">
+          Cliquez ici puis collez une image (Ctrl+V / ⌘V),<br>glissez-la, ou
+          <label style="text-decoration:underline;cursor:pointer">choisissez un fichier<input id="img-file" type="file" accept="image/*" hidden></label>
+        </div>
+        <img id="paste-preview" alt="Image à identifier">
+        <div id="lens-actions" class="row">
+          <button id="lens-go" class="pdf-btn" type="button">Identifier avec Google Lens</button>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <button id="copy-page" class="pdf-btn" type="button">Copier la planche affichée</button>
+          <a class="pdf-btn carte-btn" style="margin:0" href="https://lens.google.com/" target="_blank" rel="noopener">Ouvrir Google Lens</a>
+        </div>
+        <p id="lens-msg" class="msg"></p>
+      </section>
+    </div>
+  </div>
+
+  <form id="lens-form" method="POST" action="https://lens.google.com/v3/upload?hl=fr" enctype="multipart/form-data" target="_blank" hidden>
+    <input type="file" name="encoded_image" id="lens-file">
+  </form>
+
+  <script>
+    (function () {
+      var modal = document.getElementById('tools-modal');
+      var zone = document.getElementById('paste-zone');
+      var preview = document.getElementById('paste-preview');
+      var actions = document.getElementById('lens-actions');
+      var lensMsg = document.getElementById('lens-msg');
+      var gotoMsg = document.getElementById('goto-msg');
+      var input = document.getElementById('page-num');
+      var currentFile = null;
+
+      function open() {
+        modal.classList.add('visible');
+        var hasPager = !!window.__pager;
+        document.getElementById('goto-section').style.display = hasPager ? '' : 'none';
+        (hasPager ? input : zone).focus();
+      }
+      function close() { modal.classList.remove('visible'); }
+      function msg(el, text, err) { el.textContent = text || ''; el.classList.toggle('err', !!err); }
+
+      // ---- Aller à une page ----
+      function goto() {
+        var m = String(input.value).match(/\d+/);
+        if (!m) { msg(gotoMsg, 'Entrez un numéro de page.', true); return; }
+        var n = parseInt(m[0], 10);
+        if (window.__pager && window.__pager.goTo(n)) { msg(gotoMsg, ''); close(); }
+        else {
+          var ids = Array.from(document.querySelectorAll('.reader .page')).map(function (p) { return parseInt(p.id.replace('page-', ''), 10); });
+          msg(gotoMsg, 'Page introuvable (de ' + Math.min.apply(null, ids) + ' à ' + Math.max.apply(null, ids) + ').', true);
+        }
+      }
+      document.getElementById('page-go').addEventListener('click', goto);
+      input.addEventListener('keydown', function (e) {
+        e.stopPropagation(); // évite de tourner les pages avec les flèches
+        if (e.key === 'Enter') goto();
+      });
+
+      // ---- Image à identifier ----
+      function setImage(file) {
+        if (!file || file.type.indexOf('image/') !== 0) { msg(lensMsg, "Ce n'est pas une image.", true); return; }
+        currentFile = file;
+        preview.src = URL.createObjectURL(file);
+        preview.style.display = 'block';
+        actions.style.display = 'flex';
+        msg(lensMsg, 'Image prête.');
+      }
+      function fileFromClipboard(cd) {
+        if (!cd) return null;
+        for (var i = 0; i < cd.items.length; i++) {
+          if (cd.items[i].type.indexOf('image/') === 0) return cd.items[i].getAsFile();
+        }
+        return null;
+      }
+      document.addEventListener('paste', function (e) {
+        var f = fileFromClipboard(e.clipboardData);
+        if (!f) return;
+        e.preventDefault();
+        if (!modal.classList.contains('visible')) open();
+        setImage(f);
+      });
+      document.getElementById('img-file').addEventListener('change', function (e) { setImage(e.target.files[0]); });
+      ['dragenter', 'dragover'].forEach(function (ev) {
+        zone.addEventListener(ev, function (e) { e.preventDefault(); zone.classList.add('over'); });
+      });
+      ['dragleave', 'drop'].forEach(function (ev) {
+        zone.addEventListener(ev, function (e) { e.preventDefault(); zone.classList.remove('over'); });
+      });
+      zone.addEventListener('drop', function (e) { setImage(e.dataTransfer.files[0]); });
+
+      // Envoi vers Google Lens (nouvel onglet)
+      document.getElementById('lens-go').addEventListener('click', function () {
+        if (!currentFile) return;
+        try {
+          var dt = new DataTransfer();
+          dt.items.add(currentFile);
+          document.getElementById('lens-file').files = dt.files;
+          document.getElementById('lens-form').submit();
+          msg(lensMsg, "Envoyé à Google Lens dans un nouvel onglet. Si rien ne s'affiche, utilisez « Ouvrir Google Lens » et collez l'image (Ctrl+V).");
+        } catch (err) {
+          msg(lensMsg, "Envoi impossible : utilisez « Ouvrir Google Lens » puis collez l'image.", true);
+        }
+      });
+
+      // Copier la planche affichée dans le presse-papiers
+      function copyCurrent() {
+        var img = window.__pager ? window.__pager.currentImg()
+          : (Array.from(document.querySelectorAll('.page')).find(function (p) { return p.style.display !== 'none'; }) || {}).querySelector('img');
+        function say(t, err) { msg(lensMsg, t, err); if (window.__toast) window.__toast(t); }
+        if (!img || !img.naturalWidth) { say('Aucune planche chargée.', true); return; }
+        var c = document.createElement('canvas');
+        c.width = img.naturalWidth; c.height = img.naturalHeight;
+        c.getContext('2d').drawImage(img, 0, 0);
+        c.toBlob(function (blob) {
+          navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
+            .then(function () { say('Planche copiée : collez-la (Ctrl+V) dans Google Lens ou Google Photos.'); })
+            .catch(function () { say('Copie impossible sur ce navigateur.', true); });
+        }, 'image/png');
+      }
+      window.__copyCurrent = copyCurrent;
+      window.__openTools = open;
+      document.getElementById('copy-page').addEventListener('click', copyCurrent);
+
+      document.getElementById('tools-btn').addEventListener('click', open);
+      document.getElementById('tools-close').addEventListener('click', close);
+      modal.addEventListener('click', function (e) { if (e.target === modal) close(); });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+    })();
+  </script>
+
+  <!-- ===== Bande de miniatures (film) ===== -->
+  <style>
+    #film-btn {
+      border: 1px solid var(--accent-deep); border-radius: 18px;
+      background: transparent; color: var(--accent-deep); cursor: pointer;
+      padding: 6px 14px; font-family: 'Karla', sans-serif; font-size: 0.9rem;
+    }
+    #film-btn:hover, #film-btn:focus-visible, #film-btn[aria-pressed="true"] { background: var(--accent-deep); color: var(--cream); }
+    #film {
+      display: none; position: fixed; left: 0; right: 0; bottom: 0; z-index: 25;
+      background: rgba(30,26,22,0.92); backdrop-filter: blur(6px);
+      padding: 8px 0 10px; color: #f2ead9; font-family: 'Karla', sans-serif;
+    }
+    body.film-open #film { display: block; }
+    #film .film-tools { display: flex; gap: 8px; padding: 0 12px 8px; align-items: center; flex-wrap: wrap; }
+    #film .film-tools button {
+      font: inherit; font-size: 0.75rem; color: #f2ead9; background: transparent;
+      border: 1px solid #f2ead9; border-radius: 16px; padding: 4px 12px; cursor: pointer;
+    }
+    #film .film-tools button:hover { background: #f2ead9; color: var(--ink); }
+    #film .film-tools span { font-size: 0.75rem; opacity: 0.7; margin-left: auto; }
+    #film-track {
+      display: flex; gap: 8px; overflow-x: auto; padding: 4px 12px 2px;
+      scrollbar-width: thin; scroll-snap-type: x proximity;
+    }
+    .thumb {
+      position: relative; flex: 0 0 auto; width: 64px; height: 84px; padding: 0;
+      border: 2px solid transparent; border-radius: 4px; background: #000;
+      cursor: pointer; overflow: hidden; scroll-snap-align: center;
+    }
+    .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0.75; }
+    .thumb b {
+      position: absolute; left: 0; right: 0; bottom: 0; padding: 1px 0;
+      background: rgba(0,0,0,0.7); color: #f2ead9; font: 600 0.7rem 'Karla', sans-serif; text-align: center;
+    }
+    .thumb:hover img { opacity: 1; }
+    .thumb.active { border-color: #9fc9a3; }
+    .thumb.active img { opacity: 1; }
+    body.film-open .pager-controls { bottom: 150px; }
+    body.film-open .page img { max-height: calc(100vh - 90px - 130px); }
+    #film-toast {
+      position: fixed; left: 50%; bottom: 210px; transform: translateX(-50%); z-index: 40;
+      background: #f2ead9; color: var(--ink); padding: 8px 16px; border-radius: 20px;
+      font: 0.85rem 'Karla', sans-serif; box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+      opacity: 0; pointer-events: none; transition: opacity 0.2s; max-width: 90vw; text-align: center;
+    }
+    #film-toast.on { opacity: 1; }
+  </style>
+
+  <div id="film" aria-label="Miniatures des planches">
+    <div class="film-tools">
+      <button type="button" id="film-copy">📋 Copier cette planche</button>
+      <button type="button" id="film-ident">🔎 Identifier une image (Google)</button>
+      <span id="film-info"></span>
+    </div>
+    <div id="film-track" role="listbox"></div>
+  </div>
+  <div id="film-toast" role="status"></div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var btn = document.createElement('button');
+      btn.id = 'film-btn'; btn.type = 'button'; btn.setAttribute('aria-pressed', 'false');
+      btn.textContent = '🎞️ Bande';
+      var actions = document.querySelector('.topbar__actions');
+      actions.insertBefore(btn, document.getElementById('tools-btn'));
+
+      // Lien direct vers une planche : navigation verrouillée, pas de bande
+      if (!window.__pager) { btn.style.display = 'none'; return; }
+
+      var track = document.getElementById('film-track');
+      var info = document.getElementById('film-info');
+      var thumbs = {};
+      var built = false;
+
+      function build() {
+        built = true;
+        document.querySelectorAll('.reader .page').forEach(function (p) {
+          var num = parseInt(p.id.replace('page-', ''), 10);
+          var src = p.querySelector('img').getAttribute('src');
+          var t = document.createElement('button');
+          t.type = 'button'; t.className = 'thumb'; t.setAttribute('role', 'option');
+          t.setAttribute('aria-label', 'Planche ' + num);
+          t.innerHTML = '<img loading="lazy" decoding="async" alt=""><b>' + num + '</b>';
+          t.firstChild.src = src;
+          t.addEventListener('click', function () { window.__pager.goTo(num); });
+          track.appendChild(t);
+          thumbs[p.id] = t;
+        });
+        info.textContent = Object.keys(thumbs).length + ' planches';
+      }
+
+      var activeId = document.querySelector('.reader .page').id; // la 1re planche est affichée au départ
+      var previousHook = window.__onShow;
+      function mark(id) {
+        activeId = id;
+        if (!built) return;
+        Object.keys(thumbs).forEach(function (k) { thumbs[k].classList.toggle('active', k === id); });
+        if (thumbs[id] && document.body.classList.contains('film-open')) {
+          thumbs[id].scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+        }
+      }
+      window.__onShow = function (id) { mark(id); if (previousHook) previousHook(id); };
+
+      btn.addEventListener('click', function () {
+        var open = document.body.classList.toggle('film-open');
+        btn.setAttribute('aria-pressed', open ? 'true' : 'false');
+        if (open) {
+          if (!built) build();
+          mark(activeId);
+          var cur = thumbs[activeId]; if (cur) cur.scrollIntoView({ block: 'nearest', inline: 'center' });
+        }
+      });
+
+      document.getElementById('film-copy').addEventListener('click', function () { window.__copyCurrent(); });
+      document.getElementById('film-ident').addEventListener('click', function () { window.__openTools(); });
+
+      var toast = document.getElementById('film-toast'), timer;
+      window.__toast = function (t) {
+        toast.textContent = t; toast.classList.add('on');
+        clearTimeout(timer); timer = setTimeout(function () { toast.classList.remove('on'); }, 2500);
+      };
+    });
+  </script>
+</body>
+</html>
