@@ -1368,5 +1368,99 @@
       }, { passive: true });
     })();
   </script>
+
+  <!-- ===== Carte : demander un lieu particulier avant de l'ouvrir ===== -->
+  <style>
+    #carte-modal {
+      display: none; position: fixed; inset: 0; z-index: 10000;
+      background: rgba(30,26,22,0.7); overflow: auto; padding: 12px;
+    }
+    #carte-modal.visible { display: block; }
+    #carte-modal .carte-box {
+      max-width: 420px; margin: 14vh auto 0; background: var(--cream); color: var(--ink);
+      border-radius: 10px; padding: 16px 18px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+    #carte-modal .carte-head { display: flex; justify-content: space-between; align-items: center; }
+    #carte-modal h3 { margin: 0; font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; color: var(--accent-deep); }
+    #carte-close { border: none; background: none; font-size: 28px; line-height: 1; cursor: pointer; color: var(--ink); }
+    #carte-modal .row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+    #carte-modal .pdf-btn { margin: 0; }
+    #carte-lieu-row { display: none; }
+    #carte-lieu {
+      flex: 1 1 100%; padding: 9px 10px; font: inherit; color: var(--ink);
+      background: #fff8; border: 1px solid var(--ink-soft); border-radius: 8px;
+    }
+  </style>
+
+  <div id="carte-modal" role="dialog" aria-modal="true" aria-label="Carte">
+    <div class="carte-box">
+      <div class="carte-head">
+        <h3>🗺️ Rechercher un lieu particulier ?</h3>
+        <button id="carte-close" type="button" aria-label="Fermer">×</button>
+      </div>
+      <div id="carte-choice" class="row">
+        <button id="carte-oui" class="pdf-btn" type="button">Oui</button>
+        <button id="carte-non" class="pdf-btn" type="button">Non, carte par défaut</button>
+      </div>
+      <div id="carte-lieu-row" class="row">
+        <input id="carte-lieu" type="text" maxlength="100" autocomplete="off" placeholder="Nom du lieu (ex. : Brantôme)" aria-label="Nom du lieu">
+        <button id="carte-go" class="pdf-btn" type="button">Lancer la carte</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var PARAM = 'recherche'; // paramètre lu par la carte (?recherche=...) ; ne pas utiliser « lieu » : réservé aux identifiants de lieux
+      var modal = document.getElementById('carte-modal');
+      var choice = document.getElementById('carte-choice');
+      var lieuRow = document.getElementById('carte-lieu-row');
+      var input = document.getElementById('carte-lieu');
+      var baseUrl = '';
+
+      function openModal(url) {
+        baseUrl = url;
+        input.value = '';
+        choice.style.display = 'flex';
+        lieuRow.style.display = 'none';
+        modal.classList.add('visible');
+      }
+      function closeModal() { modal.classList.remove('visible'); }
+      function launch(place) {
+        var url = baseUrl;
+        if (place) {
+          var u = new URL(baseUrl);
+          u.searchParams.set(PARAM, place);
+          url = u.toString();
+        }
+        window.open(url, '_blank', 'noopener');
+        closeModal();
+      }
+
+      // Délégation : le bouton Carte est déplacé dans la barre du bas par le lecteur
+      document.addEventListener('click', function (e) {
+        var a = e.target.closest && e.target.closest('#carte-btn');
+        if (!a) return;
+        e.preventDefault();
+        openModal(a.href);
+      });
+
+      document.getElementById('carte-non').addEventListener('click', function () { launch(''); });
+      document.getElementById('carte-oui').addEventListener('click', function () {
+        choice.style.display = 'none';
+        lieuRow.style.display = 'flex';
+        input.focus();
+      });
+      document.getElementById('carte-go').addEventListener('click', function () { launch(input.value.trim()); });
+      input.addEventListener('keydown', function (e) {
+        e.stopPropagation(); // pas de changement de page avec les flèches
+        if (e.key === 'Enter') { e.preventDefault(); launch(input.value.trim()); }
+        if (e.key === 'Escape') closeModal();
+      });
+      document.getElementById('carte-close').addEventListener('click', closeModal);
+      modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
+    })();
+  </script>
 </body>
 </html>
