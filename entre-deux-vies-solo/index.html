@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Entre deux vies — solo</title>
+<meta name="description" content="Entre deux vies — version solo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Karla:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #f2ead9;
+    --cream-deep: #e8dcc3;
+    --ink: #3a2e28;
+    --ink-soft: #6b5c50;
+    --terracotta: #b9645f;
+    --terracotta-deep: #9c4a47;
+    --rule: rgba(58, 46, 40, 0.15);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Karla', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    background: rgba(242, 234, 217, 0.92);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--rule);
+  }
+  .topbar__title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.15rem;
+    letter-spacing: 0.02em;
+    color: var(--terracotta-deep);
+    text-decoration: none;
+  }
+  .hero {
+    position: relative;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  .hero img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .hero__caption {
+    max-width: 560px;
+    margin: 40px auto 60px;
+    padding: 0 28px;
+    text-align: center;
+  }
+  .hero__caption h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 500;
+    font-size: clamp(2rem, 6vw, 2.6rem);
+    letter-spacing: 0.01em;
+    margin: 0 0 12px;
+    color: var(--terracotta-deep);
+  }
+  .hero__caption p {
+    font-style: italic;
+    color: var(--ink-soft);
+    font-size: 1.05rem;
+    line-height: 1.6;
+    margin: 0 0 22px;
+  }
+  .pdf-btn {
+    font-family: 'Karla', sans-serif;
+    font-size: 0.85rem;
+    color: var(--terracotta-deep);
+    background: transparent;
+    border: 1px solid var(--terracotta-deep);
+    border-radius: 20px;
+    padding: 9px 20px;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .pdf-btn:hover:not(:disabled) {
+    background: var(--terracotta-deep);
+    color: var(--cream);
+  }
+  .pdf-btn:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+  .reader {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 0 100px;
+  }
+  .page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin: 0 auto;
+    scroll-margin-top: 64px;
+    position: relative;
+  }
+  .zoom-hint {
+    position: absolute;
+    bottom: 14px;
+    right: 14px;
+    display: none;
+    align-items: center;
+    gap: 6px;
+    background: rgba(30, 26, 22, 0.78);
+    color: #f2ead9;
+    font-family: 'Karla', sans-serif;
+    font-size: 0.78rem;
+    padding: 6px 12px;
+    border-radius: 20px;
+    pointer-events: none;
+    z-index: 5;
+    white-space: nowrap;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .page:hover .zoom-hint {
+      display: flex;
+    }
+  }
+  .page img {
+    display: block;
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    max-height: calc(100vh - 90px);
+    max-height: calc(100dvh - 90px);
+    margin: 0 auto;
+    object-fit: contain;
+    cursor: zoom-in;
+    transition: transform 0.25s ease;
+  }
+  .page.zoomed {
+    overflow: hidden;
+    cursor: grab;
+  }
+  .page.zoomed.dragging {
+    cursor: grabbing;
+  }
+  .page.zoomed.dragging img {
+    transition: none;
+  }
+  footer {
+    text-align: center;
+    padding: 40px 24px 60px;
+    color: var(--ink-soft);
+    font-size: 0.8rem;
+    border-top: 1px solid var(--rule);
+  }
+  footer a { color: var(--terracotta-deep); }
+  .pager-controls .pdf-btn {
+    color: var(--cream);
+    border-color: var(--cream);
+    font-size: 0.75rem;
+    padding: 6px 14px;
+  }
+  .pager-controls .pdf-btn:hover:not(:disabled) {
+    background: var(--cream);
+    color: var(--ink);
+  }
+</style>
+</head>
+<body>
+
+  <nav class="topbar">
+    <a class="topbar__title" href="#top">Entre deux vies</a>
+    <div class="topbar__actions">
+      <button id="chat-btn" type="button" title="Ouvrir le chat" aria-label="Ouvrir le chat">💬<span class="lbl"> Chat</span></button>
+    </div>
+  </nav>
+
+  <div id="top"></div>
+
+  <header class="hero">
+    <img src="../entre-deux-vies/images/00-couverture.jpg" alt="Couverture — Entre deux vies">
+  </header>
+
+  <div class="hero__caption">
+    <h1>Entre deux vies</h1>
+    <button id="pdf-btn" class="pdf-btn" onclick="downloadPDF()">Télécharger en PDF</button>
+    <a id="carte-btn" class="pdf-btn carte-btn" href="https://parisistiti-cell.github.io/Se-baigner-en-Dordogne/indexlast.html" target="_blank" rel="noopener">🗺️ Carte</a>
+  </div>
+
+  <main class="reader">
+    <div class="page" id="page-00-couverture">
+      <img src="../entre-deux-vies/images/00-couverture.jpg" alt="Planche 0">
+    </div>
+    
+    <div class="page" id="page-00">
+      <img src="../entre-deux-vies/images/00.jpg" alt="Planche 0">
+    </div>
+
+    <div class="page" id="page-01">
+      <img src="../entre-deux-vies/images/01.jpg" alt="Planche 1">
+    </div>
+
+    <div class="page" id="page-05">
+      <img src="../entre-deux-vies/images/05.jpg" alt="Planche 5">
+    </div>
+
+    <div class="page" id="page-07">
+      <img src="../entre-deux-vies/images/07.jpg" alt="Planche 7">
+    </div>
+
+    <div class="page" id="page-09">
+      <img src="../entre-deux-vies/images/09.jpg" alt="Planche 9">
+    </div>
+
+    <div class="page" id="page-11">
+      <img src="../entre-deux-vies/images/11.jpg" alt="Planche 11">
+    </div>
+
+    <div class="page" id="page-13">
+      <img src="../entre-deux-vies/images/13.jpg" alt="Planche 13">
+    </div>
+
+    <div class="page" id="page-15">
+      <img src="../entre-deux-vies/images/15.jpg" alt="Planche 15">
+    </div>
+
+    <div class="page" id="page-17">
+      <img src="../entre-deux-vies/images/17.jpg" alt="Planche 17">
+    </div>
+
+    <div class="page" id="page-19">
+      <img src="../entre-deux-vies/images/19.jpg" alt="Planche 19">
+    </div>
+
+    <div class="page" id="page-21">
+      <img src="../entre-deux-vies/images/21.jpg" alt="Planche 21">
+    </div>
+
+    <div class="page" id="page-25">
+      <img src="../entre-deux-vies/images/25.jpg" alt="Planche 25">
+    </div>
+
+    <div class="page" id="page-26">
+      <img src="../entre-deux-vies/images/26.jpg" alt="Planche 26">
+    </div>
+
+    <div class="page" id="page-27">
+      <img src="../entre-deux-vies/images/27.jpg" alt="Planche 27">
+    </div>
+
+    <div class="page" id="page-29">
+      <img src="../entre-deux-vies/images/29.jpg" alt="Planche 29">
+    </div>
+
+    <div class="page" id="page-31">
+      <img src="../entre-deux-vies/images/31.jpg" alt="Planche 31">
+    </div>
+
+    <div class="page" id="page-33">
+      <img src="../entre-deux-vies/images/33.jpg" alt="Planche 33">
+    </div>
+
+    <div class="page" id="page-35">
+      <img src="../entre-deux-vies/images/35.jpg" alt="Planche 35">
+    </div>
+
+    <div class="page" id="page-37">
+      <img src="../entre-deux-vies/images/37.jpg" alt="Planche 37">
+    </div>
+
+    <div class="page" id="page-41">
+      <img src="../entre-deux-vies/images/41.jpg" alt="Planche 41">
+    </div>
+
+    <div class="page" id="page-43">
+      <img src="../entre-deux-vies/images/43.jpg" alt="Planche 43">
+    </div>
+
+    <div class="page" id="page-45">
+      <img src="../entre-deux-vies/images/45.jpg" alt="Planche 45">
+    </div>
+
+    <div class="page" id="page-47">
+      <img src="../entre-deux-vies/images/47.jpg" alt="Planche 47">
+    </div>
+
+    <div class="page" id="page-49">
+      <img src="../entre-deux-vies/images/49.jpg" alt="Planche 49">
+    </div>
+  </main>
+
+  <footer>
+    Entre deux vies — mis à jour au fil des chapitres
+  </footer>
+
+  <script>
+    function __isolatePage(target) {
+      if (!target) return;
+      const el = document.querySelector(target);
+      if (!el) return;
+      
+document.querySelectorAll('.page').forEach((p) => {
+  p.style.display = (p === el) ? 'flex' : 'none';
+});
+      const hero = document.querySelector('.hero');
+      const caption = document.querySelector('.hero__caption');
+      const foot = document.querySelector('footer');
+      if (hero) hero.style.display = 'none';
+      if (caption) caption.style.display = 'none';
+      if (foot) foot.style.display = 'none';
+      const pager = document.querySelector('.pager-controls');
+      if (pager) pager.remove();
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+      el.scrollIntoView();
+    }
+    window.__isolatePage = __isolatePage;
+
+    if (window.location.hash) {
+      document.addEventListener('DOMContentLoaded', () => __isolatePage(window.location.hash));
+    } else {
+      document.addEventListener('DOMContentLoaded', () => {
+        const pages = Array.from(document.querySelectorAll('.reader .page'));
+        if (pages.length === 0) return;
+
+        let current = 0;
+
+        const hero = document.querySelector('.hero');
+        const caption = document.querySelector('.hero__caption');
+        const foot = document.querySelector('footer');
+        const pdfBtn = document.getElementById('pdf-btn');
+
+        if (hero) hero.style.display = 'none';
+        if (foot) foot.style.display = 'none';
+        document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
+
+        const style = document.createElement('style');
+        style.textContent = `
+          .pager-controls {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 14px; align-items: center; z-index: 30;
+            background: rgba(30,26,22,0.82); backdrop-filter: blur(6px);
+            padding: 8px 18px; border-radius: 30px; color: #f2ead9;
+            font-family: -apple-system, sans-serif; font-size: 0.85rem;
+          }
+          .pager-btn {
+            background: none; border: none; color: #f2ead9; font-size: 1.3rem;
+            cursor: pointer; padding: 2px 10px; line-height: 1;
+          }
+          .pager-btn:disabled { opacity: 0.3; cursor: default; }
+          .reader { padding-bottom: 0 !important; }
+        `;
+        document.head.appendChild(style);
+
+        const controls = document.createElement('div');
+        controls.className = 'pager-controls';
+
+        const prevBtn = document.createElement('button');
+        prevBtn.className = 'pager-btn';
+        prevBtn.textContent = '‹';
+        prevBtn.setAttribute('aria-label', 'Planche précédente');
+
+        const counter = document.createElement('span');
+
+        const nextBtn = document.createElement('button');
+        nextBtn.className = 'pager-btn';
+        nextBtn.textContent = '›';
+        nextBtn.setAttribute('aria-label', 'Planche suivante');
+
+        function show(i) {
+          pages.forEach((p, idx) => {
+            p.style.display = idx === i ? 'flex' : 'none';
+            p.classList.remove('zoomed');
+            const im = p.querySelector('img');
+            if (im) im.style.transform = '';
+            const hint = p.querySelector('.zoom-hint');
+            if (hint) hint.textContent = '🔍 Cliquer pour zoomer';
+          });
+          prevBtn.disabled = i === 0;
+          nextBtn.disabled = i === pages.length - 1;
+          counter.textContent = (i + 1) + ' / ' + pages.length;
+          if (window.__onShow) window.__onShow(pages[i].id);
+        }
+
+        prevBtn.addEventListener('click', () => { if (current > 0) { current--; show(current); } });
+        nextBtn.addEventListener('click', () => { if (current < pages.length - 1) { current++; show(current); } });
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'ArrowLeft') prevBtn.click();
+          if (e.key === 'ArrowRight') nextBtn.click();
+        });
+
+        controls.appendChild(prevBtn);
+        controls.appendChild(counter);
+        controls.appendChild(nextBtn);
+        if (pdfBtn) controls.appendChild(pdfBtn);
+        const carteBtn = document.getElementById('carte-btn');
+        if (carteBtn) controls.appendChild(carteBtn);
+        document.body.appendChild(controls);
+
+        if (caption) caption.style.display = 'none';
+
+        window.__pager = {
+          goTo: function (num) {
+            var id = 'page-' + String(num).padStart(2, '0');
+            var i = pages.findIndex(function (p) { return p.id === id; });
+            if (i < 0) return false;
+            current = i; show(i); return true;
+          },
+          step: function (d) {
+            var n = current + d;
+            if (n < 0 || n >= pages.length) return;
+            current = n; show(n);
+          },
+          currentImg: function () { return pages[current].querySelector('img'); }
+        };
+
+        show(current);
+      });
+    }
+  </script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const ZOOM = 2.2;
+
+      document.querySelectorAll('.reader .page').forEach((page) => {
+        const img = page.querySelector('img');
+        if (!img) return;
+
+        const hint = document.createElement('div');
+        hint.className = 'zoom-hint';
+        hint.textContent = '🔍 Cliquer pour zoomer';
+        page.appendChild(hint);
+
+        let panX = 0, panY = 0;
+        let isDown = false;
+        let dragged = false;
+        let startX, startY, startPanX, startPanY;
+
+        function isZoomed() { return page.classList.contains('zoomed'); }
+
+        function updateHint() {
+          hint.textContent = isZoomed()
+            ? '✋ Glisser pour déplacer · cliquer pour dézoomer'
+            : '🔍 Cliquer pour zoomer';
+        }
+
+        function applyTransform() {
+          img.style.transform = isZoomed()
+            ? `translate(${panX}px, ${panY}px) scale(${ZOOM})`
+            : '';
+        }
+
+        function clampPan() {
+          const pageRect = page.getBoundingClientRect();
+          const scaledW = img.offsetWidth * ZOOM;
+          const scaledH = img.offsetHeight * ZOOM;
+          const maxX = Math.max(0, (scaledW - pageRect.width) / 2);
+          const maxY = Math.max(0, (scaledH - pageRect.height) / 2);
+          panX = Math.min(maxX, Math.max(-maxX, panX));
+          panY = Math.min(maxY, Math.max(-maxY, panY));
+        }
+
+        img.addEventListener('click', () => {
+          if (dragged) { dragged = false; return; }
+          page.classList.toggle('zoomed');
+          panX = 0;
+          panY = 0;
+          applyTransform();
+          updateHint();
+        });
+
+        page.addEventListener('mousedown', (e) => {
+          if (!isZoomed()) return;
+          isDown = true;
+          dragged = false;
+          page.classList.add('dragging');
+          startX = e.pageX;
+          startY = e.pageY;
+          startPanX = panX;
+          startPanY = panY;
+        });
+
+        document.addEventListener('mousemove', (e) => {
+          if (!isDown) return;
+          const dx = e.pageX - startX;
+          const dy = e.pageY - startY;
+          if (Math.abs(dx) > 3 || Math.abs(dy) > 3) dragged = true;
+          panX = startPanX + dx;
+          panY = startPanY + dy;
+          clampPan();
+          applyTransform();
+        });
+
+        document.addEventListener('mouseup', () => {
+          isDown = false;
+          page.classList.remove('dragging');
+        });
+
+        // Déplacement au doigt dans l'image zoomée
+        page.addEventListener('touchstart', (e) => {
+          dragged = false;
+          if (!isZoomed() || e.touches.length !== 1) return;
+          isDown = true;
+          startX = e.touches[0].pageX;
+          startY = e.touches[0].pageY;
+          startPanX = panX;
+          startPanY = panY;
+        }, { passive: true });
+        page.addEventListener('touchmove', (e) => {
+          if (!isDown || !isZoomed() || e.touches.length !== 1) return;
+          e.preventDefault();
+          const dx = e.touches[0].pageX - startX;
+          const dy = e.touches[0].pageY - startY;
+          if (Math.abs(dx) > 3 || Math.abs(dy) > 3) dragged = true;
+          panX = startPanX + dx;
+          panY = startPanY + dy;
+          clampPan();
+          applyTransform();
+        }, { passive: false });
+        page.addEventListener('touchend', () => { isDown = false; });
+      });
+    });
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    async function downloadPDF() {
+      const btn = document.getElementById('pdf-btn');
+      const originalLabel = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Préparation du PDF...';
+
+      try {
+        const { jsPDF } = window.jspdf;
+        const images = Array.from(document.querySelectorAll('.hero img, .page img'));
+        let doc;
+
+        for (let i = 0; i < images.length; i++) {
+          const img = images[i];
+          if (!img.complete) {
+            await new Promise((resolve) => { img.onload = resolve; img.onerror = resolve; });
+          }
+          if (!img.naturalWidth || !img.naturalHeight) {
+            console.warn('Image ignorée (introuvable) :', img.src);
+            continue;
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = img.naturalWidth;
+          canvas.height = img.naturalHeight;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+
+          const wmm = canvas.width * 0.264583;
+          const hmm = canvas.height * 0.264583;
+          const orientation = wmm > hmm ? 'landscape' : 'portrait';
+
+          if (!doc) {
+            doc = new jsPDF({ orientation, unit: 'mm', format: [wmm, hmm] });
+          } else {
+            doc.addPage([wmm, hmm], orientation);
+          }
+          doc.addImage(dataUrl, 'JPEG', 0, 0, wmm, hmm);
+        }
+
+        if (!doc) {
+          throw new Error('Aucune image valide trouvée.');
+        }
+
+        doc.save('Entre deux vies - solo.pdf');
+      } catch (err) {
+        alert("Le PDF n'a pas pu être généré. Réessaie, ou vérifie que toutes les planches sont bien chargées.");
+        console.error(err);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = originalLabel;
+      }
+    }
+  </script>
+
+
+  <style>
+    .topbar__actions { display: flex; align-items: center; gap: 14px; }
+    .carte-btn { display: inline-block; text-decoration: none; margin-left: 8px; } /* liens-boutons de la fenêtre d'identification */
+  </style>
+
+  <!-- ===== Recherche de page + identification d'image (Google Lens) ===== -->
+  <style>
+    #tools-btn {
+      border: 1px solid var(--terracotta-deep); border-radius: 18px;
+      background: transparent; color: var(--terracotta-deep); cursor: pointer;
+      padding: 6px 14px; font-family: 'Karla', sans-serif; font-size: 0.9rem;
+    }
+    #tools-btn:hover, #tools-btn:focus-visible { background: var(--terracotta-deep); color: var(--cream); }
+    #tools-modal {
+      display: none; position: fixed; inset: 0; z-index: 10000;
+      background: rgba(30,26,22,0.7); overflow: auto; padding: 12px;
+    }
+    #tools-modal.visible { display: block; }
+    #tools-modal .tools-box {
+      max-width: 480px; margin: 8vh auto; background: var(--cream); color: var(--ink);
+      border-radius: 10px; padding: 16px 18px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+    #tools-modal .tools-head { display: flex; justify-content: space-between; align-items: center; }
+    #tools-modal h3 { margin: 0; font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; color: var(--terracotta-deep); }
+    #tools-close { border: none; background: none; font-size: 28px; line-height: 1; cursor: pointer; color: var(--ink); }
+    #tools-modal section { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--rule); }
+    #tools-modal h4 { margin: 0 0 8px; font-size: 0.95rem; font-weight: 500; }
+    #tools-modal .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    #hint-input { flex: 1 1 100%; padding: 8px 10px; font: inherit; color: var(--ink); background: #fff8; border: 1px solid var(--ink-soft); border-radius: 8px; }
+    #page-num {
+      width: 110px; padding: 8px 10px; font: inherit; color: var(--ink);
+      background: #fff8; border: 1px solid var(--ink-soft); border-radius: 8px;
+    }
+    #tools-modal .pdf-btn { margin: 0; }
+    #tools-modal .msg { font-size: 0.8rem; color: var(--ink-soft); margin: 8px 0 0; min-height: 1em; }
+    #tools-modal .msg.err { color: #a03a2a; }
+    #paste-zone {
+      border: 2px dashed var(--ink-soft); border-radius: 10px; padding: 18px 12px;
+      text-align: center; font-size: 0.85rem; color: var(--ink-soft); outline: none;
+    }
+    #paste-zone:focus, #paste-zone.over { border-color: var(--terracotta-deep); background: rgba(185,100,95,0.08); }
+    #paste-preview { display: none; max-width: 100%; max-height: 220px; margin: 10px auto 0; border-radius: 6px; }
+    #lens-actions { display: none; margin-top: 10px; }
+    #tools-modal.simple #goto-section,
+    #tools-modal.simple #paste-zone,
+    #tools-modal.simple #copy-page { display: none !important; }
+    #tools-modal.simple section { border-top: none; margin-top: 8px; padding-top: 0; }
+    #tools-modal.simple #paste-preview { max-height: 55vh; max-height: 55dvh; margin-top: 0; }
+    #tools-modal .simple-only { display: none; }
+    #tools-modal.simple .simple-only { display: inline; }
+    #tools-modal.simple .full-only { display: none; }
+    #other-img { background: none; border: none; padding: 0; font: inherit; font-size: 0.8rem; color: var(--ink-soft); text-decoration: underline; cursor: pointer; }
+  </style>
+
+  <div id="tools-modal" role="dialog" aria-modal="true" aria-label="Recherche">
+    <div class="tools-box">
+      <div class="tools-head">
+        <h3><span class="full-only">🔍 Recherche</span><span class="simple-only">🔎 Essayer d’identifier la planche !</span></h3>
+        <button id="tools-close" type="button" aria-label="Fermer">×</button>
+      </div>
+
+      <section id="goto-section" style="border-top:none;margin-top:8px;padding-top:0">
+        <h4>Aller à une page</h4>
+        <div class="row">
+          <input id="page-num" type="number" inputmode="numeric" min="0" placeholder="N° de page" aria-label="Numéro de page">
+          <button id="page-go" class="pdf-btn" type="button">Aller</button>
+        </div>
+        <p id="goto-msg" class="msg"></p>
+      </section>
+
+      <section>
+        <h4 class="full-only">Identifier une image avec Google</h4>
+        <div id="paste-zone" tabindex="0">
+          Cliquez ici puis collez une image (Ctrl+V / ⌘V),<br>glissez-la, ou
+          <label style="text-decoration:underline;cursor:pointer">choisissez un fichier<input id="img-file" type="file" accept="image/*" hidden></label>
+        </div>
+        <img id="paste-preview" alt="Image à identifier">
+        <div id="lens-actions" class="row">
+          <input id="hint-input" type="text" maxlength="120" autocomplete="off" placeholder="Indice facultatif : lieu, pays, monument…" aria-label="Indice facultatif">
+          <button id="lens-go" class="pdf-btn" type="button">📋 Copier et ouvrir Google Lens</button>
+          <button id="photo-go" class="pdf-btn" type="button" disabled title="Saisissez d’abord un indice">📷 Chercher des photos</button>
+          <a id="dl-img" class="pdf-btn carte-btn" style="margin:0" download="planche.png">Télécharger l’image</a>
+          <a id="lens-link" class="pdf-btn carte-btn" style="margin:0;display:none" href="https://lens.google.com/" target="_blank" rel="noopener">Ouvrir Google Lens</a>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <button id="copy-page" class="pdf-btn" type="button">Copier la planche affichée</button>
+        </div>
+        <p id="lens-msg" class="msg"></p>
+        <p class="simple-only msg"><button id="other-img" type="button">Identifier une autre image (coller / fichier)</button></p>
+      </section>
+    </div>
+  </div>
+
+
+  <script>
+    (function () {
+      var modal = document.getElementById('tools-modal');
+      var zone = document.getElementById('paste-zone');
+      var preview = document.getElementById('paste-preview');
+      var actions = document.getElementById('lens-actions');
+      var lensMsg = document.getElementById('lens-msg');
+      var gotoMsg = document.getElementById('goto-msg');
+      var input = document.getElementById('page-num');
+      var currentFile = null, currentPng = null, currentUrl = null;
+
+      function open(simple) {
+        modal.classList.toggle('simple', simple === true);
+        modal.classList.add('visible');
+        if (simple === true) return;
+        var hasPager = !!window.__pager;
+        document.getElementById('goto-section').style.display = hasPager ? '' : 'none';
+        (hasPager ? input : zone).focus();
+      }
+      function close() { modal.classList.remove('visible'); }
+      function msg(el, text, err) { el.textContent = text || ''; el.classList.toggle('err', !!err); }
+
+      // ---- Aller à une page ----
+      function goto() {
+        var m = String(input.value).match(/\d+/);
+        if (!m) { msg(gotoMsg, 'Entrez un numéro de page.', true); return; }
+        var n = parseInt(m[0], 10);
+        if (window.__pager && window.__pager.goTo(n)) { msg(gotoMsg, ''); close(); }
+        else {
+          var ids = Array.from(document.querySelectorAll('.reader .page')).map(function (p) { return parseInt(p.id.replace('page-', ''), 10); });
+          msg(gotoMsg, 'Page introuvable (de ' + Math.min.apply(null, ids) + ' à ' + Math.max.apply(null, ids) + ').', true);
+        }
+      }
+      document.getElementById('page-go').addEventListener('click', goto);
+      input.addEventListener('keydown', function (e) {
+        e.stopPropagation(); // évite de tourner les pages avec les flèches
+        if (e.key === 'Enter') goto();
+      });
+
+      // ---- Image à identifier ----
+      var hintEl = document.getElementById('hint-input');
+      var photoBtn = document.getElementById('photo-go');
+      function resetHint() { hintEl.value = ''; photoBtn.disabled = true; }
+      hintEl.addEventListener('input', function () { photoBtn.disabled = !hintEl.value.trim(); });
+      hintEl.addEventListener('keydown', function (e) {
+        e.stopPropagation(); // pas de changement de page avec les flèches
+        if (e.key === 'Enter') { e.preventDefault(); document.getElementById('lens-go').click(); }
+      });
+      // Recherche d'images classique (photos réelles) à partir de l'indice
+      photoBtn.addEventListener('click', function () {
+        var h = hintEl.value.trim();
+        if (!h) return;
+        window.open('https://www.google.com/search?tbm=isch&hl=fr&q=' + encodeURIComponent(h + ' photo'), '_blank');
+        msg(lensMsg, 'Recherche de photos ouverte dans un nouvel onglet.');
+      });
+      function isPublic(u) {
+        try {
+          var x = new URL(u);
+          return /^https?:$/.test(x.protocol) && !/^(localhost|127\.|192\.168\.|10\.)/.test(x.hostname);
+        } catch (e) { return false; }
+      }
+      function setImage(file, publicUrl) {
+        if (!file || file.type.indexOf('image/') !== 0) { msg(lensMsg, "Ce n'est pas une image.", true); return; }
+        currentFile = file; currentPng = null; resetHint();
+        currentUrl = publicUrl && isPublic(publicUrl) ? publicUrl : null;
+        document.getElementById('lens-go').textContent = currentUrl ? '🔎 Identifier avec Google Lens' : '📋 Copier et ouvrir Google Lens';
+        var url = URL.createObjectURL(file);
+        preview.src = url;
+        preview.style.display = 'block';
+        actions.style.display = 'flex';
+        document.getElementById('dl-img').href = url;
+        msg(lensMsg, 'Image prête.');
+        // PNG préparé en promesse : accepté directement par le presse-papiers
+        currentPng = createImageBitmap(file).then(function (bmp) {
+          return new Promise(function (resolve, reject) {
+            var c = document.createElement('canvas');
+            c.width = bmp.width; c.height = bmp.height;
+            c.getContext('2d').drawImage(bmp, 0, 0);
+            c.toBlob(function (png) { png ? resolve(png) : reject(new Error('png')); }, 'image/png');
+          });
+        });
+        currentPng.catch(function () {});
+      }
+      function fileFromClipboard(cd) {
+        if (!cd) return null;
+        for (var i = 0; i < cd.items.length; i++) {
+          if (cd.items[i].type.indexOf('image/') === 0) return cd.items[i].getAsFile();
+        }
+        return null;
+      }
+      document.addEventListener('paste', function (e) {
+        var f = fileFromClipboard(e.clipboardData);
+        if (!f) return;
+        e.preventDefault();
+        if (!modal.classList.contains('visible')) open(false);
+        setImage(f);
+      });
+      document.getElementById('img-file').addEventListener('change', function (e) { setImage(e.target.files[0]); });
+      ['dragenter', 'dragover'].forEach(function (ev) {
+        zone.addEventListener(ev, function (e) { e.preventDefault(); zone.classList.add('over'); });
+      });
+      ['dragleave', 'drop'].forEach(function (ev) {
+        zone.addEventListener(ev, function (e) { e.preventDefault(); zone.classList.remove('over'); });
+      });
+      zone.addEventListener('drop', function (e) { setImage(e.dataTransfer.files[0]); });
+
+      // Copie l'image PUIS ouvre Google Lens (ouvrir l'onglet d'abord ferait perdre
+      // le focus à cette page, et Firefox refuserait alors la copie)
+      document.getElementById('lens-go').addEventListener('click', function () {
+        if (!currentFile) return;
+        // Planche hébergée sur le site : Lens l'ouvre directement par son adresse, sans collage
+        if (currentUrl) {
+          var h = hintEl.value.trim();
+          window.open('https://lens.google.com/uploadbyurl?url=' + encodeURIComponent(currentUrl) + '&hl=fr' + (h ? '&q=' + encodeURIComponent(h) : ''), '_blank');
+          msg(lensMsg, h ? "Google Lens est ouvert avec cette planche et votre indice. Pour des photos réelles, utilisez aussi « Chercher des photos »."
+                          : "Google Lens est ouvert dans un nouvel onglet avec cette planche.");
+          return;
+        }
+        var link = document.getElementById('lens-link');
+        function openLens() {
+          var w = window.open('https://lens.google.com/', '_blank');
+          if (!w) link.style.display = 'inline-block'; // fenêtre bloquée : lien manuel
+        }
+        function done() { msg(lensMsg, "Image copiée. Dans l'onglet Google Lens, cliquez d'abord dans la zone en pointillés, puis Ctrl+V. Si rien ne se colle : « Télécharger l'image », puis « importez un fichier » dans Lens."); openLens(); }
+        function fail(e) {
+          msg(lensMsg, "Copie impossible" + (e && e.name ? " (" + e.name + ")" : "") + " : utilisez « Télécharger l'image », puis importez le fichier dans Google Lens.", true);
+          link.style.display = 'inline-block';
+        }
+        try {
+          navigator.clipboard.write([new ClipboardItem({ 'image/png': currentPng })]).then(done).catch(fail);
+        } catch (e) { fail(e); }
+      });
+
+      // Copier la planche affichée dans le presse-papiers
+      function copyCurrent() {
+        var img = window.__pager ? window.__pager.currentImg()
+          : (Array.from(document.querySelectorAll('.page')).find(function (p) { return p.style.display !== 'none'; }) || {}).querySelector('img');
+        function say(t, err) { msg(lensMsg, t, err); if (window.__toast) window.__toast(t); }
+        if (!img || !img.naturalWidth) { say('Aucune planche chargée.', true); return; }
+        var c = document.createElement('canvas');
+        c.width = img.naturalWidth; c.height = img.naturalHeight;
+        c.getContext('2d').drawImage(img, 0, 0);
+        c.toBlob(function (blob) {
+          navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
+            .then(function () { say('Planche copiée : collez-la (Ctrl+V) dans Google Lens ou Google Photos.'); })
+            .catch(function () { say('Copie impossible sur ce navigateur.', true); });
+        }, 'image/png');
+      }
+      window.__copyCurrent = copyCurrent;
+      window.__openTools = function () { open(false); };
+      window.__identifyCurrent = function () {
+        var img = window.__pager ? window.__pager.currentImg() : null;
+        if (!img || !img.naturalWidth) { if (window.__toast) window.__toast('Aucune planche chargée.'); return; }
+        var src = img.currentSrc || img.src;
+        // Planche en ligne : Lens la récupère par son adresse -> aucun encodage, ouverture immédiate
+        if (isPublic(src)) {
+          currentFile = { byUrl: true }; currentPng = null; currentUrl = src; resetHint();
+          open(true);
+          preview.src = src;
+          preview.style.display = 'block';
+          actions.style.display = 'flex';
+          document.getElementById('dl-img').href = src;
+          document.getElementById('lens-go').textContent = '🔎 Identifier avec Google Lens';
+          msg(lensMsg, 'Planche chargée. Cliquez sur « Identifier avec Google Lens ».');
+          return;
+        }
+        var c = document.createElement('canvas');
+        c.width = img.naturalWidth; c.height = img.naturalHeight;
+        c.getContext('2d').drawImage(img, 0, 0);
+        c.toBlob(function (blob) {
+          if (!blob) { if (window.__toast) window.__toast('Image illisible.'); return; }
+          open(true);
+          setImage(new File([blob], 'planche.png', { type: 'image/png' }), img.currentSrc || img.src);
+          msg(lensMsg, currentUrl ? "Planche chargée. Cliquez sur « Identifier avec Google Lens »." : "Planche chargée. Cliquez sur « Copier et ouvrir Google Lens », puis Ctrl+V dans Lens.");
+        }, 'image/png');
+      };
+      document.getElementById('other-img').addEventListener('click', function () { open(false); });
+      document.getElementById('copy-page').addEventListener('click', copyCurrent);
+
+      document.getElementById('tools-close').addEventListener('click', close);
+      modal.addEventListener('click', function (e) { if (e.target === modal) close(); });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+    })();
+  </script>
+
+  <!-- ===== Bande de miniatures (film) ===== -->
+  <style>
+    #film-btn {
+      border: 1px solid var(--terracotta-deep); border-radius: 18px;
+      background: transparent; color: var(--terracotta-deep); cursor: pointer;
+      padding: 6px 14px; font-family: 'Karla', sans-serif; font-size: 0.9rem;
+    }
+    #film-btn:hover, #film-btn:focus-visible, #film-btn[aria-pressed="true"] { background: var(--terracotta-deep); color: var(--cream); }
+    #film {
+      display: none; position: fixed; left: 0; right: 0; bottom: 0; z-index: 25;
+      background: rgba(30,26,22,0.92); backdrop-filter: blur(6px);
+      padding: 8px 0 calc(10px + env(safe-area-inset-bottom, 0px)); color: #f2ead9; font-family: 'Karla', sans-serif;
+    }
+    body.film-open #film { display: block; }
+    #film .film-tools { display: flex; gap: 8px; padding: 0 12px 8px; align-items: center; flex-wrap: wrap; }
+    #film .film-tools button {
+      font: inherit; font-size: 0.75rem; color: #f2ead9; background: transparent;
+      border: 1px solid #f2ead9; border-radius: 16px; padding: 4px 12px; cursor: pointer;
+    }
+    #film .film-tools button:hover { background: #f2ead9; color: var(--ink); }
+    #film .film-tools span { font-size: 0.75rem; opacity: 0.7; margin-left: auto; }
+    #film-track {
+      display: flex; gap: 8px; overflow-x: auto; padding: 4px 12px 2px;
+      scrollbar-width: thin; scroll-snap-type: x proximity;
+    }
+    .thumb {
+      position: relative; flex: 0 0 auto; width: 64px; height: 84px; padding: 0;
+      border: 2px solid transparent; border-radius: 4px; background: #000;
+      cursor: pointer; overflow: hidden; scroll-snap-align: center;
+    }
+    .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0.75; }
+    .thumb b {
+      position: absolute; left: 0; right: 0; bottom: 0; padding: 1px 0;
+      background: rgba(0,0,0,0.7); color: #f2ead9; font: 600 0.7rem 'Karla', sans-serif; text-align: center;
+    }
+    .thumb:hover img { opacity: 1; }
+    .thumb.active { border-color: #e3a7a2; }
+    .thumb.active img { opacity: 1; }
+    body.film-open .pager-controls { bottom: calc(var(--film-h, 134px) + 14px); }
+    body.film-open .page img { max-height: calc(100vh - 90px - var(--film-h, 134px)); max-height: calc(100dvh - 90px - var(--film-h, 134px)); }
+    #film-toast {
+      position: fixed; left: 50%; bottom: calc(var(--film-h, 134px) + 74px); transform: translateX(-50%); z-index: 40;
+      background: #f2ead9; color: var(--ink); padding: 8px 16px; border-radius: 20px;
+      font: 0.85rem 'Karla', sans-serif; box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+      opacity: 0; pointer-events: none; transition: opacity 0.2s; max-width: 90vw; text-align: center;
+    }
+    #film-toast.on { opacity: 1; }
+  </style>
+
+  <div id="film" aria-label="Miniatures des planches">
+    <div class="film-tools">
+      <button type="button" id="film-copy">📋 Copier cette planche</button>
+      <button type="button" id="film-ident">🔎 Identifier l’image affichée</button>
+      <span id="film-info"></span>
+    </div>
+    <div id="film-track" role="listbox"></div>
+  </div>
+  <div id="film-toast" role="status"></div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var btn = document.createElement('button');
+      btn.id = 'film-btn'; btn.type = 'button'; btn.setAttribute('aria-pressed', 'false');
+      btn.title = 'Afficher ou masquer la bande de miniatures';
+      var actions = document.querySelector('.topbar__actions');
+      actions.insertBefore(btn, document.getElementById('chat-btn'));
+
+      // Lien direct vers une planche : navigation verrouillée, pas de bande
+      if (!window.__pager) { btn.style.display = 'none'; return; }
+
+      var track = document.getElementById('film-track');
+      var info = document.getElementById('film-info');
+      var thumbs = {};
+      var built = false;
+
+      function build() {
+        built = true;
+        document.querySelectorAll('.reader .page').forEach(function (p) {
+          var num = parseInt(p.id.replace('page-', ''), 10);
+          var src = p.querySelector('img').getAttribute('src');
+          var t = document.createElement('button');
+          t.type = 'button'; t.className = 'thumb'; t.setAttribute('role', 'option');
+          t.setAttribute('aria-label', 'Planche ' + num);
+          t.innerHTML = '<img loading="lazy" decoding="async" alt=""><b>' + num + '</b>';
+          t.firstChild.src = src;
+          t.addEventListener('click', function () { window.__pager.goTo(num); });
+          track.appendChild(t);
+          thumbs[p.id] = t;
+        });
+        info.textContent = Object.keys(thumbs).length + ' planches';
+      }
+
+      var film = document.getElementById('film');
+      function setFilmH() { document.documentElement.style.setProperty('--film-h', film.offsetHeight + 'px'); }
+      window.addEventListener('resize', function () { if (document.body.classList.contains('film-open')) setFilmH(); });
+      var activeId = document.querySelector('.reader .page').id; // la 1re planche est affichée au départ
+      var previousHook = window.__onShow;
+      function mark(id) {
+        activeId = id;
+        if (!built) return;
+        Object.keys(thumbs).forEach(function (k) { thumbs[k].classList.toggle('active', k === id); });
+        if (thumbs[id] && document.body.classList.contains('film-open')) {
+          thumbs[id].scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+        }
+      }
+      window.__onShow = function (id) { mark(id); if (previousHook) previousHook(id); };
+
+      function setOpen(open) {
+        document.body.classList.toggle('film-open', open);
+        btn.setAttribute('aria-pressed', open ? 'true' : 'false');
+        btn.innerHTML = '🎞️<span class="lbl"> ' + (open ? 'Bande visible' : 'Bande masquée') + '</span>';
+        btn.setAttribute('aria-label', open ? 'Bande de miniatures visible, cliquer pour la masquer' : 'Bande de miniatures masquée, cliquer pour l’afficher');
+        if (open) {
+          if (!built) build();
+          setFilmH();
+          mark(activeId);
+          var cur = thumbs[activeId]; if (cur) cur.scrollIntoView({ block: 'nearest', inline: 'center' });
+        }
+      }
+      btn.addEventListener('click', function () { setOpen(!document.body.classList.contains('film-open')); });
+      setOpen(true); // visible par défaut
+      window.addEventListener('load', function () { if (document.body.classList.contains('film-open')) setFilmH(); });
+
+      document.getElementById('film-copy').addEventListener('click', function () { window.__copyCurrent(); });
+      document.getElementById('film-ident').addEventListener('click', function () { window.__identifyCurrent(); });
+
+      var toast = document.getElementById('film-toast'), timer;
+      window.__toast = function (t) {
+        toast.textContent = t; toast.classList.add('on');
+        clearTimeout(timer); timer = setTimeout(function () { toast.classList.remove('on'); }, 2500);
+      };
+    });
+  </script>
+
+  <!-- ===== Adaptation smartphone ===== -->
+  <style>
+    .page { touch-action: manipulation; }
+    .page.zoomed { touch-action: none; }
+    @media (max-width: 520px) {
+      .topbar { padding: 10px 12px; }
+      .topbar__actions { gap: 8px; }
+      #chat-btn, #film-btn { padding: 6px 11px; font-size: 0.85rem; }
+      .topbar__home { font-size: 0.75rem; }
+      body .pager-controls {
+        flex-wrap: wrap; justify-content: center; gap: 6px 10px;
+        width: max-content; max-width: calc(100vw - 16px);
+        padding: 6px 12px; border-radius: 22px;
+        bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+      }
+      body .pager-controls .pdf-btn { font-size: 0.7rem; padding: 5px 10px; margin: 0; }
+      .thumb { width: 52px; height: 68px; }
+      #film-info { display: none; }
+      #film .film-tools { padding-bottom: 6px; }
+    }
+    @media (max-width: 480px) {
+      .lbl { display: none; }
+    }
+  </style>
+
+  <script>
+    // Balayage gauche/droite sur la planche pour tourner les pages (planche non zoomée)
+    (function () {
+      var x0, y0, t0, ok = false;
+      document.addEventListener('touchstart', function (e) {
+        ok = false;
+        if (!window.__pager || e.touches.length !== 1) return;
+        var page = e.target.closest && e.target.closest('.reader .page');
+        if (!page || page.classList.contains('zoomed')) return;
+        x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; t0 = Date.now(); ok = true;
+      }, { passive: true });
+      document.addEventListener('touchend', function (e) {
+        if (!ok) return;
+        ok = false;
+        var t = e.changedTouches[0], dx = t.clientX - x0, dy = t.clientY - y0;
+        if (Math.abs(dx) < 50 || Math.abs(dy) > Math.abs(dx) * 0.6 || Date.now() - t0 > 700) return;
+        window.__pager.step(dx < 0 ? 1 : -1);
+      }, { passive: true });
+    })();
+  </script>
+
+  <!-- ===== Chat public (Cbox) : fenêtre chargée à la première ouverture ===== -->
+  <style>
+    .topbar__actions { display: flex; align-items: center; gap: 14px; }
+    #chat-btn {
+      border: 1px solid var(--terracotta-deep); border-radius: 18px;
+      background: var(--terracotta); color: #fff; cursor: pointer;
+      padding: 6px 14px; font-family: 'Karla', sans-serif; font-size: 0.9rem;
+    }
+    #chat-btn:hover, #chat-btn:focus-visible { background: var(--terracotta-deep); }
+    #chat-modal {
+      display: none; position: fixed; inset: 0; z-index: 10000;
+      background: rgba(30,26,22,0.7); overflow: auto; padding: 12px;
+    }
+    #chat-modal.visible { display: block; }
+    #chat-modal .chat-box {
+      max-width: 700px; margin: 4vh auto; background: var(--cream); color: var(--ink);
+      border-radius: 10px; padding: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+    #chat-modal .chat-head { display: flex; justify-content: space-between; align-items: center; }
+    #chat-modal .chat-head h3 { margin: 0; font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; color: var(--terracotta-deep); }
+    #chat-close { border: none; background: none; font-size: 28px; line-height: 1; cursor: pointer; color: var(--ink); }
+    #chat-modal .chat-note { font-size: 0.8rem; color: var(--ink-soft); margin: 6px 0 10px; }
+    #chat-container iframe { width: 100%; height: 450px; border: 0; }
+  </style>
+
+  <div id="chat-modal" role="dialog" aria-modal="true" aria-label="Chat public">
+    <div class="chat-box">
+      <div class="chat-head">
+        <h3>💬 Discussion</h3>
+        <button id="chat-close" type="button" aria-label="Fermer le chat">×</button>
+      </div>
+      <p class="chat-note">Chat public hébergé par Cbox : aucun compte requis, seul un nom ou pseudo suffit. Les messages sont visibles de tous, ne communiquez aucune information personnelle. Connexion Internet requise.</p>
+      <div id="chat-container"></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var CHAT_URL = 'https://www5.cbox.ws/box/?boxid=967777&boxtag=Yceynw';
+      var modal = document.getElementById('chat-modal');
+      var loaded = false;
+      function ouvrir() {
+        modal.classList.add('visible');
+        if (loaded) return;
+        if (!navigator.onLine) {
+          document.getElementById('chat-container').textContent = '📡 Le chat nécessite une connexion Internet.';
+          return;
+        }
+        loaded = true;
+        var f = document.createElement('iframe');
+        f.src = CHAT_URL;
+        f.setAttribute('allowtransparency', 'yes');
+        f.setAttribute('allow', 'autoplay');
+        f.setAttribute('frameborder', '0');
+        f.setAttribute('scrolling', 'auto');
+        f.setAttribute('title', 'Chat Cbox');
+        document.getElementById('chat-container').appendChild(f);
+      }
+      function fermer() { modal.classList.remove('visible'); }
+      document.getElementById('chat-btn').addEventListener('click', ouvrir);
+      document.getElementById('chat-close').addEventListener('click', fermer);
+      modal.addEventListener('click', function (e) { if (e.target === modal) fermer(); });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') fermer(); });
+    })();
+  </script>
+
+  <!-- ===== Carte : demander un lieu particulier avant de l'ouvrir ===== -->
+  <style>
+    #carte-modal {
+      display: none; position: fixed; inset: 0; z-index: 10000;
+      background: rgba(30,26,22,0.7); overflow: auto; padding: 12px;
+    }
+    #carte-modal.visible { display: block; }
+    #carte-modal .carte-box {
+      max-width: 420px; margin: 14vh auto 0; background: var(--cream); color: var(--ink);
+      border-radius: 10px; padding: 16px 18px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+    #carte-modal .carte-head { display: flex; justify-content: space-between; align-items: center; }
+    #carte-modal h3 { margin: 0; font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; color: var(--terracotta-deep); }
+    #carte-close { border: none; background: none; font-size: 28px; line-height: 1; cursor: pointer; color: var(--ink); }
+    #carte-modal .row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+    #carte-modal .pdf-btn { margin: 0; }
+    #carte-lieu-row { display: none; }
+    #carte-lieu {
+      flex: 1 1 100%; padding: 9px 10px; font: inherit; color: var(--ink);
+      background: #fff8; border: 1px solid var(--ink-soft); border-radius: 8px;
+    }
+  </style>
+
+  <div id="carte-modal" role="dialog" aria-modal="true" aria-label="Carte">
+    <div class="carte-box">
+      <div class="carte-head">
+        <h3>🗺️ Rechercher un lieu particulier ?</h3>
+        <button id="carte-close" type="button" aria-label="Fermer">×</button>
+      </div>
+      <div id="carte-choice" class="row">
+        <button id="carte-oui" class="pdf-btn" type="button">Oui</button>
+        <button id="carte-non" class="pdf-btn" type="button">Non, carte par défaut</button>
+      </div>
+      <div id="carte-lieu-row" class="row">
+        <input id="carte-lieu" type="text" maxlength="100" autocomplete="off" placeholder="Nom du lieu (ex. : Brantôme)" aria-label="Nom du lieu">
+        <button id="carte-go" class="pdf-btn" type="button">Lancer la carte</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var PARAM = 'recherche'; // paramètre lu par la carte (?recherche=...) ; ne pas utiliser « lieu » : réservé aux identifiants de lieux
+      var modal = document.getElementById('carte-modal');
+      var choice = document.getElementById('carte-choice');
+      var lieuRow = document.getElementById('carte-lieu-row');
+      var input = document.getElementById('carte-lieu');
+      var baseUrl = '';
+
+      function openModal(url) {
+        baseUrl = url;
+        input.value = '';
+        choice.style.display = 'flex';
+        lieuRow.style.display = 'none';
+        modal.classList.add('visible');
+      }
+      function closeModal() { modal.classList.remove('visible'); }
+      function launch(place) {
+        var url = baseUrl;
+        if (place) {
+          var u = new URL(baseUrl);
+          u.searchParams.set(PARAM, place);
+          url = u.toString();
+        }
+        window.open(url, '_blank', 'noopener');
+        closeModal();
+      }
+
+      // Délégation : le bouton Carte est déplacé dans la barre du bas par le lecteur
+      document.addEventListener('click', function (e) {
+        var a = e.target.closest && e.target.closest('#carte-btn');
+        if (!a) return;
+        e.preventDefault();
+        openModal(a.href);
+      });
+
+      document.getElementById('carte-non').addEventListener('click', function () { launch(''); });
+      document.getElementById('carte-oui').addEventListener('click', function () {
+        choice.style.display = 'none';
+        lieuRow.style.display = 'flex';
+        input.focus();
+      });
+      document.getElementById('carte-go').addEventListener('click', function () { launch(input.value.trim()); });
+      input.addEventListener('keydown', function (e) {
+        e.stopPropagation(); // pas de changement de page avec les flèches
+        if (e.key === 'Enter') { e.preventDefault(); launch(input.value.trim()); }
+        if (e.key === 'Escape') closeModal();
+      });
+      document.getElementById('carte-close').addEventListener('click', closeModal);
+      modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
+    })();
+  </script>
+</body>
+</html>
