@@ -389,7 +389,7 @@ document.querySelectorAll('.page').forEach((p) => {
           prevBtn.disabled = i === 0;
           nextBtn.disabled = i === pages.length - 1;
           counter.textContent = (i + 1) + ' / ' + pages.length;
-          if (window.__onShow) window.__onShow(pages[i].id);
+          if (window.__onShow) window.__onShow(i);
         }
 
         prevBtn.addEventListener('click', () => { if (current > 0) { current--; show(current); } });
@@ -410,9 +410,13 @@ document.querySelectorAll('.page').forEach((p) => {
         if (caption) caption.style.display = 'none';
 
         window.__pager = {
+          goToIndex: function (i) {
+            if (i < 0 || i >= pages.length) return false;
+            current = i; show(i); return true;
+          },
           goTo: function (num) {
             var id = 'page-' + String(num).padStart(2, '0');
-            var i = pages.findIndex(function (p) { return p.id === id; });
+            var i = pages.findIndex(function (p) { return p.id === id || parseInt(p.id.replace(/\D+/g, ''), 10) === Number(num); });
             if (i < 0) return false;
             current = i; show(i); return true;
           },
@@ -941,12 +945,12 @@ document.querySelectorAll('.page').forEach((p) => {
 
       var track = document.getElementById('film-track');
       var info = document.getElementById('film-info');
-      var thumbs = {};
+      var thumbs = [];
       var built = false;
 
       function build() {
         built = true;
-        document.querySelectorAll('.reader .page').forEach(function (p) {
+        document.querySelectorAll('.reader .page').forEach(function (p, idx) {
           var num = parseInt(p.id.replace('page-', ''), 10);
           var src = p.querySelector('img').getAttribute('src');
           var t = document.createElement('button');
@@ -954,27 +958,27 @@ document.querySelectorAll('.page').forEach((p) => {
           t.setAttribute('aria-label', 'Planche ' + num);
           t.innerHTML = '<img loading="lazy" decoding="async" alt=""><b>' + num + '</b>';
           t.firstChild.src = src;
-          t.addEventListener('click', function () { window.__pager.goTo(num); });
+          t.addEventListener('click', function () { window.__pager.goToIndex(idx); });
           track.appendChild(t);
-          thumbs[p.id] = t;
+          thumbs.push(t);
         });
-        info.textContent = Object.keys(thumbs).length + ' planches';
+        info.textContent = thumbs.length + ' planches';
       }
 
       var film = document.getElementById('film');
       function setFilmH() { document.documentElement.style.setProperty('--film-h', film.offsetHeight + 'px'); }
       window.addEventListener('resize', function () { if (document.body.classList.contains('film-open')) setFilmH(); });
-      var activeId = document.querySelector('.reader .page').id; // la 1re planche est affichée au départ
+      var activeIdx = 0; // la 1re planche est affichée au départ
       var previousHook = window.__onShow;
-      function mark(id) {
-        activeId = id;
+      function mark(i) {
+        activeIdx = i;
         if (!built) return;
-        Object.keys(thumbs).forEach(function (k) { thumbs[k].classList.toggle('active', k === id); });
-        if (thumbs[id] && document.body.classList.contains('film-open')) {
-          thumbs[id].scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+        thumbs.forEach(function (t, k) { t.classList.toggle('active', k === i); });
+        if (thumbs[i] && document.body.classList.contains('film-open')) {
+          thumbs[i].scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
         }
       }
-      window.__onShow = function (id) { mark(id); if (previousHook) previousHook(id); };
+      window.__onShow = function (i) { mark(i); if (previousHook) previousHook(i); };
 
       function setOpen(open) {
         document.body.classList.toggle('film-open', open);
@@ -984,8 +988,8 @@ document.querySelectorAll('.page').forEach((p) => {
         if (open) {
           if (!built) build();
           setFilmH();
-          mark(activeId);
-          var cur = thumbs[activeId]; if (cur) cur.scrollIntoView({ block: 'nearest', inline: 'center' });
+          mark(activeIdx);
+          var cur = thumbs[activeIdx]; if (cur) cur.scrollIntoView({ block: 'nearest', inline: 'center' });
         }
       }
       btn.addEventListener('click', function () { setOpen(!document.body.classList.contains('film-open')); });
