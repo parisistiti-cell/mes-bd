@@ -3,30 +3,35 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Tranches de vie</title>
-<meta name="description" content="Tranches de vie.">
+<title>L'affaire de la souris</title>
+<meta name="description" content="L'affaire de la souris — les 40 ans d'une étrange habitude.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Karla:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --cream: #f2ead9;
-    --cream-deep: #e8dcc3;
-    --ink: #3a2e28;
-    --ink-soft: #6b5c50;
-    --accent: #4a6b8a;
-    --accent-deep: #37516b;
-    --rule: rgba(58, 46, 40, 0.15);
+    --teal: #3d7d94;
+    --teal-deep: #2b5c6e;
+    --cream: #f2e9d3;
+    --wood: #c79a63;
+    --rust: #c0503a;
+    --rust-deep: #9c3d2c;
+    --ink: #2a2521;
+    --ink-soft: #5c534a;
+    --rule: rgba(42, 37, 33, 0.15);
   }
+
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
+
   body {
     margin: 0;
     background: var(--cream);
     color: var(--ink);
-    font-family: 'Karla', sans-serif;
+    font-family: 'Space Grotesk', sans-serif;
     -webkit-font-smoothing: antialiased;
   }
+
   .topbar {
     position: sticky;
     top: 0;
@@ -35,71 +40,94 @@
     align-items: center;
     justify-content: space-between;
     padding: 14px 24px;
-    background: rgba(242, 234, 217, 0.92);
+    background: rgba(242, 233, 211, 0.94);
     backdrop-filter: blur(6px);
-    border-bottom: 1px solid var(--rule);
+    border-bottom: 2px solid var(--ink);
   }
+
   .topbar__title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.15rem;
-    letter-spacing: 0.02em;
-    color: var(--accent-deep);
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 0.01em;
+    color: var(--rust-deep);
     text-decoration: none;
   }
+
   .topbar__home {
     font-size: 0.8rem;
     color: var(--ink-soft);
     text-decoration: none;
     border-bottom: 1px solid var(--ink-soft);
   }
+
+  .topbar__progress {
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+  }
+
   .hero {
     position: relative;
     max-width: 720px;
     margin: 0 auto;
   }
+
   .hero img {
     display: block;
     width: 100%;
     height: auto;
   }
+
   .hero__caption {
     max-width: 560px;
-    margin: 40px auto 60px;
+    margin: 36px auto 56px;
     padding: 0 28px;
     text-align: center;
   }
+
   .hero__caption h1 {
-    font-family: 'Cormorant Garamond', serif;
-    font-weight: 500;
-    font-size: clamp(2rem, 6vw, 2.6rem);
+    font-family: 'Archivo Black', sans-serif;
+    font-size: clamp(1.6rem, 5.5vw, 2.2rem);
     letter-spacing: 0.01em;
-    margin: 0 0 22px;
-    color: var(--accent-deep);
+    margin: 0 0 14px;
+    color: var(--rust-deep);
+    line-height: 1.15;
   }
+
+  .hero__caption p {
+    color: var(--ink-soft);
+    font-size: 1rem;
+    line-height: 1.6;
+    margin: 0 0 22px;
+  }
+
   .pdf-btn {
-    font-family: 'Karla', sans-serif;
+    font-family: 'Space Grotesk', sans-serif;
     font-size: 0.85rem;
-    color: var(--accent-deep);
+    color: var(--rust-deep);
     background: transparent;
-    border: 1px solid var(--accent-deep);
-    border-radius: 20px;
+    border: 2px solid var(--rust-deep);
+    border-radius: 4px;
     padding: 9px 20px;
     cursor: pointer;
     transition: background 0.15s ease, color 0.15s ease;
   }
+
   .pdf-btn:hover:not(:disabled) {
-    background: var(--accent-deep);
+    background: var(--rust-deep);
     color: var(--cream);
   }
+
   .pdf-btn:disabled {
     opacity: 0.6;
     cursor: default;
   }
+
   .reader {
     max-width: 720px;
     margin: 0 auto;
     padding: 0 0 100px;
   }
+
   .page {
     display: flex;
     align-items: center;
@@ -118,7 +146,7 @@
     gap: 6px;
     background: rgba(30, 26, 22, 0.78);
     color: #f2ead9;
-    font-family: 'Karla', sans-serif;
+    font-family: 'Space Grotesk', sans-serif;
     font-size: 0.78rem;
     padding: 6px 12px;
     border-radius: 20px;
@@ -131,6 +159,7 @@
       display: flex;
     }
   }
+
   .page img {
     display: block;
     width: auto;
@@ -153,33 +182,41 @@
   .page.zoomed.dragging img {
     transition: none;
   }
+
   .placeholder {
     margin: 20px auto;
     padding: 48px 28px;
     max-width: 560px;
     text-align: center;
-    border: 1px dashed var(--rule);
+    border: 2px dashed var(--ink);
     border-radius: 4px;
     color: var(--ink-soft);
+    background: rgba(61, 125, 148, 0.06);
   }
+
   .placeholder p {
     margin: 0 0 6px;
     font-size: 0.92rem;
     line-height: 1.6;
   }
+
   .placeholder code {
-    background: var(--cream-deep);
+    background: var(--wood);
+    color: var(--ink);
     padding: 2px 6px;
     border-radius: 3px;
     font-size: 0.85rem;
   }
+
   footer {
     text-align: center;
     padding: 40px 24px 60px;
     color: var(--ink-soft);
     font-size: 0.8rem;
-    border-top: 1px solid var(--rule);
+    border-top: 2px solid var(--ink);
   }
+
+  footer a { color: var(--rust-deep); }
 
   .pager-controls .pdf-btn {
     color: var(--cream);
@@ -191,13 +228,94 @@
     background: var(--cream);
     color: var(--ink);
   }
+  /* ---- Bouton + lecteur vidéo (planche 11) ---- */
+  .video-btn {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 6;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--cream);
+    background: var(--rust-deep);
+    border: 2px solid var(--cream);
+    border-radius: 30px;
+    padding: 9px 16px 9px 12px;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
+    transition: transform 0.15s ease, background 0.15s ease;
+  }
+  .video-btn:hover { background: var(--rust); transform: translate(-50%, -50%) scale(1.06); }
+  .video-btn:focus-visible { outline: 3px solid var(--teal); outline-offset: 2px; }
 
+  .video-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(20, 17, 14, 0.88);
+  }
+  .video-modal.open { display: flex; }
+  .video-modal__box {
+    position: relative;
+    width: min(960px, 100%);
+  }
+  .video-modal video {
+    display: block;
+    width: 100%;
+    max-height: 80vh;
+    max-height: 80dvh;
+    background: #000;
+    border-radius: 6px;
+  }
+  .video-modal__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 14px;
+  }
+  .video-modal__actions button {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--cream);
+    background: transparent;
+    border: 2px solid var(--cream);
+    border-radius: 30px;
+    padding: 9px 18px;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .video-modal__actions button:hover:not(:disabled) { background: var(--cream); color: var(--ink); }
+  .video-modal__actions button:disabled { opacity: 0.6; cursor: default; }
+  .video-modal.ended .video-modal__actions .is-replay { background: var(--rust-deep); border-color: var(--rust-deep); }
+  .video-modal__close {
+    position: absolute;
+    top: -42px;
+    right: 0;
+    font-size: 1.6rem;
+    line-height: 1;
+    color: var(--cream);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 8px;
+  }
 </style>
 </head>
 <body>
 
   <nav class="topbar">
-    <a class="topbar__title" href="#top">Tranches de vie</a>
+    <a class="topbar__title" href="#top">L'affaire de la souris</a>
     <div class="topbar__actions">
       <button id="chat-btn" type="button" title="Ouvrir le chat" aria-label="Ouvrir le chat">💬<span class="lbl"> Chat</span></button>
       <a class="topbar__home" href="../">Toutes les BD</a>
@@ -207,11 +325,12 @@
   <div id="top"></div>
 
   <header class="hero">
-    <img src="images/00-couverture.jpg" alt="Couverture — Tranches de vie">
+    <img src="images/00.jpg" alt="Couverture — L'affaire de la souris">
   </header>
 
   <div class="hero__caption">
-    <h1>Tranches de vie</h1>
+    <h1>L'affaire de la souris</h1>
+    <p>Les 40 ans d'une étrange habitude.</p>
     <button id="pdf-btn" class="pdf-btn" onclick="downloadPDF()">Télécharger en PDF</button>
   </div>
 
@@ -221,14 +340,9 @@
 
     Pour chaque planche : dépose l'image dans le dossier images/
     puis ajoute un bloc comme celui-ci (en gardant le même ordre
-    que ton histoire). L'attribut id permet un lien direct vers
-    cette planche précise :
+    que ton histoire) :
 
-    <div class="page" id="page-1">
-      <img src="images/01.jpg" alt="Planche 1">
-    </div>
-
-    Lien vers cette planche : ton-site.pages.dev/Tranche-de-vie/#page-1
+   
     ===========================================================
   -->
   <main class="reader">
@@ -236,79 +350,79 @@
      <div class="page" id="page-0">
       <img src="images/00-couverture.jpg" alt="Planche 0">
     </div>
-    
-    <div class="page" id="page-00">
-      <img src="images/00-couverture0.jpg" alt="Planche 00">
-    </div>
     <div class="page" id="page-01">
-      <img src="images/00.jpg" alt="Planche 01">
-    </div>
-    
-    <div class="page" id="page-04">
       <img src="images/01.jpg" alt="Planche 1">
     </div>
     
     <div class="page" id="page-02">
       <img src="images/02.jpg" alt="Planche 2">
     </div>
-    
+
     <div class="page" id="page-03">
       <img src="images/03.jpg" alt="Planche 3">
     </div>
+
     <div class="page" id="page-04">
       <img src="images/04.jpg" alt="Planche 4">
     </div>
-    
+   
     <div class="page" id="page-05">
       <img src="images/05.jpg" alt="Planche 5">
     </div>
-    
+
     <div class="page" id="page-06">
       <img src="images/06.jpg" alt="Planche 6">
     </div>
+
     <div class="page" id="page-07">
       <img src="images/07.jpg" alt="Planche 7">
     </div>
-    
+
     <div class="page" id="page-08">
       <img src="images/08.jpg" alt="Planche 8">
     </div>
+
     <div class="page" id="page-09">
       <img src="images/09.jpg" alt="Planche 9">
     </div>
+
     <div class="page" id="page-10">
       <img src="images/10.jpg" alt="Planche 10">
     </div>
-    
+
     <div class="page" id="page-11">
       <img src="images/11.jpg" alt="Planche 11">
+      <button type="button" class="video-btn" id="video-btn" aria-label="Lire la vidéo : Voix GPS adaptées">▶ Voir la vidéo</button>
     </div>
-    
+
     <div class="page" id="page-12">
       <img src="images/12.jpg" alt="Planche 12">
     </div>
+
     <div class="page" id="page-13">
       <img src="images/13.jpg" alt="Planche 13">
     </div>
-    
+
     <div class="page" id="page-14">
       <img src="images/14.jpg" alt="Planche 14">
     </div>
-    
+
     <div class="page" id="page-15">
       <img src="images/15.jpg" alt="Planche 15">
     </div>
+
     <div class="page" id="page-16">
       <img src="images/16.jpg" alt="Planche 16">
     </div>
-    
+
     <div class="page" id="page-17">
       <img src="images/17.jpg" alt="Planche 17">
     </div>
-    
+
     <div class="page" id="page-18">
       <img src="images/18.jpg" alt="Planche 18">
     </div>
+    
     <div class="page" id="page-19">
       <img src="images/19.jpg" alt="Planche 19">
     </div>
@@ -317,94 +431,10 @@
       <img src="images/20.jpg" alt="Planche 20">
     </div>
     
-    <div class="page" id="page-21">
-      <img src="images/21.jpg" alt="Planche 21">
-    </div>
-    <div class="page" id="page-22">
-      <img src="images/22.jpg" alt="Planche 22">
-    </div>
-    
-    <div class="page" id="page-23">
-      <img src="images/23.jpg" alt="Planche 23">
-    </div>
-    
-    <div class="page" id="page-24">
-      <img src="images/24.jpg" alt="Planche 24">
-    </div>
-    <div class="page" id="page-25">
-      <img src="images/25.jpg" alt="Planche 25">
-    </div>
-    
-    <div class="page" id="page-26">
-      <img src="images/26.jpg" alt="Planche 26">
-    </div>
-    
-    <div class="page" id="page-27">
-      <img src="images/27.jpg" alt="Planche 27">
-    </div>
-    <div class="page" id="page-28">
-      <img src="images/28.jpg" alt="Planche 28">
-    </div>
-    
-    <div class="page" id="page-29">
-      <img src="images/29.jpg" alt="Planche 29">
-    </div>
-    
-    <div class="page" id="page-30">
-      <img src="images/30.jpg" alt="Planche 30">
-    </div>
-    <div class="page" id="page-31">
-      <img src="images/31.jpg" alt="Planche 31">
-    </div>
-    
-    <div class="page" id="page-32">
-      <img src="images/32.jpg" alt="Planche 32">
-    </div>
-    <div class="page" id="page-33">
-      <img src="images/33.jpg" alt="Planche 33">
-    </div>
-    <div class="page" id="page-34">
-      <img src="images/34.jpg" alt="Planche 34">
-    </div>
-    
-    <div class="page" id="page-35">
-      <img src="images/35.jpg" alt="Planche 35">
-    </div>
-    
-  
-    <div class="page" id="page-36">
-      <img src="images/36.jpg" alt="Planche 36">
-    </div>
-    
-    <div class="page" id="page-37">
-      <img src="images/37.jpg" alt="Planche 37">
-    </div>
-    
-    <div class="page" id="page-38">
-      <img src="images/38.jpg" alt="Planche 38">
-    </div>
-    <div class="page" id="page-39">
-      <img src="images/39.jpg" alt="Planche 39">
-    </div>
-    
-    <div class="page" id="page-40">
-      <img src="images/40.jpg" alt="Planche 40">
-    </div>
-    
-    <div class="page" id="page-41">
-      <img src="images/41.jpg" alt="Planche 41">
-    </div>
-    <div class="page" id="page-42">
-      <img src="images/42.jpg" alt="Planche 42">
-    </div>
-
-
-
-
   </main>
 
   <footer>
-    Tranches de vie — mis à jour au fil des chapitres
+    L'affaire de la souris — mis à jour au fil des chapitres
   </footer>
 
   <script>
@@ -412,10 +442,9 @@
       if (!target) return;
       const el = document.querySelector(target);
       if (!el) return;
-      
-document.querySelectorAll('.page').forEach((p) => {
-  p.style.display = (p === el) ? '' : 'none';
-});
+      document.querySelectorAll('.page').forEach((p) => {
+        p.style.display = (p === el) ? 'flex' : 'none';
+      });
       const hero = document.querySelector('.hero');
       const caption = document.querySelector('.hero__caption');
       const foot = document.querySelector('footer');
@@ -641,15 +670,19 @@ document.querySelectorAll('.page').forEach((p) => {
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
+    // Génère un PDF à partir de la couverture et de toutes les planches
+    // actuellement présentes sur la page, dans leur ordre d'affichage.
     async function downloadPDF() {
       const btn = document.getElementById('pdf-btn');
       const originalLabel = btn.textContent;
       btn.disabled = true;
       btn.textContent = 'Préparation du PDF...';
+
       try {
         const { jsPDF } = window.jspdf;
         const images = Array.from(document.querySelectorAll('.hero img, .page img'));
         let doc;
+
         for (let i = 0; i < images.length; i++) {
           const img = images[i];
           if (!img.complete) {
@@ -661,9 +694,11 @@ document.querySelectorAll('.page').forEach((p) => {
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0);
           const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+
           const wmm = canvas.width * 0.264583;
           const hmm = canvas.height * 0.264583;
           const orientation = wmm > hmm ? 'landscape' : 'portrait';
+
           if (i === 0) {
             doc = new jsPDF({ orientation, unit: 'mm', format: [wmm, hmm] });
           } else {
@@ -671,7 +706,8 @@ document.querySelectorAll('.page').forEach((p) => {
           }
           doc.addImage(dataUrl, 'JPEG', 0, 0, wmm, hmm);
         }
-        doc.save('Tranches de vie.pdf');
+
+        doc.save("L'affaire de la souris.pdf");
       } catch (err) {
         alert("Le PDF n'a pas pu être généré. Réessaie, ou vérifie que toutes les planches sont bien chargées.");
         console.error(err);
@@ -691,11 +727,11 @@ document.querySelectorAll('.page').forEach((p) => {
   <style>
     .topbar__actions { display: flex; align-items: center; gap: 14px; }
     #chat-btn {
-      border: 1px solid var(--accent-deep); border-radius: 18px;
-      background: var(--accent); color: #fff; cursor: pointer;
-      padding: 6px 14px; font-family: 'Karla', sans-serif; font-size: 0.9rem;
+      border: 2px solid var(--rust-deep); border-radius: 4px;
+      background: var(--rust); color: #fff; cursor: pointer;
+      padding: 6px 14px; font-family: 'Space Grotesk', sans-serif; font-size: 0.9rem;
     }
-    #chat-btn:hover, #chat-btn:focus-visible { background: var(--accent-deep); }
+    #chat-btn:hover, #chat-btn:focus-visible { background: var(--rust-deep); }
     #chat-modal {
       display: none; position: fixed; inset: 0; z-index: 10000;
       background: rgba(30,26,22,0.7); overflow: auto; padding: 12px;
@@ -706,7 +742,7 @@ document.querySelectorAll('.page').forEach((p) => {
       border-radius: 10px; padding: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.4);
     }
     #chat-modal .chat-head { display: flex; justify-content: space-between; align-items: center; }
-    #chat-modal .chat-head h3 { margin: 0; font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; color: var(--accent-deep); }
+    #chat-modal .chat-head h3 { margin: 0; font-family: 'Archivo Black', sans-serif; font-size: 1.5rem; color: var(--rust-deep); }
     #chat-close { border: none; background: none; font-size: 28px; line-height: 1; cursor: pointer; color: var(--ink); }
     #chat-modal .chat-note { font-size: 0.8rem; color: var(--ink-soft); margin: 6px 0 10px; }
     #chat-container iframe { width: 100%; height: 450px; border: 0; }
@@ -756,15 +792,15 @@ document.querySelectorAll('.page').forEach((p) => {
   <!-- ===== Bande de miniatures (film) ===== -->
   <style>
     #film-btn {
-      border: 1px solid var(--accent-deep); border-radius: 18px;
-      background: transparent; color: var(--accent-deep); cursor: pointer;
-      padding: 6px 14px; font-family: 'Karla', sans-serif; font-size: 0.9rem;
+      border: 2px solid var(--rust-deep); border-radius: 4px;
+      background: transparent; color: var(--rust-deep); cursor: pointer;
+      padding: 6px 14px; font-family: 'Space Grotesk', sans-serif; font-size: 0.9rem;
     }
-    #film-btn:hover, #film-btn:focus-visible, #film-btn[aria-pressed="true"] { background: var(--accent-deep); color: var(--cream); }
+    #film-btn:hover, #film-btn:focus-visible, #film-btn[aria-pressed="true"] { background: var(--rust-deep); color: var(--cream); }
     #film {
       display: none; position: fixed; left: 0; right: 0; bottom: 0; z-index: 25;
       background: rgba(30,26,22,0.92); backdrop-filter: blur(6px);
-      padding: 10px 0 calc(10px + env(safe-area-inset-bottom, 0px)); color: #f2ead9; font-family: 'Karla', sans-serif;
+      padding: 10px 0 calc(10px + env(safe-area-inset-bottom, 0px)); color: #f2ead9; font-family: 'Space Grotesk', sans-serif;
     }
     body.film-open #film { display: block; }
     #film-track {
@@ -779,10 +815,10 @@ document.querySelectorAll('.page').forEach((p) => {
     .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0.75; }
     .thumb b {
       position: absolute; left: 0; right: 0; bottom: 0; padding: 1px 0;
-      background: rgba(0,0,0,0.7); color: #f2ead9; font: 600 0.7rem 'Karla', sans-serif; text-align: center;
+      background: rgba(0,0,0,0.7); color: #f2ead9; font: 600 0.7rem 'Space Grotesk', sans-serif; text-align: center;
     }
     .thumb:hover img { opacity: 1; }
-    .thumb.active { border-color: #a9c4de; }
+    .thumb.active { border-color: #e3a392; }
     .thumb.active img { opacity: 1; }
     body.film-open .pager-controls { bottom: calc(var(--film-h, 110px) + 14px); }
     body.film-open .page img { max-height: calc(100vh - 90px - var(--film-h, 110px)); max-height: calc(100dvh - 90px - var(--film-h, 110px)); }
@@ -897,6 +933,92 @@ document.querySelectorAll('.page').forEach((p) => {
         if (Math.abs(dx) < 50 || Math.abs(dy) > Math.abs(dx) * 0.6 || Date.now() - t0 > 700) return;
         window.__pager.step(dx < 0 ? 1 : -1);
       }, { passive: true });
+    })();
+  </script>
+  <div class="video-modal" id="video-modal" role="dialog" aria-modal="true" aria-label="Vidéo : Voix GPS adaptées">
+    <div class="video-modal__box">
+      <button type="button" class="video-modal__close" id="video-close" aria-label="Fermer la vidéo">✕</button>
+      <video id="video-player" controls playsinline preload="none">
+        <source src="videos/Voix%20GPS%20adapt%C3%A9es.mp4" type="video/mp4">
+        <source src="https://raw.githubusercontent.com/parisistiti-cell/mes-bd/main/laffaire-de-la-souris/videos/Voix%20GPS%20adapt%C3%A9es.mp4" type="video/mp4">
+        Votre navigateur ne peut pas lire cette vidéo.
+      </video>
+      <div class="video-modal__actions">
+        <button type="button" id="video-save">⬇ Enregistrer la vidéo</button>
+        <button type="button" id="video-replay" class="is-replay">↻ Revoir</button>
+        <button type="button" id="video-close2">✕ Fermer</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const btn = document.getElementById('video-btn');
+      const modal = document.getElementById('video-modal');
+      const player = document.getElementById('video-player');
+      const closeBtn = document.getElementById('video-close');
+      const closeBtn2 = document.getElementById('video-close2');
+      const saveBtn = document.getElementById('video-save');
+      const replayBtn = document.getElementById('video-replay');
+      if (!btn || !modal || !player) return;
+
+      const FILE_NAME = 'Voix GPS adaptées.mp4';
+
+      function openVideo(e) {
+        e.stopPropagation();
+        modal.classList.remove('ended');
+        modal.classList.add('open');
+        player.play().catch(() => {});
+      }
+      function closeVideo() {
+        modal.classList.remove('open', 'ended');
+        player.pause();
+      }
+      function replayVideo() {
+        modal.classList.remove('ended');
+        player.currentTime = 0;
+        player.play().catch(() => {});
+      }
+      async function saveVideo() {
+        const src = player.currentSrc || (player.querySelector('source') || {}).src;
+        if (!src) return;
+        const label = saveBtn.textContent;
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Téléchargement…';
+        try {
+          const res = await fetch(src);
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          const blob = await res.blob();
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = FILE_NAME;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          setTimeout(() => URL.revokeObjectURL(url), 10000);
+        } catch (err) {
+          // Repli : ouvre la vidéo dans un nouvel onglet
+          window.open(src, '_blank', 'noopener');
+        } finally {
+          saveBtn.disabled = false;
+          saveBtn.textContent = label;
+        }
+      }
+
+      btn.addEventListener('click', openVideo);
+      closeBtn.addEventListener('click', closeVideo);
+      closeBtn2.addEventListener('click', closeVideo);
+      replayBtn.addEventListener('click', replayVideo);
+      saveBtn.addEventListener('click', saveVideo);
+      player.addEventListener('ended', () => modal.classList.add('ended'));
+      player.addEventListener('play', () => modal.classList.remove('ended'));
+      modal.addEventListener('click', (e) => { if (e.target === modal) closeVideo(); });
+      document.addEventListener('keydown', (e) => {
+        if (!modal.classList.contains('open')) return;
+        if (e.key === 'Escape') closeVideo();
+        e.stopPropagation();
+      }, true);
     })();
   </script>
 </body>
