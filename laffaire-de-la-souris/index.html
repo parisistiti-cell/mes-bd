@@ -231,8 +231,9 @@
   /* ---- Bouton + lecteur vidéo (planche 11) ---- */
   .video-btn {
     position: absolute;
-    left: 14px;
-    bottom: 14px;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
     z-index: 6;
     display: flex;
     align-items: center;
@@ -249,9 +250,8 @@
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
     transition: transform 0.15s ease, background 0.15s ease;
   }
-  .video-btn:hover { background: var(--rust); transform: scale(1.04); }
+  .video-btn:hover { background: var(--rust); transform: translate(-50%, -50%) scale(1.06); }
   .video-btn:focus-visible { outline: 3px solid var(--teal); outline-offset: 2px; }
-  .page.zoomed .video-btn { display: none; }
 
   .video-modal {
     position: fixed;
@@ -276,6 +276,28 @@
     background: #000;
     border-radius: 6px;
   }
+  .video-modal__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 14px;
+  }
+  .video-modal__actions button {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--cream);
+    background: transparent;
+    border: 2px solid var(--cream);
+    border-radius: 30px;
+    padding: 9px 18px;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .video-modal__actions button:hover:not(:disabled) { background: var(--cream); color: var(--ink); }
+  .video-modal__actions button:disabled { opacity: 0.6; cursor: default; }
+  .video-modal.ended .video-modal__actions .is-replay { background: var(--rust-deep); border-color: var(--rust-deep); }
   .video-modal__close {
     position: absolute;
     top: -42px;
@@ -407,10 +429,6 @@
     
     <div class="page" id="page-20">
       <img src="images/20.jpg" alt="Planche 20">
-    </div>
-    
-    <div class="page" id="page-21">
-      <img src="images/21.jpg" alt="Planche 21">
     </div>
     
   </main>
@@ -925,6 +943,11 @@
         <source src="https://raw.githubusercontent.com/parisistiti-cell/mes-bd/main/laffaire-de-la-souris/videos/Voix%20GPS%20adapt%C3%A9es.mp4" type="video/mp4">
         Votre navigateur ne peut pas lire cette vidéo.
       </video>
+      <div class="video-modal__actions">
+        <button type="button" id="video-save">⬇ Enregistrer la vidéo</button>
+        <button type="button" id="video-replay" class="is-replay">↻ Revoir</button>
+        <button type="button" id="video-close2">✕ Fermer</button>
+      </div>
     </div>
   </div>
 
@@ -934,20 +957,62 @@
       const modal = document.getElementById('video-modal');
       const player = document.getElementById('video-player');
       const closeBtn = document.getElementById('video-close');
+      const closeBtn2 = document.getElementById('video-close2');
+      const saveBtn = document.getElementById('video-save');
+      const replayBtn = document.getElementById('video-replay');
       if (!btn || !modal || !player) return;
+
+      const FILE_NAME = 'Voix GPS adaptées.mp4';
 
       function openVideo(e) {
         e.stopPropagation();
+        modal.classList.remove('ended');
         modal.classList.add('open');
         player.play().catch(() => {});
       }
       function closeVideo() {
-        modal.classList.remove('open');
+        modal.classList.remove('open', 'ended');
         player.pause();
+      }
+      function replayVideo() {
+        modal.classList.remove('ended');
+        player.currentTime = 0;
+        player.play().catch(() => {});
+      }
+      async function saveVideo() {
+        const src = player.currentSrc || (player.querySelector('source') || {}).src;
+        if (!src) return;
+        const label = saveBtn.textContent;
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Téléchargement…';
+        try {
+          const res = await fetch(src);
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          const blob = await res.blob();
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = FILE_NAME;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          setTimeout(() => URL.revokeObjectURL(url), 10000);
+        } catch (err) {
+          // Repli : ouvre la vidéo dans un nouvel onglet
+          window.open(src, '_blank', 'noopener');
+        } finally {
+          saveBtn.disabled = false;
+          saveBtn.textContent = label;
+        }
       }
 
       btn.addEventListener('click', openVideo);
       closeBtn.addEventListener('click', closeVideo);
+      closeBtn2.addEventListener('click', closeVideo);
+      replayBtn.addEventListener('click', replayVideo);
+      saveBtn.addEventListener('click', saveVideo);
+      player.addEventListener('ended', () => modal.classList.add('ended'));
+      player.addEventListener('play', () => modal.classList.remove('ended'));
       modal.addEventListener('click', (e) => { if (e.target === modal) closeVideo(); });
       document.addEventListener('keydown', (e) => {
         if (!modal.classList.contains('open')) return;
