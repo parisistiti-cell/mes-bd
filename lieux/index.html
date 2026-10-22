@@ -477,14 +477,17 @@
     
     <div class="page" id="page-44">
       <img src="images/44.jpg" alt="Planche 44">
+      <button type="button" class="video-btn" data-file="ventoux.mp4" aria-label="Lire la vidéo : Ventoux">▶ Voir la vidéo</button>
     </div>
     
     <div class="page" id="page-45">
       <img src="images/45.jpg" alt="Planche 45">
+      <button type="button" class="video-btn" data-file="cevennes.mp4" aria-label="Lire la vidéo : Cévennes">▶ Voir la vidéo</button>
     </div>
     
     <div class="page" id="page-46">
       <img src="images/46.jpg" alt="Planche 46">
+      <button type="button" class="video-btn" data-file="cevennes.mp4" aria-label="Lire la vidéo : Cévennes">▶ Voir la vidéo</button>
     </div>
     
     <div class="page" id="page-47">
@@ -499,6 +502,7 @@
 
     <div class="page" id="page-49">
       <img src="images/49.jpg" alt="Planche 49">
+      <button type="button" class="video-btn" data-file="cathares.mp4" aria-label="Lire la vidéo : Cathares">▶ Voir la vidéo</button>
     </div>
 
     <div class="page" id="page-50">
@@ -544,6 +548,7 @@
 
     <div class="page" id="page-60">
       <img src="images/60.jpg" alt="Planche 60">
+      <button type="button" class="video-btn" data-file="cevennes.mp4" aria-label="Lire la vidéo : Cévennes">▶ Voir la vidéo</button>
     </div>
     
     <div class="page" id="page-61">
@@ -557,6 +562,7 @@
     
     <div class="page" id="page-63">
       <img src="images/63.jpg" alt="Planche 63">
+      <button type="button" class="video-btn" data-file="ardeche.mp4" aria-label="Lire la vidéo : Ardèche">▶ Voir la vidéo</button>
     </div>
     <div class="page" id="page-64">
       <img src="images/64.jpg" alt="Planche 64">
@@ -1775,10 +1781,14 @@
       const othersBtn = document.getElementById('video-others');
       if (!btn || !modal || !player) return;
 
-      const RAW = 'https://raw.githubusercontent.com/parisistiti-cell/mes-bd/main/lieux/videos/';
+      const RAW = 'https://raw.githubusercontent.com/parisistiti-cell/mes-bd/main/';
       const VIDEOS = [
-        { label: 'Bande annonce', file: 'bande annonce.mp4' },
-        { label: 'Îles',          file: 'iles.mp4' }
+        { label: 'Bande annonce', file: 'bande annonce.mp4', dir: 'lieux/videos/' },
+        { label: 'Îles',          file: 'iles.mp4',          dir: 'lieux/videos/' },
+        { label: 'Ardèche',       file: 'ardeche.mp4',       dir: 'Ardeche-2026/video/' },
+        { label: 'Cathares',      file: 'cathares.mp4',      dir: 'catha/videos/' },
+        { label: 'Cévennes',      file: 'cevennes.mp4',      dir: 'lieux/videos/' },
+        { label: 'Ventoux',       file: 'ventoux.mp4',       dir: 'lieux/videos/' }
       ];
       let current = null;
 
@@ -1797,10 +1807,14 @@
         const enc = encodeURIComponent(v.file);
         player.pause();
         player.innerHTML = '';
-        [ 'videos/' + enc, RAW + enc ].forEach(function (u) {
+        [ '../' + v.dir + enc, RAW + v.dir + enc ].forEach(function (u) {
           const s = document.createElement('source');
           s.src = u; s.type = 'video/mp4';
           player.appendChild(s);
+        });
+        const last = player.lastElementChild;
+        if (last) last.addEventListener('error', function () {
+          nameEl.textContent = v.label + ' — vidéo introuvable pour le moment';
         });
         player.load();
         nameEl.textContent = v.label;
