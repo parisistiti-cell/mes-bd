@@ -30,8 +30,13 @@ def process(folder, max_side, quality, thumbs=False):
         if not f.is_file() or f.suffix.lower() not in {".jpg", ".jpeg", ".png", ".webp"}:
             continue
         before = f.stat().st_size
+        try:
+            im = ImageOps.exif_transpose(Image.open(f))
+            im.load()
+        except Exception as e:
+            print(f"IGNORÉ (fichier illisible) : {f.name} ({before//1024} Ko)")
+            continue
         shutil.copy2(f, backup / f.name)
-        im = ImageOps.exif_transpose(Image.open(f))
         if thumbs:
             t = im.copy(); t.thumbnail((240, 240 * 4))
             save(t, src_dir / "thumbs" / (f.stem + ".jpg"), 70)
