@@ -1,1 +1,62 @@
+name: Optimiser les images
 
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  optimiser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Installer Pillow
+        run: pip install pillow
+
+      - name: Compresser images et photos
+        working-directory: lieux
+        run: |
+          python - <<'EOF'
+          from pathlib import Path
+          from PIL import Image, ImageOps
+
+          def save(img, dest, quality):
+              img.convert("RGB").save(dest, "JPEG", quality=quality, optimize=True, progressive=True)
+
+          def process(folder, max_side, quality, thumbs=False):
+              d = Path(folder)
+              if not d.exists():
+                  return
+              if thumbs:
+                  (d / "thumbs").mkdir(exist_ok=True)
+              for f in sorted(d.iterdir()):
+                  if not f.is_file() or f.suffix.lower() not in {".jpg", ".jpeg", ".png", ".webp"}:
+                      continue
+                  before = f.stat().st_size
+                  im = ImageOps.exif_transpose(Image.open(f))
+                  if thumbs:
+                      t = im.copy()
+                      t.thumbnail((240, 960))
+                      save(t, d / "thumbs" / (f.stem + ".jpg"), 70)
+                  im.thumbnail((max_side, max_side))
+                  if f.suffix.lower() in {".jpg", ".jpeg"}:
+                      save(im, f, quality)
+                  elif f.suffix.lower() == ".png":
+                      im.save(f, "PNG", optimize=True)
+                  else:
+                      im.save(f, "WEBP", quality=quality)
+                  print(f"{f.name}: {before//1024} Ko -> {f.stat().st_size//1024} Ko")
+
+          process("images", 1800, 80, thumbs=True)
+          process("photos", 1400, 78)
+          EOF
+
+      - name: Enregistrer les changements
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add -A
+          git commit -m "Images optimisées" || echo "Rien à changer"
+          git push
