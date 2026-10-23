@@ -1,1 +1,26 @@
+name: Miniatures
 
+on:
+  workflow_dispatch:
+    inputs:
+      dossier:
+        description: "Dossier (vide = tous)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+jobs:
+  miniatures:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install pillow
+      - run: python miniatures.py "${{ github.event.inputs.dossier }}"
+      - run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add -A
+          git commit -m "Miniatures" || echo "Rien à changer"
+          git push
