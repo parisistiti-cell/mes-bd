@@ -202,7 +202,7 @@
   <div id="top"></div>
 
   <header class="hero">
-    <img src="../avance/images/00-couverture.jpg" alt="Couverture — avance">
+    <img loading="lazy" decoding="async" src="../avance/images/00-couverture.jpg" alt="Couverture — avance">
   </header>
 
   <div class="hero__caption">
@@ -212,31 +212,31 @@
   <main class="reader">
 
      <div class="page" id="page-00-couverture">
-      <img src="../avance/images/00-couverture.jpg" alt="Planche 0">
+      <img decoding="async" fetchpriority="high" src="../avance/images/00-couverture.jpg" alt="Planche 0">
     </div>
 
     
     <div class="page" id="page-00">
-      <img src="../avance/images/00.jpg" alt="Planche 0">
+      <img loading="lazy" decoding="async" src="../avance/images/00.jpg" alt="Planche 0">
     </div>
     <div class="page" id="page-01">
-      <img src="../avance/images/01.jpg" alt="Planche 1">
+      <img loading="lazy" decoding="async" src="../avance/images/01.jpg" alt="Planche 1">
     </div>
     
     <div class="page" id="page-02">
-      <img src="../avance/images/02.jpg" alt="Planche 2">
+      <img loading="lazy" decoding="async" src="../avance/images/02.jpg" alt="Planche 2">
     </div>
     
     <div class="page" id="page-03">
-      <img src="../avance/images/03.jpg" alt="Planche 3">
+      <img loading="lazy" decoding="async" src="../avance/images/03.jpg" alt="Planche 3">
     </div>
     
     <div class="page" id="page-04">
-      <img src="../avance/images/04.jpg" alt="Planche 4">
+      <img loading="lazy" decoding="async" src="../avance/images/04.jpg" alt="Planche 4">
     </div>
     
     <div class="page" id="page-05">
-      <img src="../avance/images/05.jpg" alt="Planche 5">
+      <img loading="lazy" decoding="async" src="../avance/images/05.jpg" alt="Planche 5">
     </div>
 
   </main>
@@ -337,6 +337,7 @@ document.querySelectorAll('.page').forEach((p) => {
           prevBtn.disabled = i === 0;
           nextBtn.disabled = i === pages.length - 1;
           counter.textContent = (i + 1) + ' / ' + pages.length;
+          if (window.__onShow) window.__onShow(i);
         }
 
         prevBtn.addEventListener('click', () => { if (current > 0) { current--; show(current); } });
@@ -451,6 +452,7 @@ document.querySelectorAll('.page').forEach((p) => {
       try {
         const { jsPDF } = window.jspdf;
         const images = Array.from(document.querySelectorAll('.hero img, .page img'));
+        images.forEach((im) => { im.loading = 'eager'; }); // sinon les planches masquées (lazy) ne se chargent jamais
         let doc;
         for (let i = 0; i < images.length; i++) {
           const img = images[i];
@@ -484,5 +486,21 @@ document.querySelectorAll('.page').forEach((p) => {
     }
   </script>
 
+  <script>
+    // Précharge la planche suivante pendant la lecture de l'actuelle
+    (function () {
+      var prev = window.__onShow;
+      window.__onShow = function (id) {
+        if (prev) prev(id);
+        var pages = document.querySelectorAll('.reader .page');
+        for (var i = 0; i < pages.length; i++) {
+          if ((typeof id === 'number' ? i === id : pages[i].id === id) && pages[i + 1]) {
+            var im = pages[i + 1].querySelector('img');
+            if (im) im.loading = 'eager';
+          }
+        }
+      };
+    })();
+  </script>
 </body>
 </html>
