@@ -170,6 +170,88 @@
     background: var(--cream);
     color: var(--ink);
   }
+  /* ---- Boutons vidéo (planches 8 et 29, bandeau) + lecteur ---- */
+  .video-btn {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 6;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Karla', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--cream);
+    background: var(--terracotta-deep);
+    border: 2px solid var(--cream);
+    border-radius: 30px;
+    padding: 9px 16px 9px 12px;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
+    transition: transform 0.15s ease, background 0.15s ease;
+  }
+  .video-btn:hover { background: var(--terracotta); transform: translate(-50%, -50%) scale(1.06); }
+  .video-btn:focus-visible { outline: 3px solid var(--cream-deep); outline-offset: 2px; }
+  #video-btn {
+    border: 1px solid var(--terracotta-deep); border-radius: 18px;
+    background: var(--terracotta-deep); color: var(--cream); cursor: pointer;
+    padding: 6px 14px; font-family: 'Karla', sans-serif; font-size: 0.9rem;
+    white-space: nowrap;
+  }
+  #video-btn:hover, #video-btn:focus-visible { background: var(--terracotta); }
+  .video-modal {
+    position: fixed; inset: 0; z-index: 100; display: none;
+    align-items: center; justify-content: center; padding: 20px;
+    background: rgba(20, 17, 14, 0.88);
+  }
+  .video-modal.open { display: flex; }
+  .video-modal__box { position: relative; width: min(960px, 100%); }
+  .video-modal video {
+    display: block; width: 100%; max-height: 80vh; max-height: 80dvh;
+    background: #000; border-radius: 6px;
+  }
+  .video-modal__actions {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 14px;
+  }
+  .video-modal__actions button {
+    font-family: 'Karla', sans-serif; font-size: 0.9rem; font-weight: 500;
+    color: var(--cream); background: transparent; border: 2px solid var(--cream);
+    border-radius: 30px; padding: 9px 18px; cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .video-modal__actions button:hover:not(:disabled) { background: var(--cream); color: var(--ink); }
+  .video-modal__actions button:disabled { opacity: 0.6; cursor: default; }
+  .video-modal.ended .video-modal__actions .is-replay { background: var(--terracotta-deep); border-color: var(--terracotta-deep); }
+  .video-modal__close {
+    position: absolute; top: -42px; right: 0; font-size: 1.6rem; line-height: 1;
+    color: var(--cream); background: none; border: none; cursor: pointer; padding: 4px 8px;
+  }
+  .video-modal [hidden] { display: none !important; }
+  .video-menu {
+    background: var(--cream); color: var(--ink); border-radius: 10px;
+    padding: 22px 20px 20px; text-align: center;
+  }
+  .video-menu__title {
+    margin: 0 0 16px; font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem; color: var(--terracotta-deep);
+  }
+  .video-menu__list { display: flex; flex-direction: column; gap: 10px; }
+  .video-menu__item {
+    font-family: 'Karla', sans-serif; font-size: 1rem; font-weight: 500;
+    color: var(--terracotta-deep); background: transparent;
+    border: 2px solid var(--terracotta-deep); border-radius: 30px;
+    padding: 12px 18px; cursor: pointer; text-align: center;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .video-menu__item:hover, .video-menu__item:focus-visible {
+    background: var(--terracotta-deep); color: var(--cream);
+  }
+  .video-modal__name {
+    margin: 0 0 10px; text-align: center; font-family: 'Karla', sans-serif;
+    font-size: 0.95rem; font-weight: 600; color: var(--cream);
+  }
 </style>
 </head>
 <body>
@@ -177,6 +259,7 @@
   <nav class="topbar">
     <a class="topbar__title" href="#top">tp</a>
     <div class="topbar__actions" style="display: flex; align-items: center; gap: 16px;">
+      <button id="video-btn" type="button" title="Voir les vidéos" aria-label="Voir les vidéos">▶<span class="lbl"> Vidéos</span></button>
       <button id="chat-btn" type="button" title="Ouvrir le chat" aria-label="Ouvrir le chat">💬<span class="lbl"> Chat</span></button>
       <span id="progress" class="topbar__progress">0%</span>
       <a class="topbar__home" href="../" style="font-size:0.8rem;color:var(--ink-soft);text-decoration:none;border-bottom:1px solid var(--ink-soft);">Toutes les BD</a>
@@ -231,6 +314,7 @@
 
     <div class="page" id="page-08">
       <img loading="lazy" decoding="async" src="images/08.jpg" alt="Planche 08">
+      <button type="button" class="video-btn" data-file="mob.mp4" aria-label="Lire la vidéo : Mob">▶ Voir la vidéo</button>
     </div>
 
     <div class="page" id="page-09">
@@ -315,6 +399,7 @@
     
     <div class="page" id="page-29">
       <img loading="lazy" decoding="async" src="images/29.jpg" alt="Planche 29">
+      <button type="button" class="video-btn" data-file="pilotage porsche 991 gt3 rs.mp4" aria-label="Lire la vidéo : Pilotage Porsche 991 GT3 RS">▶ Voir la vidéo</button>
     </div>
     
     <div class="page" id="page-30">
@@ -863,7 +948,7 @@ document.querySelectorAll('.page').forEach((p) => {
     @media (max-width: 520px) {
       .topbar { padding: 10px 12px; }
       .topbar__actions { gap: 8px; }
-      #chat-btn, #film-btn { padding: 6px 11px; font-size: 0.85rem; }
+      #chat-btn, #film-btn, #video-btn { padding: 6px 11px; font-size: 0.85rem; }
       .topbar__home { font-size: 0.75rem; }
       body .pager-controls {
         flex-wrap: wrap; justify-content: center; gap: 6px 10px;
@@ -916,6 +1001,163 @@ document.querySelectorAll('.page').forEach((p) => {
         }
       };
     })();
+  </script>
+  <div class="video-modal" id="video-modal" role="dialog" aria-modal="true" aria-label="Vidéos">
+    <div class="video-modal__box">
+      <button type="button" class="video-modal__close" id="video-close" aria-label="Fermer">✕</button>
+
+      <div class="video-menu" id="video-menu">
+        <p class="video-menu__title">Choisir une vidéo</p>
+        <div class="video-menu__list" id="video-list"></div>
+      </div>
+
+      <div id="video-stage" hidden>
+        <p class="video-modal__name" id="video-name"></p>
+        <video id="video-player" controls playsinline preload="none">
+          Votre navigateur ne peut pas lire cette vidéo.
+        </video>
+        <div class="video-modal__actions">
+          <button type="button" id="video-save">⬇ Enregistrer la vidéo</button>
+          <button type="button" id="video-replay" class="is-replay">↻ Revoir</button>
+          <button type="button" id="video-others">☰ Autres vidéos</button>
+          <button type="button" id="video-close2">✕ Fermer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const btn = document.getElementById('video-btn');
+      const modal = document.getElementById('video-modal');
+      const menu = document.getElementById('video-menu');
+      const list = document.getElementById('video-list');
+      const stage = document.getElementById('video-stage');
+      const nameEl = document.getElementById('video-name');
+      const player = document.getElementById('video-player');
+      const closeBtn = document.getElementById('video-close');
+      const closeBtn2 = document.getElementById('video-close2');
+      const saveBtn = document.getElementById('video-save');
+      const replayBtn = document.getElementById('video-replay');
+      const othersBtn = document.getElementById('video-others');
+      if (!btn || !modal || !player) return;
+
+      const RAW = 'https://raw.githubusercontent.com/parisistiti-cell/mes-bd/main/';
+      const VIDEOS = [
+        { label: 'Mob',                          file: 'mob.mp4',                         dir: 'tp/videos/' },
+        { label: 'Pilotage Porsche 991 GT3 RS',  file: 'pilotage porsche 991 gt3 rs.mp4', dir: 'tp/videos/' }
+      ];
+      let current = null;
+
+      function showMenu() {
+        player.pause();
+        modal.classList.remove('ended');
+        stage.hidden = true;
+        menu.hidden = false;
+        modal.setAttribute('aria-label', 'Choisir une vidéo');
+        const first = list.querySelector('button');
+        if (first) first.focus();
+      }
+
+      function play(v) {
+        current = v;
+        const enc = encodeURIComponent(v.file);
+        player.pause();
+        player.innerHTML = '';
+        [ '../' + v.dir + enc, RAW + v.dir + enc ].forEach(function (u) {
+          const s = document.createElement('source');
+          s.src = u; s.type = 'video/mp4';
+          player.appendChild(s);
+        });
+        const last = player.lastElementChild;
+        if (last) last.addEventListener('error', function () {
+          nameEl.textContent = v.label + ' — vidéo introuvable pour le moment';
+        });
+        player.load();
+        nameEl.textContent = v.label;
+        modal.setAttribute('aria-label', 'Vidéo : ' + v.label);
+        modal.classList.remove('ended');
+        menu.hidden = true;
+        stage.hidden = false;
+        player.play().catch(function () {});
+      }
+
+      VIDEOS.forEach(function (v) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'video-menu__item';
+        b.textContent = '▶ ' + v.label;
+        b.addEventListener('click', function () { play(v); });
+        list.appendChild(b);
+      });
+
+      // Boutons posés au centre des planches : lancent directement leur vidéo
+      document.querySelectorAll('.video-btn').forEach(function (b) {
+        b.addEventListener('click', function (e) {
+          e.stopPropagation();
+          const v = VIDEOS.find(function (x) { return x.file === b.dataset.file; });
+          if (!v) return;
+          modal.classList.add('open');
+          play(v);
+        });
+      });
+
+      function openModal(e) {
+        e.stopPropagation();
+        modal.classList.add('open');
+        showMenu();
+      }
+      function closeModal() {
+        modal.classList.remove('open', 'ended');
+        player.pause();
+      }
+      function replay() {
+        modal.classList.remove('ended');
+        player.currentTime = 0;
+        player.play().catch(function () {});
+      }
+      async function save() {
+        if (!current) return;
+        const src = player.currentSrc || (player.querySelector('source') || {}).src;
+        if (!src) return;
+        const label = saveBtn.textContent;
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Téléchargement…';
+        try {
+          const res = await fetch(src);
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          const blob = await res.blob();
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = current.file;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
+        } catch (err) {
+          window.open(src, '_blank', 'noopener');
+        } finally {
+          saveBtn.disabled = false;
+          saveBtn.textContent = label;
+        }
+      }
+
+      btn.addEventListener('click', openModal);
+      closeBtn.addEventListener('click', closeModal);
+      closeBtn2.addEventListener('click', closeModal);
+      othersBtn.addEventListener('click', showMenu);
+      replayBtn.addEventListener('click', replay);
+      saveBtn.addEventListener('click', save);
+      player.addEventListener('ended', function () { modal.classList.add('ended'); });
+      player.addEventListener('play', function () { modal.classList.remove('ended'); });
+      modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
+      document.addEventListener('keydown', function (e) {
+        if (!modal.classList.contains('open')) return;
+        if (e.key === 'Escape') closeModal();
+        e.stopPropagation();
+      }, true);
+    });
   </script>
 </body>
 </html>
