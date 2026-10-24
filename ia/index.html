@@ -187,7 +187,7 @@
   <div id="top"></div>
 
   <header class="hero">
-    <img src="images/00-couverture.jpg" alt="Couverture — ia">
+    <img loading="lazy" decoding="async" src="images/00-couverture.jpg" alt="Couverture — ia">
   </header>
 
   <div class="hero__caption">
@@ -198,52 +198,52 @@
 
   <main class="reader">
     <div class="page" id="page-00">
-      <img src="images/00-couverture.jpg" alt="Planche 0">
+      <img decoding="async" fetchpriority="high" src="images/00-couverture.jpg" alt="Planche 0">
     </div>
 
     <div class="page" id="page-01">
-      <img src="images/01.jpg" alt="Planche 1">
+      <img loading="lazy" decoding="async" src="images/01.jpg" alt="Planche 1">
     </div>
     
     <div class="page" id="page-02">
-      <img src="images/02.jpg" alt="Planche 2">
+      <img loading="lazy" decoding="async" src="images/02.jpg" alt="Planche 2">
     </div>
     
     <div class="page" id="page-03">
-      <img src="images/03.jpg" alt="Planche 3">
+      <img loading="lazy" decoding="async" src="images/03.jpg" alt="Planche 3">
     </div>
     
     <div class="page" id="page-04">
-      <img src="images/04.jpg" alt="Planche 4">
+      <img loading="lazy" decoding="async" src="images/04.jpg" alt="Planche 4">
     </div>
 
     <div class="page" id="page-05">
-      <img src="images/05.jpg" alt="Planche 5">
+      <img loading="lazy" decoding="async" src="images/05.jpg" alt="Planche 5">
     </div>
     
     <div class="page" id="page-06">
-      <img src="images/06.jpg" alt="Planche 6">
+      <img loading="lazy" decoding="async" src="images/06.jpg" alt="Planche 6">
     </div>
 
     <div class="page" id="page-07">
-      <img src="images/07.jpg" alt="Planche 7">
+      <img loading="lazy" decoding="async" src="images/07.jpg" alt="Planche 7">
     </div>
     
     <div class="page" id="page-08">
-      <img src="images/08.jpg" alt="Planche 8">
+      <img loading="lazy" decoding="async" src="images/08.jpg" alt="Planche 8">
     </div>
     
     <div class="page" id="page-09">
-      <img src="images/09.jpg" alt="Planche 9">
+      <img loading="lazy" decoding="async" src="images/09.jpg" alt="Planche 9">
     </div>
 
     <div class="page" id="page-10">
-      <img src="images/10.jpg" alt="Planche 10">
+      <img loading="lazy" decoding="async" src="images/10.jpg" alt="Planche 10">
     </div>
     
    
     <div class="page" id="page-11">
-      <img src="images/11.jpg" alt="Planche 11">
+      <img loading="lazy" decoding="async" src="images/11.jpg" alt="Planche 11">
     </div>
 
     
@@ -490,6 +490,7 @@
       try {
         const { jsPDF } = window.jspdf;
         const images = Array.from(document.querySelectorAll('.hero img, .page img'));
+        images.forEach((im) => { im.loading = 'eager'; }); // sinon les planches masquées (lazy) ne se chargent jamais
         let doc;
 
         for (let i = 0; i < images.length; i++) {
@@ -674,7 +675,9 @@
           t.type = 'button'; t.className = 'thumb'; t.setAttribute('role', 'option');
           t.setAttribute('aria-label', 'Planche ' + label + ' (' + (i + 1) + ' sur ' + pages.length + ')');
           t.innerHTML = '<img loading="lazy" decoding="async" alt=""><b>' + label + '</b>';
-          t.firstChild.src = p.querySelector('img').getAttribute('src');
+          var ti = t.firstChild, full = p.querySelector('img').getAttribute('src');
+          ti.onerror = function () { ti.onerror = null; ti.src = full; }; // repli si la miniature n'existe pas
+          ti.src = full.replace(/(^|\/)images\//, '$1images/thumbs/');
           t.addEventListener('click', function () { window.__pager.goToIndex(i); });
           track.appendChild(t); thumbs.push(t);
         });
@@ -750,6 +753,22 @@
         if (Math.abs(dx) < 50 || Math.abs(dy) > Math.abs(dx) * 0.6 || Date.now() - t0 > 700) return;
         window.__pager.step(dx < 0 ? 1 : -1);
       }, { passive: true });
+    })();
+  </script>
+  <script>
+    // Précharge la planche suivante pendant la lecture de l'actuelle
+    (function () {
+      var prev = window.__onShow;
+      window.__onShow = function (id) {
+        if (prev) prev(id);
+        var pages = document.querySelectorAll('.reader .page');
+        for (var i = 0; i < pages.length; i++) {
+          if ((typeof id === 'number' ? i === id : pages[i].id === id) && pages[i + 1]) {
+            var im = pages[i + 1].querySelector('img');
+            if (im) im.loading = 'eager';
+          }
+        }
+      };
     })();
   </script>
 </body>
