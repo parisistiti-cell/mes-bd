@@ -1,31 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://mes-bd.pages.dev/</loc><lastmod>2026-10-25</lastmod></url>
-  <url><loc>https://mes-bd.pages.dev/Ardeche-2026/</loc><lastmod>2026-10-25</lastmod></url>
-  <url><loc>https://mes-bd.pages.dev/conf/</loc><lastmod>2026-10-25</lastmod></url>
-  <url><loc>https://mes-bd.pages.dev/entre-deux-vies/</loc><lastmod>2026-10-25</lastmod></url>
-  <url><loc>https://mes-bd.pages.dev/lieux/</loc><lastmod>2026-10-25</lastmod></url>
-  <url><loc>https://mes-bd.pages.dev/moto/</loc><lastmod>2026-10-25</lastmod></url>
-  <url><loc>https://mes-bd.pages.dev/avance/</loc><lastmod>2026-10-25</lastmod></url>
-  <url><loc>https://mes-bd.pages.dev/laffaire-de-la-souris/</loc><lastmod>2026-10-25</lastmod></url>
-  <url><loc>https://mes-bd.pages.dev/eusk/</loc><lastmod>2026-10-25</lastmod></url>
-  <url><loc>https://mes-bd.pages.dev/leym/</loc><lastmod>2026-10-25</lastmod></url>
-  <url><loc>https://mes-bd.pages.dev/code/</loc><lastmod>2026-10-25</lastmod></url>
-  <url><loc>https://mes-bd.pages.dev/bloi/</loc><lastmod>2026-10-25</lastmod></url>
-  <url><loc>https://mes-bd.pages.dev/ia/</loc><lastmod>2026-10-25</lastmod></url>
-  <url><loc>https://mes-bd.pages.dev/Tranche-de-vie/</loc><lastmod>2026-10-25</lastmod></url>
-  <url><loc>https://mes-bd.pages.dev/sola/</loc><lastmod>2026-10-25</lastmod></url>
-  <url><loc>https://mes-bd.pages.dev/clis/</loc><lastmod>2026-10-25</lastmod></url>
-  <url><loc>https://mes-bd.pages.dev/meca/</loc><lastmod>2026-10-25</lastmod></url>
-  <url><loc>https://mes-bd.pages.dev/jard/</loc><lastmod>2026-10-25</lastmod></url>
-  <url><loc>https://mes-bd.pages.dev/corezlot/</loc><lastmod>2026-10-25</lastmod></url>
-  <url><loc>https://mes-bd.pages.dev/opti/</loc><lastmod>2026-10-25</lastmod></url>
-  <url><loc>https://mes-bd.pages.dev/phrases/</loc><lastmod>2026-10-25</lastmod></url>
-  <url><loc>https://mes-bd.pages.dev/irla/</loc><lastmod>2026-10-25</lastmod></url>
-  <url><loc>https://mes-bd.pages.dev/tp/</loc><lastmod>2026-10-25</lastmod></url>
-  <url><loc>https://mes-bd.pages.dev/reseaux/</loc><lastmod>2026-10-25</lastmod></url>
-  <url><loc>https://mes-bd.pages.dev/venus/</loc><lastmod>2026-10-25</lastmod></url>
-  <url><loc>https://mes-bd.pages.dev/drone/</loc><lastmod>2026-10-25</lastmod></url>
-  <url><loc>https://mes-bd.pages.dev/bre/</loc><lastmod>2026-10-25</lastmod></url>
-  <url><loc>https://mes-bd.pages.dev/catha/</loc><lastmod>2026-10-25</lastmod></url>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <url><loc>https://mes-bd.pages.dev/</loc><lastmod>2026-10-26</lastmod></url>
+  <url><loc>https://mes-bd.pages.dev/Ardeche-2026/</loc><lastmod>2026-10-26</lastmod><image:image><image:loc>https://mes-bd.pages.dev/Ardeche-2026/images/00-couverture.jpg</image:loc><image:title>Ardèche 2026</image:title></image:image></url>
+  <url><loc>https://mes-bd.pages.dev/conf/</loc><lastmod>2026-10-26</lastmod><image:image><image:loc>https://mes-bd.pages.dev/conf/images/00-couverture.jpg</image:loc><image:title>Confiture de melon d&#x27;Espagne</image:title></image:image></url>
+  <url><loc>https://mes-bd.pages.dev/lieux/</loc><lastmod>2026-10-26</lastmod><image:image><image:loc>https://mes-bd.pages.dev/lieux/images/00-couverture.jpg</image:loc><image:title>Lieux</image:title></image:image></url>
+  <url><loc>https://mes-bd.pages.dev/moto/</loc><lastmod>2026-10-26</lastmod><image:image><image:loc>https://mes-bd.pages.dev/moto/images/00-couverture.jpg</image:loc><image:title>Moto</image:title></image:image></url>
+  <url><loc>https://mes-bd.pages.dev/laffaire-de-la-souris/</loc><lastmod>2026-10-26</lastmod><image:image><image:loc>https://mes-bd.pages.dev/laffaire-de-la-souris/images/00-couverture.jpg</image:loc><image:title>L&#x27;affaire de la souris</image:title></image:image></url>
+  <url><loc>https://mes-bd.pages.dev/eusk/</loc><lastmod>2026-10-26</lastmod><image:image><image:loc>https://mes-bd.pages.dev/eusk/images/00-couverture.jpg</image:loc><image:title>Pays basque espagnol</image:title></image:image></url>
+  <url><loc>https://mes-bd.pages.dev/leym/</loc><lastmod>2026-10-26</lastmod><image:image><image:loc>https://mes-bd.pages.dev/leym/images/00-couverture.jpg</image:loc><image:title>Leymarie</image:title></image:image></url>
+  <url><loc>https://mes-bd.pages.dev/code/</loc><lastmod>2026-10-26</lastmod><image:image><image:loc>https://mes-bd.pages.dev/code/images/00-couverture.jpg</image:loc><image:title>Code</image:title></image:image></url>
+  <url><loc>https://mes-bd.pages.dev/bloi/</loc><lastmod>2026-10-26</lastmod><image:image><image:loc>https://mes-bd.pages.dev/bloi/images/00-couverture.jpg</image:loc><image:title>Blois et les châteaux de la Loire</image:title></image:image></url>
+  <url><loc>https://mes-bd.pages.dev/ia/</loc><lastmod>2026-10-26</lastmod><image:image><image:loc>https://mes-bd.pages.dev/ia/images/00-couverture.jpg</image:loc><image:title>Intelligence artificielle</image:title></image:image></url>
+  <url><loc>https://mes-bd.pages.dev/sola/</loc><lastmod>2026-10-26</lastmod><image:image><image:loc>https://mes-bd.pages.dev/sola/images/00-couverture.jpg</image:loc><image:title>Solaire</image:title></image:image></url>
+  <url><loc>https://mes-bd.pages.dev/clis/</loc><lastmod>2026-10-26</lastmod><image:image><image:loc>https://mes-bd.pages.dev/clis/images/00-couverture.jpg</image:loc><image:title>Clisson et le Hellfest</image:title></image:image></url>
+  <url><loc>https://mes-bd.pages.dev/meca/</loc><lastmod>2026-10-26</lastmod><image:image><image:loc>https://mes-bd.pages.dev/meca/images/00-couverture.jpg</image:loc><image:title>Mécanique</image:title></image:image></url>
+  <url><loc>https://mes-bd.pages.dev/jard/</loc><lastmod>2026-10-26</lastmod><image:image><image:loc>https://mes-bd.pages.dev/jard/images/00-couverture.jpg</image:loc><image:title>Jardin</image:title></image:image></url>
+  <url><loc>https://mes-bd.pages.dev/corezlot/</loc><lastmod>2026-10-26</lastmod><image:image><image:loc>https://mes-bd.pages.dev/corezlot/images/00-couverture.jpg</image:loc><image:title>Corrèze et Lot</image:title></image:image></url>
+  <url><loc>https://mes-bd.pages.dev/opti/</loc><lastmod>2026-10-26</lastmod><image:image><image:loc>https://mes-bd.pages.dev/opti/images/00-couverture.jpg</image:loc><image:title>Récupération d&#x27;eau de pluie</image:title></image:image></url>
+  <url><loc>https://mes-bd.pages.dev/phrases/</loc><lastmod>2026-10-26</lastmod><image:image><image:loc>https://mes-bd.pages.dev/phrases/images/00-couverture.jpg</image:loc><image:title>Phrases</image:title></image:image></url>
+  <url><loc>https://mes-bd.pages.dev/irla/</loc><lastmod>2026-10-26</lastmod><image:image><image:loc>https://mes-bd.pages.dev/irla/images/00-couverture.jpg</image:loc><image:title>Irlande</image:title></image:image></url>
+  <url><loc>https://mes-bd.pages.dev/reseaux/</loc><lastmod>2026-10-26</lastmod><image:image><image:loc>https://mes-bd.pages.dev/reseaux/images/00-couverture.jpg</image:loc><image:title>Réseaux sociaux</image:title></image:image></url>
+  <url><loc>https://mes-bd.pages.dev/drone/</loc><lastmod>2026-10-26</lastmod><image:image><image:loc>https://mes-bd.pages.dev/drone/images/00-couverture.jpg</image:loc><image:title>Drone</image:title></image:image></url>
+  <url><loc>https://mes-bd.pages.dev/bre/</loc><lastmod>2026-10-26</lastmod><image:image><image:loc>https://mes-bd.pages.dev/bre/images/00-couverture.jpg</image:loc><image:title>Sud Bretagne</image:title></image:image></url>
+  <url><loc>https://mes-bd.pages.dev/catha/</loc><lastmod>2026-10-26</lastmod><image:image><image:loc>https://mes-bd.pages.dev/catha/images/00-couverture.jpg</image:loc><image:title>Châteaux cathares</image:title></image:image></url>
 </urlset>
