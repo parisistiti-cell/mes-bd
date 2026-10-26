@@ -1,0 +1,35 @@
+name: SEO des BD
+
+# Lancement manuel : onglet Actions > "SEO des BD" > Run workflow
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: seo-bd
+  cancel-in-progress: false
+
+jobs:
+  seo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: Ajouter titres, descriptions, partage et sitemap
+        run: python3 seo_bd.py --write
+      - name: Enregistrer les modifications
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Rien à enregistrer."
+          else
+            git commit -m "SEO : titres, descriptions, partage, sitemap"
+            git pull --rebase origin "${GITHUB_REF_NAME}"
+            git push
+          fi
