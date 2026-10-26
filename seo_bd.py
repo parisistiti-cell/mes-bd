@@ -93,17 +93,17 @@ def transform(src, slug, t, d, solo=False):
     block, title, desc = seo_block(slug, t, d, solo)
     # 1. retirer l'ancien bloc SEO et les anciennes balises
     src = re.sub(re.escape(START) + r".*?" + re.escape(END) + r"\n?", "", src, flags=re.S)
-    head_m = re.search(r"<head>.*?</head>", src, flags=re.S)
+    head_m = re.search(r"<head\b[^>]*>.*?</head>", src, flags=re.S | re.I)
     if not head_m:
-        raise ValueError("pas de <head>")
+        return None, None, None
     head = head_m.group(0)
     for pat in [r"<title>.*?</title>\s*", r'<meta name="description"[^>]*>\s*',
                 r'<meta name="robots"[^>]*>\s*', r'<link rel="canonical"[^>]*>\s*',
                 r'<meta property="og:[^>]*>\s*', r'<meta name="twitter:[^>]*>\s*']:
         head = re.sub(pat, "", head, flags=re.S)
     # 2. insérer le nouveau bloc après la balise viewport (sinon après <head>)
-    m = re.search(r'<meta name="viewport"[^>]*>', head)
-    ins = m.end() if m else len("<head>")
+    m = re.search(r'<meta name="viewport"[^>]*>', head, flags=re.I)
+    ins = m.end() if m else re.match(r"<head\b[^>]*>", head, flags=re.I).end()
     head = head[:ins] + "\n" + block + head[ins:]
     src = src[:head_m.start()] + head + src[head_m.end():]
     # 3. titres visibles : h1 et barre du haut (seulement s'ils contiennent le nom du dossier)
@@ -133,7 +133,7 @@ def main():
     write = "--write" in sys.argv
     root = Path(".")
     # chaque BD + ses éventuelles versions "-solo" (noindex, canonical vers la BD principale)
-    jobs = []
+    jobs, ignores = [], []
     for slug, t, d in BOOKS:
         jobs.append((slug, slug, t, d, False))
         for extra in {f"{slug}-solo", slug.lower() + "-solo", slug.split("-")[0].lower() + "-solo"}:
@@ -143,13 +143,21 @@ def main():
         if not f.exists():
             if not solo: print(f"[absent ] {folder}/index.html")
             continue
-        new, title, desc = transform(f.read_text(encoding="utf-8"), slug, t, d, solo)
+        try:
+            new, title, desc = transform(f.read_text(encoding="utf-8", errors="replace"), slug, t, d, solo)
+        except Exception as ex:
+            print(f"[IGNORÉ ] {folder}/index.html : erreur ({ex})"); ignores.append(folder); continue
+        if new is None:
+            print(f"[IGNORÉ ] {folder}/index.html : pas de balise <head> reconnue, page laissée telle quelle")
+            ignores.append(folder); continue
         warn = []
         if len(title) > 60: warn.append(f"title {len(title)} car.")
         if len(desc) > 160: warn.append(f"description {len(desc)} car.")
         etat = "noindex " if (solo or slug in EN_TRAVAUX) else "indexée "
         print(f"[{'écrit ' if write else 'simulé'}] {folder:24} {etat} {' / '.join(warn)}")
         if write: f.write_text(new, encoding="utf-8")
+    if ignores:
+        print(f"\n{len(ignores)} page(s) ignorée(s) : {', '.join(ignores)}")
     if write:
         Path("sitemap.xml").write_text(sitemap(), encoding="utf-8")
         Path("robots.txt").write_text(f"User-agent: *\nAllow: /\n\nSitemap: {SITE}/sitemap.xml\n", encoding="utf-8")
