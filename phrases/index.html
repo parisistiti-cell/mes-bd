@@ -587,7 +587,7 @@
         <h3>💬 Discussion</h3>
         <button id="chat-close" type="button" aria-label="Fermer le chat">×</button>
       </div>
-      <p class="chat-note">Chat public hébergé par Cbox : aucun compte requis, seul un nom ou pseudo suffit. Les messages sont visibles de tous, ne communiquez aucune information personnelle. Connexion Internet requise.</p>
+      <p class="chat-note">Chat public hébergé par Cbox (service tiers). Il ne se charge qu'après votre accord : en l'acceptant, Cbox peut déposer des cookies et reçoit votre adresse IP. Aucun compte requis, seul un nom ou pseudo suffit. Les messages sont visibles de tous, ne communiquez aucune information personnelle. Connexion Internet requise.</p>
       <div id="chat-container"></div>
     </div>
   </div>
@@ -597,22 +597,34 @@
       var CHAT_URL = 'https://www5.cbox.ws/box/?boxid=967777&boxtag=Yceynw';
       var modal = document.getElementById('chat-modal');
       var loaded = false;
-      function ouvrir() {
-        modal.classList.add('visible');
+      var ok = false;
+      try { ok = sessionStorage.getItem('chat-ok') === '1'; } catch (e) {}
+      var cont = document.getElementById('chat-container');
+      function charger() {
         if (loaded) return;
-        if (!navigator.onLine) {
-          document.getElementById('chat-container').textContent = '📡 Le chat nécessite une connexion Internet.';
-          return;
-        }
+        if (!navigator.onLine) { cont.textContent = '📡 Le chat nécessite une connexion Internet.'; return; }
         loaded = true;
         var f = document.createElement('iframe');
         f.src = CHAT_URL;
-        f.setAttribute('allowtransparency', 'yes');
-        f.setAttribute('allow', 'autoplay');
-        f.setAttribute('frameborder', '0');
-        f.setAttribute('scrolling', 'auto');
-        f.setAttribute('title', 'Chat Cbox');
-        document.getElementById('chat-container').appendChild(f);
+        f.title = 'Chat Cbox';
+        f.setAttribute('referrerpolicy', 'no-referrer');
+        cont.textContent = '';
+        cont.appendChild(f);
+      }
+      function accepter() { ok = true; try { sessionStorage.setItem('chat-ok', '1'); } catch (e) {} charger(); }
+      function ouvrir() {
+        modal.classList.add('visible');
+        var cb = document.getElementById('chat-close'); if (cb) cb.focus();
+        if (loaded) return;
+        if (ok) { charger(); return; }
+        if (cont.firstChild) return;
+        var b = document.createElement('button');
+        b.type = 'button'; b.id = 'chat-accept';
+        b.textContent = 'Accepter et charger le chat';
+        b.style.cssText = 'padding:10px 16px;border:0;border-radius:6px;cursor:pointer;font:inherit;'
+          + 'background:var(--accent-deep, var(--wood-3, #4a2f1e));color:var(--cream, #f2ead9);';
+        b.addEventListener('click', accepter);
+        cont.appendChild(b);
       }
       function fermer() { modal.classList.remove('visible'); }
       document.getElementById('chat-btn').addEventListener('click', ouvrir);
