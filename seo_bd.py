@@ -51,6 +51,50 @@ BOOKS = [
 e = lambda s: html.escape(s, quote=True)
 START, END = "<!-- SEO:start -->", "<!-- SEO:end -->"
 
+NOTE_CHAT = ('<p class="chat-note">Chat public hébergé par Cbox (service tiers). Il ne se charge qu\'après votre accord : '
+             'en l\'acceptant, Cbox peut déposer des cookies et reçoit votre adresse IP. Aucun compte requis, seul un nom '
+             'ou pseudo suffit. Les messages sont visibles de tous, ne communiquez aucune information personnelle. '
+             'Connexion Internet requise.</p>')
+JS_CHAT = r"""var loaded = false;
+      var ok = false;
+      try { ok = sessionStorage.getItem('chat-ok') === '1'; } catch (e) {}
+      var cont = document.getElementById('chat-container');
+      function charger() {
+        if (loaded) return;
+        if (!navigator.onLine) { cont.textContent = '📡 Le chat nécessite une connexion Internet.'; return; }
+        loaded = true;
+        var f = document.createElement('iframe');
+        f.src = CHAT_URL;
+        f.title = 'Chat Cbox';
+        f.setAttribute('referrerpolicy', 'no-referrer');
+        cont.textContent = '';
+        cont.appendChild(f);
+      }
+      function accepter() { ok = true; try { sessionStorage.setItem('chat-ok', '1'); } catch (e) {} charger(); }
+      function ouvrir() {
+        modal.classList.add('visible');
+        var cb = document.getElementById('chat-close'); if (cb) cb.focus();
+        if (loaded) return;
+        if (ok) { charger(); return; }
+        if (cont.firstChild) return;
+        var b = document.createElement('button');
+        b.type = 'button'; b.id = 'chat-accept';
+        b.textContent = 'Accepter et charger le chat';
+        b.style.cssText = 'padding:10px 16px;border:0;border-radius:6px;cursor:pointer;font:inherit;'
+          + 'background:var(--accent-deep, var(--wood-3, #4a2f1e));color:var(--cream, #f2ead9);';
+        b.addEventListener('click', accepter);
+        cont.appendChild(b);
+      }
+      """
+
+def patch_chat(src):
+    """Informe avant de charger Cbox : le chat ne se charge qu'après clic sur « Accepter »."""
+    if 'id="chat-container"' not in src:
+        return src
+    src = re.sub(r'<p class="chat-note">.*?</p>', lambda m: NOTE_CHAT, src, count=1, flags=re.S)
+    src = re.sub(r"var loaded = false;.*?(?=function fermer\(\))", lambda m: JS_CHAT, src, count=1, flags=re.S)
+    return src
+
 def seo_block(slug, t, d, solo=False):
     url = f"{SITE}/{slug}/"
     img = f"{SITE}/{slug}/images/00-couverture.jpg"
@@ -117,6 +161,7 @@ def transform(src, slug, t, d, solo=False):
     src = re.sub(r'<header class="hero">.*?</header>', hero, src, count=1, flags=re.S)
     # 5. alt des planches
     src = re.sub(r'alt="Planche (\d+)"', lambda mm: f'alt="{e(t)} — planche {int(mm.group(1))}"', src)
+    src = patch_chat(src)
     return src, title, desc
 
 def sitemap():
@@ -156,6 +201,12 @@ def main():
         etat = "noindex " if (solo or slug in EN_TRAVAUX) else "indexée "
         print(f"[{'écrit ' if write else 'simulé'}] {folder:24} {etat} {' / '.join(warn)}")
         if write: f.write_text(new, encoding="utf-8")
+    accueil = root / "index.html"
+    if accueil.exists():
+        a = accueil.read_text(encoding="utf-8", errors="replace")
+        b = patch_chat(a)
+        print(f"[{'écrit ' if write else 'simulé'}] accueil (chat)         {'modifié' if b != a else 'inchangé'}")
+        if write and b != a: accueil.write_text(b, encoding="utf-8")
     if ignores:
         print(f"\n{len(ignores)} page(s) ignorée(s) : {', '.join(ignores)}")
     if write:
