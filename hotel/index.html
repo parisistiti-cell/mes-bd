@@ -4,23 +4,23 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <!-- SEO:start -->
-<title>hotel — BD en ligne | Mes BD</title>
-<meta name="description" content="Les prérequis pour piloter un hotel en France. BD à lire en ligne, textes et photos de TP, illustrations IA.">
+<title>Hôtel California — BD en ligne | Mes BD</title>
+<meta name="description" content="La légende de la chanson « Hotel California » des Eagles : de la maquette sur cassette au succès mondial. BD à lire en ligne, textes et photos de TP, illustrations IA.">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://mes-bd.pages.dev/hotel/">
 <meta property="og:type" content="article">
 <meta property="og:locale" content="fr_FR">
 <meta property="og:site_name" content="Mes BD">
-<meta property="og:title" content="hotel — Mes BD">
+<meta property="og:title" content="Hôtel California — Mes BD">
 <meta property="og:description" content="La légende d'hôtel California des Eagles.">
 <meta property="og:url" content="https://mes-bd.pages.dev/hotel/">
 <meta property="og:image" content="https://mes-bd.pages.dev/hotel/images/00-couverture.jpg">
-<meta property="og:image:alt" content="Couverture de la BD hotel">
+<meta property="og:image:alt" content="Couverture de la BD Hôtel California">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="hotel — Mes BD">
+<meta name="twitter:title" content="Hôtel California — Mes BD">
 <meta name="twitter:description" content="La légende d'hôtel California des Eagles.">
 <meta name="twitter:image" content="https://mes-bd.pages.dev/hotel/images/00-couverture.jpg">
-<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "CreativeWork", "name": "hotel", "description": "La légende d'hôtel California des Eagles.", "url": "https://mes-bd.pages.dev/hotel/", "image": "https://mes-bd.pages.dev/hotel/images/00-couverture.jpg", "inLanguage": "fr", "author": {"@type": "Person", "name": "TP"}, "isPartOf": {"@type": "WebSite", "name": "Mes BD", "url": "https://mes-bd.pages.dev/"}}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Mes BD", "item": "https://mes-bd.pages.dev/"}, {"@type": "ListItem", "position": 2, "name": "hotel", "item": "https://mes-bd.pages.dev/hotel/"}]}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "CreativeWork", "name": "Hôtel California", "description": "La légende d'hôtel California des Eagles.", "url": "https://mes-bd.pages.dev/hotel/", "image": "https://mes-bd.pages.dev/hotel/images/00-couverture.jpg", "inLanguage": "fr", "author": {"@type": "Person", "name": "TP"}, "isPartOf": {"@type": "WebSite", "name": "Mes BD", "url": "https://mes-bd.pages.dev/"}}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Mes BD", "item": "https://mes-bd.pages.dev/"}, {"@type": "ListItem", "position": 2, "name": "hotel", "item": "https://mes-bd.pages.dev/hotel/"}]}]}</script>
 <!-- SEO:end -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -189,13 +189,96 @@
     background: var(--cream);
     color: var(--ink);
   }
+  /* ---- Boutons vidéo (bandeau) + lecteur ---- */
+  .video-btn {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 6;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Karla', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--cream);
+    background: var(--accent-deep);
+    border: 2px solid var(--cream);
+    border-radius: 30px;
+    padding: 9px 16px 9px 12px;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
+    transition: transform 0.15s ease, background 0.15s ease;
+  }
+  .video-btn:hover { background: var(--accent); transform: translate(-50%, -50%) scale(1.06); }
+  .video-btn:focus-visible { outline: 3px solid var(--cream-deep); outline-offset: 2px; }
+  #video-btn {
+    border: 1px solid var(--accent-deep); border-radius: 18px;
+    background: var(--accent-deep); color: var(--cream); cursor: pointer;
+    padding: 6px 14px; font-family: 'Karla', sans-serif; font-size: 0.9rem;
+    white-space: nowrap;
+  }
+  #video-btn:hover, #video-btn:focus-visible { background: var(--accent); }
+  .video-modal {
+    position: fixed; inset: 0; z-index: 100; display: none;
+    align-items: center; justify-content: center; padding: 20px;
+    background: rgba(20, 17, 14, 0.88);
+  }
+  .video-modal.open { display: flex; }
+  .video-modal__box { position: relative; width: min(960px, 100%); }
+  .video-modal video {
+    display: block; width: 100%; max-height: 80vh; max-height: 80dvh;
+    background: #000; border-radius: 6px;
+  }
+  .video-modal__actions {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 14px;
+  }
+  .video-modal__actions button {
+    font-family: 'Karla', sans-serif; font-size: 0.9rem; font-weight: 500;
+    color: var(--cream); background: transparent; border: 2px solid var(--cream);
+    border-radius: 30px; padding: 9px 18px; cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .video-modal__actions button:hover:not(:disabled) { background: var(--cream); color: var(--ink); }
+  .video-modal__actions button:disabled { opacity: 0.6; cursor: default; }
+  .video-modal.ended .video-modal__actions .is-replay { background: var(--accent-deep); border-color: var(--accent-deep); }
+  .video-modal__close {
+    position: absolute; top: -42px; right: 0; font-size: 1.6rem; line-height: 1;
+    color: var(--cream); background: none; border: none; cursor: pointer; padding: 4px 8px;
+  }
+  .video-modal [hidden] { display: none !important; }
+  .video-menu {
+    background: var(--cream); color: var(--ink); border-radius: 10px;
+    padding: 22px 20px 20px; text-align: center;
+  }
+  .video-menu__title {
+    margin: 0 0 16px; font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem; color: var(--accent-deep);
+  }
+  .video-menu__list { display: flex; flex-direction: column; gap: 10px; }
+  .video-menu__item {
+    font-family: 'Karla', sans-serif; font-size: 1rem; font-weight: 500;
+    color: var(--accent-deep); background: transparent;
+    border: 2px solid var(--accent-deep); border-radius: 30px;
+    padding: 12px 18px; cursor: pointer; text-align: center;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .video-menu__item:hover, .video-menu__item:focus-visible {
+    background: var(--accent-deep); color: var(--cream);
+  }
+  .video-modal__name {
+    margin: 0 0 10px; text-align: center; font-family: 'Karla', sans-serif;
+    font-size: 0.95rem; font-weight: 600; color: var(--cream);
+  }
 </style>
 </head>
 <body>
 
   <nav class="topbar">
-    <a class="topbar__title" href="#top">hotel</a>
+    <a class="topbar__title" href="#top">Hôtel California</a>
     <div class="topbar__actions">
+      <button id="video-btn" type="button" title="Voir les vidéos" aria-label="Voir les vidéos">▶<span class="lbl"> Vidéos</span></button>
       <button id="chat-btn" type="button" title="Ouvrir le chat" aria-label="Ouvrir le chat">💬<span class="lbl"> Chat</span></button>
       <a class="topbar__home" href="../">Toutes les BD</a>
     </div>
@@ -204,67 +287,55 @@
   <div id="top"></div>
 
   <header class="hero">
-    <img decoding="async" src="images/00-couverture.jpg" alt="Couverture de la BD hotel">
+    <img decoding="async" src="images/00-couverture.jpg" alt="Couverture de la BD Hôtel California">
   </header>
 
   <div class="hero__caption">
-    <h1>hotel</h1>
+    <h1>Hôtel California</h1>
     <button id="pdf-btn" class="pdf-btn" onclick="downloadPDF()">Télécharger en PDF</button>
   </div>
 
   <main class="reader">
 
     <div class="page" id="page-00">
-      <img decoding="async" fetchpriority="high" src="images/00-couverture.jpg" alt="hotel — planche 0">
+      <img decoding="async" fetchpriority="high" src="images/00-couverture.jpg" alt="Hôtel California — planche 0">
     </div>
     <div class="page" id="page-01">
-      <img loading="lazy" decoding="async" src="images/01.jpg" alt="hotel — planche 1">
+      <img loading="lazy" decoding="async" src="images/01.jpg" alt="Hôtel California — planche 1">
     </div>
     <div class="page" id="page-02">
-      <img loading="lazy" decoding="async" src="images/02.jpg" alt="hotel — planche 2">
+      <img loading="lazy" decoding="async" src="images/02.jpg" alt="Hôtel California — planche 2">
     </div>
     <div class="page" id="page-03">
-      <img loading="lazy" decoding="async" src="images/03.jpg" alt="hotel — planche 3">
+      <img loading="lazy" decoding="async" src="images/03.jpg" alt="Hôtel California — planche 3">
     </div>
     <div class="page" id="page-04">
-      <img loading="lazy" decoding="async" src="images/04.jpg" alt="hotel — planche 4">
+      <img loading="lazy" decoding="async" src="images/04.jpg" alt="Hôtel California — planche 4">
     </div>
     <div class="page" id="page-05">
-      <img loading="lazy" decoding="async" src="images/05.jpg" alt="hotel — planche 5">
+      <img loading="lazy" decoding="async" src="images/05.jpg" alt="Hôtel California — planche 5">
     </div>
     <div class="page" id="page-06">
-      <img loading="lazy" decoding="async" src="images/06.jpg" alt="hotel — planche 6">
+      <img loading="lazy" decoding="async" src="images/06.jpg" alt="Hôtel California — planche 6">
     </div>
     <div class="page" id="page-07">
-      <img loading="lazy" decoding="async" src="images/07.jpg" alt="hotel — planche 7">
+      <img loading="lazy" decoding="async" src="images/07.jpg" alt="Hôtel California — planche 7">
     </div>
     <div class="page" id="page-08">
-      <img loading="lazy" decoding="async" src="images/08.jpg" alt="hotel — planche 8">
-    </div>
-    <div class="page" id="page-09">
-      <img loading="lazy" decoding="async" src="images/09.jpg" alt="hotel — planche 9">
+      <img loading="lazy" decoding="async" src="images/08.jpg" alt="Hôtel California — planche 8">
     </div>
     <div class="page" id="page-15">
-      <img loading="lazy" decoding="async" src="images/15.jpg" alt="hotel — planche 15">
+      <img loading="lazy" decoding="async" src="images/15.jpg" alt="Hôtel California — planche 15">
     </div>
     
     <div class="page" id="page-22">
-      <img loading="lazy" decoding="async" src="images/22.jpg" alt="hotel — planche 22">
-    </div>
-    <div class="page" id="page-12">
-      <img loading="lazy" decoding="async" src="images/12.jpg" alt="hotel — planche 12">
-    </div>
-    <div class="page" id="page-13">
-      <img loading="lazy" decoding="async" src="images/13.jpg" alt="hotel — planche 13">
-    </div>
-    <div class="page" id="page-14">
-      <img loading="lazy" decoding="async" src="images/14.jpg" alt="hotel — planche 14">
+      <img loading="lazy" decoding="async" src="images/22.jpg" alt="Hôtel California — planche 22">
     </div>
    
   </main>
 
   <footer>
-    hotel — mis à jour au fil des chapitres
+    Hôtel California — mis à jour au fil des chapitres
   </footer>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -737,7 +808,7 @@
     @media (max-width: 520px) {
       .topbar { padding: 10px 12px; }
       .topbar__actions { gap: 8px; }
-      #chat-btn, #film-btn { padding: 6px 11px; font-size: 0.85rem; }
+      #chat-btn, #film-btn, #video-btn { padding: 6px 11px; font-size: 0.85rem; }
       .topbar__home { font-size: 0.75rem; }
       body .pager-controls {
         flex-wrap: wrap; justify-content: center; gap: 6px 10px;
@@ -790,6 +861,164 @@
         }
       };
     })();
+  </script>
+  <div class="video-modal" id="video-modal" role="dialog" aria-modal="true" aria-label="Vidéos">
+    <div class="video-modal__box">
+      <button type="button" class="video-modal__close" id="video-close" aria-label="Fermer">✕</button>
+
+      <div class="video-menu" id="video-menu">
+        <p class="video-menu__title">Choisir une vidéo</p>
+        <div class="video-menu__list" id="video-list"></div>
+      </div>
+
+      <div id="video-stage" hidden>
+        <p class="video-modal__name" id="video-name"></p>
+        <video id="video-player" controls playsinline preload="none">
+          Votre navigateur ne peut pas lire cette vidéo.
+        </video>
+        <div class="video-modal__actions">
+          <button type="button" id="video-save">⬇ Enregistrer la vidéo</button>
+          <button type="button" id="video-replay" class="is-replay">↻ Revoir</button>
+          <button type="button" id="video-others">☰ Autres vidéos</button>
+          <button type="button" id="video-close2">✕ Fermer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const btn = document.getElementById('video-btn');
+      const modal = document.getElementById('video-modal');
+      const menu = document.getElementById('video-menu');
+      const list = document.getElementById('video-list');
+      const stage = document.getElementById('video-stage');
+      const nameEl = document.getElementById('video-name');
+      const player = document.getElementById('video-player');
+      const closeBtn = document.getElementById('video-close');
+      const closeBtn2 = document.getElementById('video-close2');
+      const saveBtn = document.getElementById('video-save');
+      const replayBtn = document.getElementById('video-replay');
+      const othersBtn = document.getElementById('video-others');
+      if (!btn || !modal || !player) return;
+
+      const RAW = 'https://raw.githubusercontent.com/parisistiti-cell/mes-bd/main/';
+      const VIDEOS = [
+        { label: 'Eagles — Hotel California (Live 1977)', file: 'Eagles - Hotel California (Live 1977) .mp4', dir: 'hotel/vidéo/' },
+        { label: 'La batterie',                          file: 'HC drum.mp4',                                dir: 'hotel/vidéo/' },
+        { label: 'La guitare',                           file: 'HC guitare.mp4',                             dir: 'hotel/vidéo/' }
+      ];
+      let current = null;
+
+      function showMenu() {
+        player.pause();
+        modal.classList.remove('ended');
+        stage.hidden = true;
+        menu.hidden = false;
+        modal.setAttribute('aria-label', 'Choisir une vidéo');
+        const first = list.querySelector('button');
+        if (first) first.focus();
+      }
+
+      function play(v) {
+        current = v;
+        const enc = encodeURIComponent(v.file);
+        player.pause();
+        player.innerHTML = '';
+        [ '../' + encodeURI(v.dir) + enc, RAW + encodeURI(v.dir) + enc ].forEach(function (u) {
+          const s = document.createElement('source');
+          s.src = u; s.type = 'video/mp4';
+          player.appendChild(s);
+        });
+        const last = player.lastElementChild;
+        if (last) last.addEventListener('error', function () {
+          nameEl.textContent = v.label + ' — vidéo introuvable pour le moment';
+        });
+        player.load();
+        nameEl.textContent = v.label;
+        modal.setAttribute('aria-label', 'Vidéo : ' + v.label);
+        modal.classList.remove('ended');
+        menu.hidden = true;
+        stage.hidden = false;
+        player.play().catch(function () {});
+      }
+
+      VIDEOS.forEach(function (v) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'video-menu__item';
+        b.textContent = '▶ ' + v.label;
+        b.addEventListener('click', function () { play(v); });
+        list.appendChild(b);
+      });
+
+      // Boutons posés au centre des planches : lancent directement leur vidéo
+      document.querySelectorAll('.video-btn').forEach(function (b) {
+        b.addEventListener('click', function (e) {
+          e.stopPropagation();
+          const v = VIDEOS.find(function (x) { return x.file === b.dataset.file; });
+          if (!v) return;
+          modal.classList.add('open');
+          play(v);
+        });
+      });
+
+      function openModal(e) {
+        e.stopPropagation();
+        modal.classList.add('open');
+        showMenu();
+      }
+      function closeModal() {
+        modal.classList.remove('open', 'ended');
+        player.pause();
+      }
+      function replay() {
+        modal.classList.remove('ended');
+        player.currentTime = 0;
+        player.play().catch(function () {});
+      }
+      async function save() {
+        if (!current) return;
+        const src = player.currentSrc || (player.querySelector('source') || {}).src;
+        if (!src) return;
+        const label = saveBtn.textContent;
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Téléchargement…';
+        try {
+          const res = await fetch(src);
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          const blob = await res.blob();
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = current.file;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
+        } catch (err) {
+          window.open(src, '_blank', 'noopener');
+        } finally {
+          saveBtn.disabled = false;
+          saveBtn.textContent = label;
+        }
+      }
+
+      btn.addEventListener('click', openModal);
+      closeBtn.addEventListener('click', closeModal);
+      closeBtn2.addEventListener('click', closeModal);
+      othersBtn.addEventListener('click', showMenu);
+      replayBtn.addEventListener('click', replay);
+      saveBtn.addEventListener('click', save);
+      player.addEventListener('ended', function () { modal.classList.add('ended'); });
+      player.addEventListener('play', function () { modal.classList.remove('ended'); });
+      modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
+      document.addEventListener('keydown', function (e) {
+        if (!modal.classList.contains('open')) return;
+        if (e.key === 'Escape') closeModal();
+        e.stopPropagation();
+      }, true);
+    });
   </script>
 </body>
 </html>
