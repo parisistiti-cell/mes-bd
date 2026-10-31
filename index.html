@@ -496,6 +496,26 @@
     ]
   },
   {
+    "bd": "Hôtel California",
+    "videos": [
+      {
+        "label": "Eagles — Hotel California (Live 1977)",
+        "file": "Eagles - Hotel California (Live 1977) .mp4",
+        "dir": "hotel/vidéo/"
+      },
+      {
+        "label": "La batterie",
+        "file": "HC drum.mp4",
+        "dir": "hotel/vidéo/"
+      },
+      {
+        "label": "La guitare",
+        "file": "HC guitare.mp4",
+        "dir": "hotel/vidéo/"
+      }
+    ]
+  },
+  {
     "bd": "Clisson et le Hellfest",
     "videos": [
       {
@@ -573,7 +593,7 @@
         var enc = encodeURIComponent(v.file);
         player.pause();
         player.innerHTML = '';
-        [v.dir + enc, RAW + v.dir + enc].forEach(function (u) {
+        [encodeURI(v.dir) + enc, RAW + encodeURI(v.dir) + enc].forEach(function (u) {
           var s = document.createElement('source');
           s.src = u; s.type = 'video/mp4';
           player.appendChild(s);
