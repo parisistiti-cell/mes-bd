@@ -79,6 +79,10 @@
     <button type="button" class="video-open" id="video-open" aria-haspopup="dialog">▶ Voir les vidéos</button>
   </header>
   <main class="table" id="table">
+    <a class="book" href="/enncre/" style="--tilt:2deg" title="L’encre de tes yeux — La chanson de Francis Cabrel racontée en BD">
+      <div class="book__cover"><img src="enncre/images/00-couverture.jpg" alt="Couverture de la BD L’encre de tes yeux : la chanson de Francis Cabrel racontée en BD" width="360" height="504" loading="eager" decoding="async"></div>
+      <span class="sr-only">L’encre de tes yeux</span>
+    </a>
     <a class="book" href="/Ardeche-2026/" style="--tilt:-3deg" title="Ardèche 2026 — Un voyage de 15 jours en Ardèche en août 2026">
       <div class="book__cover"><img src="Ardeche-2026/images/00-couverture.jpg" alt="Couverture de la BD Ardèche 2026 : Un voyage de 15 jours en Ardèche en août 2026" width="360" height="504" loading="eager" decoding="async"></div>
       <span class="sr-only">Ardèche 2026</span>
@@ -400,6 +404,16 @@
     (function () {
       var RAW = 'https://raw.githubusercontent.com/parisistiti-cell/mes-bd/main/';
       var GROUPS = [
+  {
+    "bd": "L’encre de tes yeux",
+    "videos": [
+      {
+        "label": "Francis Cabrel — L’encre de tes yeux",
+        "file": "Francis Cabrel - L'encre de tes yeux .mp4",
+        "dir": "enncre/video/"
+      }
+    ]
+  },
   {
     "bd": "Ardèche 2026",
     "videos": [
