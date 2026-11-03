@@ -193,24 +193,49 @@
   /* ---- Bouton + lecteur vidéo (planches 1, 17, 18 et 19) ---- */
 
   .video-modal {
-    position: fixed;
-    inset: 0;
-    z-index: 100;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    background: rgba(20, 17, 14, 0.88);
+    position: fixed; z-index: 950; display: none; flex-direction: column;
+    width: 440px; max-width: calc(100vw - 16px);
+    background: #1d1915; color: var(--cream);
+    border: 1px solid rgba(242, 234, 217, 0.28); border-radius: 12px;
+    box-shadow: 0 10px 34px rgba(0, 0, 0, 0.55); overflow: hidden;
   }
   .video-modal.open { display: flex; }
-  .video-modal__box { position: relative; width: min(960px, 100%); }
-  .video-modal video {
-    display: block;
-    width: 100%;
-    max-height: 80vh;
-    max-height: 80dvh;
-    background: #000;
-    border-radius: 6px;
+  .video-modal.fl-br { right: 16px; bottom: var(--fl-bottom, 16px); }
+  .video-modal.fl-bl { left: 16px; bottom: var(--fl-bottom, 16px); }
+  .video-modal__bar {
+    display: flex; align-items: center; gap: 4px; padding: 3px 4px 3px 12px;
+    background: var(--accent-deep); cursor: grab; touch-action: none;
+    user-select: none; -webkit-user-select: none;
+  }
+  .video-modal.dragging .video-modal__bar { cursor: grabbing; }
+  .video-modal__grip { opacity: .75; }
+  .video-modal__bartitle { flex: 1; min-width: 0; font-weight: 600; font-size: 13px; font-family: inherit; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .video-modal__ctl {
+    width: 38px; height: 38px; border: 0; border-radius: 8px; background: transparent;
+    color: var(--cream); font-size: 1.1rem; line-height: 1; cursor: pointer;
+  }
+  .video-modal__ctl:hover, .video-modal__ctl:focus-visible { background: rgba(242, 234, 217, 0.22); }
+  .video-modal__body { padding: 10px 10px 4px; overflow-y: auto; max-height: calc(100vh - 110px); max-height: calc(100dvh - 110px); }
+  .video-modal video { display: block; width: 100%; max-height: 70vh; max-height: 70dvh; background: #000; border-radius: 6px; }
+  .video-modal__foot { display: flex; justify-content: flex-end; height: 24px; }
+  .video-modal__resize {
+    width: 48px; height: 24px; cursor: nwse-resize; touch-action: none;
+    background: linear-gradient(135deg, transparent 52%, rgba(242,234,217,.75) 52% 60%, transparent 60% 72%, rgba(242,234,217,.75) 72% 80%, transparent 80%);
+  }
+  /* ---- Son seul ---- */
+  .video-modal .video-audio { display: none; align-items: center; gap: 10px; padding: 10px; margin-top: 4px; background: #2a241e; border-radius: 8px; }
+  .video-modal.audio-only .video-audio { display: flex; }
+  .video-modal.audio-only video { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+  .video-audio__play { flex: none; width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--cream); background: transparent; color: var(--cream); font-size: 1rem; line-height: 1; cursor: pointer; }
+  .video-audio__play:hover, .video-audio__play:focus-visible { background: var(--cream); color: var(--ink); }
+  .video-audio input[type=range] { flex: 1; min-width: 0; height: 28px; accent-color: var(--cream); cursor: pointer; }
+  .video-audio__time { flex: none; font: 12px/1 ui-monospace, Menlo, Consolas, monospace; color: var(--cream); opacity: .85; }
+  .video-modal.min .video-modal__body, .video-modal.min .video-modal__foot { display: none; }
+  .video-modal .video-menu { max-height: min(62vh, 480px); overflow-y: auto; }
+  @media (max-width: 700px) {
+    .video-modal__ctl { width: 42px; height: 42px; }
+    .video-modal__foot { height: 30px; }
+    .video-modal__resize { width: 60px; height: 30px; }
   }
   .video-modal__actions {
     display: flex;
@@ -234,18 +259,6 @@
   .video-modal__actions button:hover:not(:disabled) { background: var(--cream); color: var(--ink); }
   .video-modal__actions button:disabled { opacity: 0.6; cursor: default; }
   .video-modal.ended .video-modal__actions .is-replay { background: var(--accent-deep); border-color: var(--accent-deep); }
-  .video-modal__close {
-    position: absolute;
-    top: -42px;
-    right: 0;
-    font-size: 1.6rem;
-    line-height: 1;
-    color: var(--cream);
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 4px 8px;
-  }
 </style>
 </head>
 <body>
@@ -1298,20 +1311,33 @@
       document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
     })();
   </script>
-  <div class="video-modal" id="video-modal" role="dialog" aria-modal="true" aria-label="Vidéo : Deep Purple helfest 2026">
-    <div class="video-modal__box">
-      <button type="button" class="video-modal__close" id="video-close" aria-label="Fermer la vidéo">✕</button>
+  <div class="video-modal fl-br" id="video-modal" role="dialog" aria-label="Vidéo : Deep Purple helfest 2026">
+    <div class="video-modal__bar" id="video-bar">
+      <span class="video-modal__grip" aria-hidden="true">⠿</span>
+      <span class="video-modal__bartitle" id="video-bartitle">▶ Deep Purple helfest 2026</span>
+      <button type="button" class="video-modal__ctl" id="video-bp" aria-label="Pause">⏸</button>
+      <button type="button" class="video-modal__ctl" id="video-min" aria-label="Réduire la fenêtre" aria-expanded="true">▁</button>
+      <button type="button" class="video-modal__ctl" id="video-close" aria-label="Fermer">✕</button>
+    </div>
+    <div class="video-modal__body">
       <video id="video-player" controls playsinline preload="none">
         <source src="../clis/video/Deep%20Purple%20helfest%202026.mp4" type="video/mp4">
         <source src="https://raw.githubusercontent.com/parisistiti-cell/mes-bd/main/clis/video/Deep%20Purple%20helfest%202026.mp4" type="video/mp4">
         Votre navigateur ne peut pas lire cette vidéo.
       </video>
+        <div class="video-audio" id="video-audio">
+          <button type="button" class="video-audio__play" id="video-ap" aria-label="Lecture">▶</button>
+          <input type="range" id="video-seek" min="0" max="1000" step="1" value="0" aria-label="Position dans la vidéo">
+          <span class="video-audio__time" id="video-time">0:00 / 0:00</span>
+        </div>
       <div class="video-modal__actions">
+        <button type="button" id="video-audiobtn" aria-pressed="false">🎧 Son seul</button>
         <button type="button" id="video-save">⬇ Enregistrer la vidéo</button>
         <button type="button" id="video-replay" class="is-replay">↻ Revoir</button>
         <button type="button" id="video-close2">✕ Fermer</button>
       </div>
     </div>
+    <div class="video-modal__foot"><span class="video-modal__resize" id="video-resize" aria-hidden="true" title="Redimensionner"></span></div>
   </div>
 
   <script>
@@ -1343,17 +1369,154 @@
       const saveBtn = document.getElementById('video-save');
       const replayBtn = document.getElementById('video-replay');
       if (!btns.length || !modal || !player) return;
+      // ---- Fenêtre flottante : déplaçable, redimensionnable, réductible ----
+      function makeFloat(panel, bar, grip, minBtn, opts) {
+        var M = 8;
+        var moved = false, mode = 'menu', videoW = 0;
+        function vw() { return document.documentElement.clientWidth; }
+        function vh() { return window.innerHeight; }
+        function phone() { return vw() < 700; }
+        function defVideoW() { return phone() ? Math.max(220, Math.min(360, Math.round(vw() * 0.66))) : (vw() < 1100 ? 380 : 440); }
+        function setW(w) { panel.style.width = Math.round(Math.max(220, Math.min(w, vw() - 2 * M))) + 'px'; }
+        // Passe de l'ancrage « coin » à des coordonnées libres dès le premier déplacement
+        function materialize() {
+          if (moved) return;
+          var r = panel.getBoundingClientRect();
+          panel.classList.remove('fl-br', 'fl-bl');
+          panel.style.left = r.left + 'px';
+          panel.style.top = r.top + 'px';
+          panel.style.right = 'auto';
+          panel.style.bottom = 'auto';
+          moved = true;
+        }
+        function clamp() {
+          if (panel.offsetWidth > vw() - 2 * M) setW(vw() - 2 * M);
+          if (!moved) return;
+          var r = panel.getBoundingClientRect();
+          panel.style.left = Math.min(Math.max(M, r.left), Math.max(M, vw() - r.width - M)) + 'px';
+          panel.style.top = Math.min(Math.max(M, r.top), Math.max(M, vh() - 48)) + 'px';
+        }
+        function setMode(m) {
+          mode = m;
+          if (m === 'menu') setW(Math.min(460, vw() - 2 * M)); else setW(videoW || defVideoW());
+          window.requestAnimationFrame(clamp);
+        }
+        function setMin(on) {
+          panel.classList.toggle('min', on);
+          minBtn.setAttribute('aria-expanded', String(!on));
+          minBtn.setAttribute('aria-label', on ? 'Agrandir la fenêtre' : 'Réduire la fenêtre');
+          minBtn.textContent = on ? '▢' : '▁';
+        }
+        // Déplacement : souris, doigt ou stylet (barre de titre)
+        bar.addEventListener('pointerdown', function (e) {
+          if (e.target.closest('button') || (e.button && e.button !== 0)) return;
+          materialize();
+          var r = panel.getBoundingClientRect();
+          var dx = e.clientX - r.left, dy = e.clientY - r.top;
+          panel.classList.add('dragging');
+          try { bar.setPointerCapture(e.pointerId); } catch (err) {}
+          function move(ev) {
+            var w = panel.offsetWidth;
+            panel.style.left = Math.min(Math.max(M, ev.clientX - dx), Math.max(M, vw() - w - M)) + 'px';
+            panel.style.top = Math.min(Math.max(M, ev.clientY - dy), Math.max(M, vh() - 48)) + 'px';
+          }
+          function up() {
+            panel.classList.remove('dragging');
+            bar.removeEventListener('pointermove', move);
+            bar.removeEventListener('pointerup', up);
+            bar.removeEventListener('pointercancel', up);
+          }
+          bar.addEventListener('pointermove', move);
+          bar.addEventListener('pointerup', up);
+          bar.addEventListener('pointercancel', up);
+        });
+        bar.addEventListener('dblclick', function (e) { if (!e.target.closest('button')) setMin(!panel.classList.contains('min')); });
+        // Redimensionnement : poignée en bas à droite
+        grip.addEventListener('pointerdown', function (e) {
+          if (e.button && e.button !== 0) return;
+          e.preventDefault();
+          materialize();
+          var startX = e.clientX, startW = panel.offsetWidth, left = panel.getBoundingClientRect().left;
+          try { grip.setPointerCapture(e.pointerId); } catch (err) {}
+          function move(ev) {
+            var w = Math.max(220, Math.min(startW + ev.clientX - startX, 1100, vw() - left - M));
+            panel.style.width = Math.round(w) + 'px';
+            if (mode === 'video') videoW = w;
+          }
+          function up() {
+            grip.removeEventListener('pointermove', move);
+            grip.removeEventListener('pointerup', up);
+            grip.removeEventListener('pointercancel', up);
+          }
+          grip.addEventListener('pointermove', move);
+          grip.addEventListener('pointerup', up);
+          grip.addEventListener('pointercancel', up);
+        });
+        minBtn.addEventListener('click', function () { setMin(!panel.classList.contains('min')); });
+        window.addEventListener('resize', clamp);
+        return {
+          open: function (m) {
+            panel.classList.add('open');
+            setMin(false);
+            if (!moved) {
+              panel.classList.add(opts.corner === 'bl' ? 'fl-bl' : 'fl-br');
+              panel.style.setProperty('--fl-bottom', (phone() ? opts.bottomPhone : 16) + 'px');
+            }
+            setMode(m);
+          },
+          setMode: setMode,
+          close: function () { panel.classList.remove('open', 'min'); }
+        };
+      }
+
+      const FL = makeFloat(modal, document.getElementById('video-bar'), document.getElementById('video-resize'), document.getElementById('video-min'), { corner: 'br', bottomPhone: 76 });
+      // ---- Son seul : on cache l'image, on garde le son et des commandes simples ----
+      const audioBtn = document.getElementById('video-audiobtn');
+      const apBtn = document.getElementById('video-ap');
+      const barPlay = document.getElementById('video-bp');
+      const seekEl = document.getElementById('video-seek');
+      const timeEl = document.getElementById('video-time');
+      function fmtTime(t) {
+        if (!isFinite(t) || t < 0) return '0:00';
+        var m = Math.floor(t / 60), s = Math.floor(t % 60);
+        return m + ':' + (s < 10 ? '0' : '') + s;
+      }
+      function syncAudioUI() {
+        var paused = player.paused;
+        apBtn.textContent = paused ? '▶' : '⏸';
+        apBtn.setAttribute('aria-label', paused ? 'Lecture' : 'Pause');
+        barPlay.textContent = paused ? '▶' : '⏸';
+        barPlay.setAttribute('aria-label', paused ? 'Lecture' : 'Pause');
+        seekEl.value = player.duration ? Math.round(player.currentTime / player.duration * 1000) : 0;
+        timeEl.textContent = fmtTime(player.currentTime) + ' / ' + fmtTime(player.duration);
+      }
+      function setAudioOnly(on) {
+        modal.classList.toggle('audio-only', on);
+        audioBtn.textContent = on ? '🎬 Image + son' : '🎧 Son seul';
+        audioBtn.setAttribute('aria-pressed', String(on));
+        try { localStorage.setItem('mesbd-son-seul', on ? '1' : '0'); } catch (err) {}
+        syncAudioUI();
+      }
+      function togglePlay() { if (player.paused) player.play().catch(function () {}); else player.pause(); }
+      audioBtn.addEventListener('click', function () { setAudioOnly(!modal.classList.contains('audio-only')); });
+      apBtn.addEventListener('click', togglePlay);
+      barPlay.addEventListener('click', togglePlay);
+      seekEl.addEventListener('input', function () { if (player.duration) player.currentTime = seekEl.value / 1000 * player.duration; });
+      ['timeupdate', 'play', 'pause', 'loadedmetadata', 'durationchange', 'ended'].forEach(function (n) { player.addEventListener(n, syncAudioUI); });
+      try { if (localStorage.getItem('mesbd-son-seul') === '1') setAudioOnly(true); } catch (err) {}
 
       const FILE_NAME = 'Deep Purple helfest 2026.mp4';
 
       function openVideo(e) {
         e.stopPropagation();
         modal.classList.remove('ended');
-        modal.classList.add('open');
+        FL.open('video');
+        syncAudioUI();
         player.play().catch(() => {});
       }
       function closeVideo() {
-        modal.classList.remove('open', 'ended');
+        FL.close();
+        modal.classList.remove('ended');
         player.pause();
       }
       function replayVideo() {
@@ -1394,12 +1557,11 @@
       saveBtn.addEventListener('click', saveVideo);
       player.addEventListener('ended', () => modal.classList.add('ended'));
       player.addEventListener('play', () => modal.classList.remove('ended'));
-      modal.addEventListener('click', (e) => { if (e.target === modal) closeVideo(); });
-      document.addEventListener('keydown', (e) => {
-        if (!modal.classList.contains('open')) return;
+      // Les touches restent dans la fenêtre vidéo (les flèches ne tournent plus les pages)
+      modal.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') closeVideo();
         e.stopPropagation();
-      }, true);
+      });
     });
   </script>
   <script>
