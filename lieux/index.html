@@ -1124,12 +1124,6 @@
     #tools-modal .simple-only { display: none; }
     #tools-modal.simple .simple-only { display: inline; }
     #tools-modal.simple .full-only { display: none; }
-    /* ---- Indice verrouillé (cadenas) : texte + liens propres à chaque photo, lus dans indices.txt ---- */
-    #indice-box { display: none; margin-top: 10px; border: 1px dashed var(--ink-soft); border-radius: 10px; padding: 6px; background: rgba(255,255,255,0.35); }
-    #indice-btn { width: 100%; background: none; border: 0; padding: 8px; font: inherit; font-size: 0.9rem; color: var(--accent-deep); cursor: pointer; border-radius: 8px; }
-    #indice-btn:hover, #indice-btn:focus-visible { background: rgba(90,125,94,0.12); }
-    #indice-txt { margin: 4px 6px 6px; font-size: 0.9rem; line-height: 1.6; text-align: left; white-space: pre-line; }
-    #indice-txt a { color: var(--accent-deep); word-break: break-all; }
     #other-img { background: none; border: none; padding: 0; font: inherit; font-size: 0.8rem; color: var(--ink-soft); text-decoration: underline; cursor: pointer; }
   </style>
 
@@ -1156,10 +1150,6 @@
           <label style="text-decoration:underline;cursor:pointer">choisissez un fichier<input id="img-file" type="file" accept="image/*" hidden></label>
         </div>
         <img id="paste-preview" alt="Image à identifier">
-        <div id="indice-box">
-          <button id="indice-btn" type="button" aria-expanded="false" aria-controls="indice-txt">🔒 Indice : cliquer pour afficher</button>
-          <div id="indice-txt" hidden></div>
-        </div>
         <div id="lens-actions" class="row">
           <input id="hint-input" type="text" maxlength="120" autocomplete="off" placeholder="Indice facultatif : lieu, pays, monument…" aria-label="Indice facultatif">
           <button id="lens-go" class="pdf-btn" type="button">📋 Copier et ouvrir Google Lens</button>
@@ -1191,7 +1181,6 @@
       function open(simple) {
         modal.classList.toggle('simple', simple === true);
         modal.classList.add('visible');
-        if (simple !== true) hideIndice();
         if (simple === true) return;
         var hasPager = !!window.__pager;
         document.getElementById('goto-section').style.display = hasPager ? '' : 'none';
@@ -1200,10 +1189,7 @@
       function close() { modal.classList.remove('visible'); }
 
       // ---- Indices par photo : fichier indices.txt (voir le fichier pour le format) ----
-      var indBox = document.getElementById('indice-box');
-      var indBtn = document.getElementById('indice-btn');
-      var indTxt = document.getElementById('indice-txt');
-      var indMap = null, indLoad = null, indToken = 0;
+      var indMap = null, indLoad = null;
       var INDICE_FILE = 'indices.txt';
       function loadIndices() {
         if (indLoad) return indLoad;
@@ -1232,25 +1218,8 @@
           return '<a href="' + u + '" target="_blank" rel="noopener noreferrer">' + u + '</a>';
         });
       }
-      function hideIndice() { indToken++; indBox.style.display = 'none'; indTxt.hidden = true; indTxt.innerHTML = ''; }
-      function setIndice(num) {
-        hideIndice();
-        if (!(num >= 0)) return;
-        var my = indToken;
-        loadIndices().then(function (map) {
-          if (my !== indToken || !map[num]) return;
-          indTxt.innerHTML = linkify(map[num]);
-          indBtn.textContent = '🔒 Indice : cliquer pour afficher';
-          indBtn.setAttribute('aria-expanded', 'false');
-          indBox.style.display = 'block';
-        });
-      }
-      indBtn.addEventListener('click', function () {
-        var show = indTxt.hidden;
-        indTxt.hidden = !show;
-        indBtn.textContent = show ? '🔓 Indice (cliquer pour masquer)' : '🔒 Indice : cliquer pour afficher';
-        indBtn.setAttribute('aria-expanded', show ? 'true' : 'false');
-      });
+      // utilisés par la fenêtre « Indice » de la bande de miniatures
+      window.__indices = { load: loadIndices, linkify: linkify };
       function msg(el, text, err) { el.textContent = text || ''; el.classList.toggle('err', !!err); }
 
       // ---- Aller à une page ----
@@ -1383,7 +1352,6 @@
       window.__openTools = function () { open(false); };
       window.__identifyImg = function (img, num) {
         if (!img || !img.naturalWidth) { if (window.__toast) window.__toast('Aucune planche chargée.'); return; }
-        setIndice(num); // num = n° de planche de la photo source (undefined : pas d'indice)
         var src = img.currentSrc || img.src;
         // Planche en ligne : Lens la récupère par son adresse -> aucun encodage, ouverture immédiate
         if (isPublic(src)) {
@@ -1473,6 +1441,7 @@
       <button type="button" id="film-copy">📋 Copier cette planche</button>
       <button type="button" id="film-ident">🔎 Identifier l’image affichée</button>
       <button type="button" id="film-photo" aria-pressed="false">📷 Photo source</button>
+      <button type="button" id="film-hint" aria-pressed="false">🔒 Indice</button>
       <span id="film-info"></span>
     </div>
     <div id="film-track" role="listbox"></div>
@@ -1740,6 +1709,121 @@
         });
       });
 
+      window.addEventListener('resize', function () { if (win.classList.contains('visible')) clamp(); });
+    });
+  </script>
+
+  <!-- ===== Indice : petite fenêtre déplaçable (texte de indices.txt pour la photo affichée) ===== -->
+  <style>
+    #hint-win {
+      display: none; position: fixed; z-index: 9001; left: 16px; top: 70px; width: 300px; max-width: calc(100vw - 16px);
+      flex-direction: column; background: var(--cream); color: var(--ink); border: 1px solid var(--ink-soft);
+      border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.45); overflow: hidden;
+    }
+    #hint-win.visible { display: flex; }
+    #hint-head {
+      display: flex; align-items: center; gap: 8px; padding: 6px 8px 6px 12px; cursor: move;
+      background: var(--cream-deep); border-bottom: 1px solid var(--rule);
+      touch-action: none; user-select: none; -webkit-user-select: none;
+    }
+    #hint-title { flex: 1; font: 500 1.05rem 'Cormorant Garamond', serif; color: var(--accent-deep); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    #hint-head button {
+      font: inherit; font-size: 0.75rem; color: var(--accent-deep); background: transparent; cursor: pointer;
+      border: 1px solid var(--accent-deep); border-radius: 16px; padding: 4px 12px; white-space: nowrap;
+    }
+    #hint-head button:hover { background: var(--accent-deep); color: var(--cream); }
+    #hint-body { padding: 10px 12px 12px; overflow-y: auto; max-height: min(50vh, 340px); font-size: 0.92rem; line-height: 1.6; text-align: left; white-space: pre-line; }
+    #hint-body a { color: var(--accent-deep); word-break: break-all; }
+    #hint-body .none { color: var(--ink-soft); font-style: italic; }
+    #film-hint[aria-pressed="true"] { background: #f2ead9 !important; color: var(--ink) !important; }
+  </style>
+
+  <div id="hint-win" role="dialog" aria-label="Indice">
+    <div id="hint-head">
+      <span id="hint-title">🔒 Indice</span>
+      <button type="button" id="hint-close" aria-label="Fermer">✕ Fermer</button>
+    </div>
+    <div id="hint-body"></div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var btn = document.getElementById('film-hint');
+      var photoBtn = document.getElementById('film-photo');
+      var photoWin = document.getElementById('photo-win');
+      if (!btn) return;
+      if (!window.__pager || !window.__indices) { btn.style.display = 'none'; return; }
+
+      var win = document.getElementById('hint-win');
+      var head = document.getElementById('hint-head');
+      var title = document.getElementById('hint-title');
+      var body = document.getElementById('hint-body');
+      var placed = false, token = 0;
+
+      function currentNum() { return parseInt(String(window.__pager.currentId()).replace('page-', ''), 10); }
+
+      // Affiche l'indice de la planche dont la photo est affichée
+      function refresh() {
+        var num = currentNum(), my = ++token;
+        title.textContent = '🔒 Indice — planche ' + num;
+        window.__indices.load().then(function (map) {
+          if (my !== token) return;
+          if (map[num]) body.innerHTML = window.__indices.linkify(map[num]);
+          else body.innerHTML = '<span class="none">Pas d’indice pour cette planche.</span>';
+        });
+      }
+
+      // Premier affichage : sous la fenêtre photo si elle est ouverte, sinon en haut à droite
+      function place() {
+        var vw = window.innerWidth, w = Math.min(300, vw - 16);
+        win.style.width = w + 'px';
+        var left = Math.max(8, vw - w - 16), top = 70;
+        if (photoWin && photoWin.classList.contains('visible')) {
+          var r = photoWin.getBoundingClientRect();
+          if (r.left - w - 12 >= 8) { left = r.left - w - 12; top = r.top; }
+          else { left = Math.max(8, Math.min(r.left, vw - w - 8)); top = Math.min(r.bottom + 8, window.innerHeight - 120); }
+        }
+        win.style.left = left + 'px'; win.style.top = top + 'px';
+      }
+
+      function setOpen(on) {
+        win.classList.toggle('visible', on);
+        btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+        if (!on) { token++; return; }
+        // pas de photo affichée : on commence par l'afficher, puis l'indice
+        if (photoBtn && photoWin && !photoWin.classList.contains('visible')) photoBtn.click();
+        if (!placed) { place(); placed = true; }
+        refresh();
+      }
+      btn.addEventListener('click', function () { setOpen(!win.classList.contains('visible')); });
+      document.getElementById('hint-close').addEventListener('click', function () { setOpen(false); });
+      win.addEventListener('keydown', function (e) { if (e.key === 'Escape') setOpen(false); });
+
+      // L'indice suit la planche affichée
+      var prev = window.__onShow;
+      window.__onShow = function (id) {
+        if (win.classList.contains('visible')) refresh();
+        if (prev) prev(id);
+      };
+
+      // ---- déplacement (souris, doigt, stylet) ----
+      function clamp() {
+        var r = win.getBoundingClientRect(), vw = window.innerWidth, vh = window.innerHeight;
+        win.style.left = Math.min(Math.max(r.left, 60 - r.width), vw - 60) + 'px';
+        win.style.top = Math.min(Math.max(r.top, 0), vh - 40) + 'px';
+      }
+      head.addEventListener('pointerdown', function (e) {
+        if (e.target.closest('button')) return;
+        var r = win.getBoundingClientRect(), dx = e.clientX - r.left, dy = e.clientY - r.top;
+        try { head.setPointerCapture(e.pointerId); } catch (err) {}
+        function move(ev) { win.style.left = (ev.clientX - dx) + 'px'; win.style.top = (ev.clientY - dy) + 'px'; }
+        function up() {
+          head.removeEventListener('pointermove', move); head.removeEventListener('pointerup', up);
+          head.removeEventListener('pointercancel', up); clamp();
+        }
+        head.addEventListener('pointermove', move); head.addEventListener('pointerup', up); head.addEventListener('pointercancel', up);
+        e.preventDefault();
+      });
       window.addEventListener('resize', function () { if (win.classList.contains('visible')) clamp(); });
     });
   </script>
