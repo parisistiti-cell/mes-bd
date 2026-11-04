@@ -87,7 +87,7 @@ function renderForm(pathname, wrong) {
         <circle cx="8" cy="15" r="4"></circle>
         <path d="M10.5 12.5L20 3M20 3h-4M20 3v4"></path>
       </svg>
-      Accès privé (temporairement)
+      Réservé (temporairement)
     </h1>
     ${wrong ? '<p class="err">Code incorrect, réessaie.</p>' : ""}
     <form method="POST" action="${pathname}" id="access-form">
