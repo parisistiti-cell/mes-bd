@@ -721,6 +721,11 @@
         if (caption) caption.style.display = 'none';
 
         window.__pager = {
+          goToId: function (id) {
+            var i = pages.findIndex(function (p) { return p.id === id; });
+            if (i < 0) return false;
+            current = i; show(i); return true;
+          },
           goTo: function (num) {
             var id = 'page-' + String(num).padStart(2, '0');
             var i = pages.findIndex(function (p) { return p.id === id; });
@@ -1331,14 +1336,15 @@
         document.querySelectorAll('.reader .page').forEach(function (p) {
           var num = parseInt(p.id.replace('page-', ''), 10);
           var src = p.querySelector('img').getAttribute('src');
+          var label = /couverture/i.test(src) ? 'Couv.' : num;
           var t = document.createElement('button');
           t.type = 'button'; t.className = 'thumb'; t.setAttribute('role', 'option');
-          t.setAttribute('aria-label', 'Planche ' + num);
-          t.innerHTML = '<img loading="lazy" decoding="async" alt=""><b>' + num + '</b>';
+          t.setAttribute('aria-label', label === 'Couv.' ? 'Couverture' : 'Planche ' + num);
+          t.innerHTML = '<img loading="lazy" decoding="async" alt=""><b>' + label + '</b>';
           var ti = t.firstChild;
           ti.onerror = function () { ti.onerror = null; ti.src = src; }; // repli si la miniature n'existe pas
           ti.src = src.replace(/(^|\/)images\//, '$1images/thumbs/');
-          t.addEventListener('click', function () { window.__pager.goTo(num); });
+          t.addEventListener('click', function () { window.__pager.goToId(p.id); });
           track.appendChild(t);
           thumbs[p.id] = t;
         });
@@ -2025,5 +2031,6 @@
       };
     })();
   </script>
+  <script src="/vues.js" defer></script>
 </body>
 </html>
