@@ -310,6 +310,7 @@
     <a class="topbar__title" href="#top">Lieux</a>
     <div class="topbar__actions">
       <button id="tour-btn" type="button" title="Présentation guidée des menus" aria-label="Présentation guidée des menus">💡<span class="lbl"> Guide</span></button>
+      <button id="help-btn" type="button" title="Aide : ce que permet cette BD" aria-label="Aide : ce que permet cette BD">?</button>
       <button id="video-btn" type="button" title="Voir les vidéos" aria-label="Voir les vidéos">▶<span class="lbl"> Vidéos</span></button>
       <button id="chat-btn" type="button" title="Ouvrir le chat" aria-label="Ouvrir le chat">💬<span class="lbl"> Chat</span></button>
       <a class="topbar__home" href="../">Toutes les BD</a>
@@ -1836,6 +1837,11 @@
       cursor: pointer; padding: 6px 14px; font-family: 'Karla', sans-serif; font-size: 0.9rem; white-space: nowrap;
     }
     #tour-btn:hover, #tour-btn:focus-visible { background: var(--accent-deep); color: var(--cream); }
+    #help-btn {
+      width: 34px; height: 34px; padding: 0; border-radius: 50%; cursor: pointer; flex: none;
+      background: #c62828; color: #fff; border: 2px solid #c62828; font: 700 1.05rem 'Karla', sans-serif; line-height: 1;
+    }
+    #help-btn:hover, #help-btn:focus-visible { background: #a31f1f; border-color: #a31f1f; }
     #tour { position: fixed; inset: 0; z-index: 9500; pointer-events: none; }
     #tour[hidden] { display: none; }
     .tour-shade { position: fixed; background: rgba(20, 17, 14, 0.72); pointer-events: auto; cursor: pointer; }
@@ -1958,6 +1964,7 @@
         <ul>
           <li>Rien n’est envoyé pendant la lecture. Google Lens ne reçoit une image que lorsque vous l’ouvrez vous-même. Le chat Cbox peut déposer des cookies et reçoit votre adresse IP, mais seulement après votre accord.</li>
         </ul>
+        <p class="note">Toutes les BD n’ont pas toutes ces fonctions : certaines sont communes à la plupart des BD, d’autres propres à quelques-unes. L’aide de la page d’accueil (bouton ? de l’étagère) indique lesquelles.</p>
         <p class="note">Aide relue et mise à jour le 4 novembre 2026.</p>
       </div>
       <div id="help-foot">
@@ -2015,8 +2022,8 @@
           h: '<p>Chat public hébergé par Cbox. Il <b>ne se charge qu’après votre accord</b>. Aucun compte requis : un pseudo suffit.</p><p>Les messages sont visibles de tous : ne communiquez aucune information personnelle.</p>' },
         { sel: '.topbar__home', t: '📚 Toutes les BD',
           h: '<p>Retour à l’<b>étagère</b> avec toutes les BD.</p>' },
-        { sel: '#tour-btn', t: '💡 Revoir cette présentation',
-          h: '<p>Le bouton <b>💡 Guide</b> relance cette présentation à tout moment.</p><p>Pour le détail de chaque fonction : <a id="tour-help-link">❓ ouvrir l’aide complète</a>.</p><p>Bonne lecture !</p>' }
+        { sel: '#help-btn', t: '❓ L’aide, à tout moment',
+          h: '<p>Le <b>? rouge</b> ouvre l’<b>aide complète</b> de cette BD, quand vous voulez.</p><p>Le bouton <b>💡 Guide</b>, juste à côté, relance cette présentation.</p><p><a id="tour-help-link">❓ Ouvrir l’aide complète maintenant</a></p><p>Toutes les BD n’ont pas toutes ces fonctions : l’aide de la page d’accueil (bouton ? de l’étagère) indique lesquelles. Bonne lecture !</p>' }
       ];
 
       function visible(el) { if (!el) return false; var r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0; }
@@ -2119,6 +2126,7 @@
       document.getElementById('help-tour').addEventListener('click', function () { closeHelp(); start(); });
       help.addEventListener('click', function (e) { if (e.target === help) closeHelp(); });
       help.addEventListener('keydown', function (e) { if (e.key === 'Escape') { e.stopPropagation(); closeHelp(); } });
+      document.getElementById('help-btn').addEventListener('click', function () { if (active) end(); if (help.classList.contains('visible')) closeHelp(); else openHelp(); });
       window.__openGuide = start; window.__openHelp = openHelp;
 
       // Première visite : la présentation démarre seule (pas si on arrive par un lien vers une planche précise)
