@@ -62,12 +62,26 @@
   .book:hover, .book:focus-visible { transform: rotate(0deg) translateY(-6px); }
   .book:focus-visible { outline: 3px solid var(--cream); outline-offset: 4px; }
   .book__cover {
+    position: relative;
     aspect-ratio: 3 / 4.2; border-radius: 2px; overflow: hidden;
     border: 1px solid rgba(0,0,0,0.35); background: var(--cream);
     box-shadow: 6px 10px 14px rgba(0,0,0,0.45);
   }
   .book:hover .book__cover, .book:focus-visible .book__cover { box-shadow: 4px 8px 18px rgba(0,0,0,0.55); }
   .book__cover img { display: block; width: 100%; height: 100%; object-fit: contain; }
+  .book--actu .book__cover::after {
+    content: "ACTU. 10/26";
+    position: absolute;
+    top: 18%; left: -12%; width: 124%;
+    padding: 7px 0;
+    color: #fff; background: #c90018;
+    font: 700 17px/1 'Karla', system-ui, sans-serif;
+    letter-spacing: 0.08em; text-align: center;
+    transform: rotate(-35deg);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+    pointer-events: none;
+  }
+
   footer { max-width: 700px; margin: 0 auto; padding: 0 28px 100px; text-align: center; font-size: 0.85rem; color: var(--ink-soft); line-height: 1.5; }
   @media (prefers-reduced-motion: reduce) { .book, #chat-btn { transition: none; } }
 </style>
@@ -90,7 +104,7 @@
       <div class="book__cover"><img src="Ardeche-2026/images/00-couverture.jpg" alt="Couverture de la BD Ardèche 2026 : Un voyage de 15 jours en Ardèche en août 2026" width="360" height="504" loading="eager" decoding="async"></div>
       <span class="sr-only">Ardèche 2026</span>
     </a>
-    <a class="book" href="/conf/" style="--tilt:2deg" title="Confiture de melon d&#x27;Espagne — Recette complète de la confiture de melon d&#x27;Espagne">
+    <a class="book book--actu" href="/conf/" style="--tilt:2deg" title="Confiture de melon d&#x27;Espagne — Recette complète de la confiture de melon d&#x27;Espagne">
       <div class="book__cover"><img src="conf/images/00-couverture.jpg" alt="Couverture de la BD Confiture de melon d&#x27;Espagne : Recette complète de la confiture de melon d&#x27;Espagne" width="360" height="504" loading="eager" decoding="async"></div>
       <span class="sr-only">Confiture de melon d&#x27;Espagne</span>
     </a>
@@ -163,7 +177,7 @@
       <div class="book__cover"><img src="corezlot/images/00-couverture.jpg" alt="Couverture de la BD Corrèze et Lot : Des lieux à voir en Corrèze et dans le Lot" width="360" height="504" loading="lazy" decoding="async"></div>
       <span class="sr-only">Corrèze et Lot</span>
     </a>
-    <a class="book" href="/opti/" style="--tilt:-3deg" title="Récupération d&#x27;eau de pluie — La récupération de l&#x27;eau de pluie avec l&#x27;entreprise Optimeau">
+    <a class="book book--actu" href="/opti/" style="--tilt:-3deg" title="Récupération d&#x27;eau de pluie — La récupération de l&#x27;eau de pluie avec l&#x27;entreprise Optimeau">
       <div class="book__cover"><img src="opti/images/00-couverture.jpg" alt="Couverture de la BD Récupération d&#x27;eau de pluie : La récupération de l&#x27;eau de pluie avec l&#x27;entreprise Optimeau" width="360" height="504" loading="lazy" decoding="async"></div>
       <span class="sr-only">Récupération d&#x27;eau de pluie</span>
     </a>
