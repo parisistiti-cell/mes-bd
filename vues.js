@@ -22,6 +22,9 @@
 
   var seg = location.pathname.split('/').filter(Boolean)[0] || '';
   if (/\.html?$/i.test(seg)) seg = '';
+  
+  if (seg === 'indexcompt.html' || seg === 'indexcompt') seg = '';
+ 
   var slug = norm(seg), isShelf = slug === '';
 
   var css = document.createElement('style');
