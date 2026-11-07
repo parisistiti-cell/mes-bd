@@ -81,7 +81,6 @@
     box-shadow: 0 2px 6px rgba(0,0,0,0.35);
     pointer-events: none;
   }
-
   footer { max-width: 700px; margin: 0 auto; padding: 0 28px 100px; text-align: center; font-size: 0.85rem; color: var(--ink-soft); line-height: 1.5; }
   @media (prefers-reduced-motion: reduce) { .book, #chat-btn { transition: none; } }
 </style>
@@ -459,6 +458,7 @@
       <div class="vm__menu" id="vm-menu">
         <p class="vm__title">Vidéos des BD</p>
         <div id="vm-groups"></div>
+        <p class="vm__srcline"><button type="button" id="vm-sources" class="vm__srcbtn">ⓘ Sources des vidéos</button></p>
       </div>
 
       <div id="vm-stage" hidden>
@@ -591,7 +591,9 @@
       {
         "label": "Francis Cabrel — L’encre de tes yeux",
         "file": "Francis Cabrel - L'encre de tes yeux .mp4",
-        "dir": "enncre/video/"
+        "dir": "enncre/video/",
+        "src": "yt",
+        "note": "Clip officiel de Francis Cabrel, mis en ligne le 30 octobre 2024"
       }
     ]
   },
@@ -601,7 +603,9 @@
       {
         "label": "Ardèche",
         "file": "ardeche.mp4",
-        "dir": "Ardeche-2026/video/"
+        "dir": "Ardeche-2026/video/",
+        "src": "tp",
+        "note": "Montage de l’auteur (Adobe Premiere), octobre 2026"
       }
     ]
   },
@@ -611,42 +615,58 @@
       {
         "label": "Bande annonce",
         "file": "bande annonce.mp4",
-        "dir": "lieux/videos/"
+        "dir": "lieux/videos/",
+        "src": "tp",
+        "note": "Bande-annonce de la BD, réalisée par l’auteur (juin 2026)"
       },
       {
         "label": "Îles",
         "file": "iles.mp4",
-        "dir": "lieux/videos/"
+        "dir": "lieux/videos/",
+        "src": "tp",
+        "note": "« Autour de Rochefort » : montage de l’auteur"
       },
       {
         "label": "Ardèche",
         "file": "ardeche.mp4",
-        "dir": "Ardeche-2026/video/"
+        "dir": "Ardeche-2026/video/",
+        "src": "tp",
+        "note": "Montage de l’auteur (Adobe Premiere), octobre 2026"
       },
       {
         "label": "Cathares",
         "file": "cathares.mp4",
-        "dir": "catha/videos/"
+        "dir": "catha/videos/",
+        "src": "tp",
+        "note": "Images et montage de l’auteur"
       },
       {
         "label": "Cévennes",
         "file": "cevennes.mp4",
-        "dir": "lieux/videos/"
+        "dir": "lieux/videos/",
+        "src": "tp",
+        "note": "« En 2011 dans les Cévennes » : montage de l’auteur"
       },
       {
         "label": "Ventoux",
         "file": "ventoux.mp4",
-        "dir": "lieux/videos/"
+        "dir": "lieux/videos/",
+        "src": "tp",
+        "note": "« Autour du mont Ventoux » : montage de l’auteur"
       },
       {
         "label": "Mulholland Drive",
         "file": "Mulholland Drive.mp4",
-        "dir": "lieux/videos/"
+        "dir": "lieux/videos/",
+        "src": "yt",
+        "note": "Mulholland Drive (David Lynch), bande-annonce 2017 de la version restaurée, mise en ligne le 28 avril 2017"
       },
       {
         "label": "Noix",
         "file": "noix.mp4",
-        "dir": "lieux/videos/"
+        "dir": "lieux/videos/",
+        "src": "tp",
+        "note": "Images et montage de l’auteur (juin 2026)"
       }
     ]
   },
@@ -656,17 +676,24 @@
       {
         "label": "KAWA 600 KLR B",
         "file": "KAWA 600 KLR B.mp4",
-        "dir": "moto/videos/"
+        "dir": "moto/videos/",
+        "src": "tp",
+        "note": "Démarrage à froid d’une Kawasaki 600 KLR B de 1986 (2018), filmé pour une annonce",
+        "check": true
       },
       {
         "label": "Road trips",
         "file": "Road trips.mp4",
-        "dir": "moto/videos/"
+        "dir": "moto/videos/",
+        "src": "tp",
+        "note": "« Fabulous motorcycle road trips » : film de l’auteur"
       },
       {
         "label": "Mob",
         "file": "mob.mp4",
-        "dir": "moto/videos/"
+        "dir": "moto/videos/",
+        "src": "tp",
+        "note": "Film de l’auteur sur les mobylettes"
       }
     ]
   },
@@ -676,7 +703,9 @@
       {
         "label": "Le code perdu",
         "file": "Le code perdu.mp4",
-        "dir": "code/video/"
+        "dir": "code/video/",
+        "src": "tp",
+        "note": "Montage de l’auteur (Wondershare Filmora, décembre 2025)"
       }
     ]
   },
@@ -686,7 +715,10 @@
       {
         "label": "Carl",
         "file": "carl.mp4",
-        "dir": "ia/video/"
+        "dir": "ia/video/",
+        "src": "web",
+        "note": "Vidéo vue sur un réseau social (« En 1968, Kubrick a décrit l’IA »), auteur non retrouvé",
+        "check": true
       }
     ]
   },
@@ -696,17 +728,25 @@
       {
         "label": "Eagles — Hotel California (Live 1977)",
         "file": "Eagles - Hotel California (Live 1977) .mp4",
-        "dir": "hotel/vidéo/"
+        "dir": "hotel/vidéo/",
+        "src": "yt",
+        "note": "Eagles, chaîne officielle : concert du 21 mars 1977 (Capital Centre, Landover), mis en ligne en décembre 2022",
+        "url": "https://www.youtube.com/watch?v=09839DpTctU"
       },
       {
         "label": "La batterie",
         "file": "HC drum.mp4",
-        "dir": "hotel/vidéo/"
+        "dir": "hotel/vidéo/",
+        "src": "yt",
+        "note": "« Eagles – Hotel California | Drums Only », mis en ligne le 8 janvier 2026 (chaîne non identifiée)"
       },
       {
         "label": "La guitare",
         "file": "HC guitare.mp4",
-        "dir": "hotel/vidéo/"
+        "dir": "hotel/vidéo/",
+        "src": "web",
+        "note": "Tutoriel de guitare vu sur un réseau social, auteur non retrouvé",
+        "check": true
       }
     ]
   },
@@ -716,7 +756,10 @@
       {
         "label": "Deep Purple Hellfest 2026",
         "file": "Deep Purple helfest 2026.mp4",
-        "dir": "clis/video/"
+        "dir": "clis/video/",
+        "src": "web",
+        "note": "Extrait de concert (Hellfest, 20 juin 2026), auteur non retrouvé",
+        "check": true
       }
     ]
   },
@@ -726,7 +769,10 @@
       {
         "label": "Vidéo 25 03 05 19 27 17",
         "file": "Video 25 03 05 19 27 17.mp4",
-        "dir": "opti/videos/"
+        "dir": "opti/videos/",
+        "src": "web",
+        "note": "Reportage télévisé régional (Périgueux, logo « ici »), diffuseur à confirmer",
+        "check": true
       }
     ]
   },
@@ -736,7 +782,9 @@
       {
         "label": "Cathares",
         "file": "cathares.mp4",
-        "dir": "catha/videos/"
+        "dir": "catha/videos/",
+        "src": "tp",
+        "note": "Images et montage de l’auteur"
       }
     ]
   },
@@ -746,7 +794,10 @@
       {
         "label": "No woman no cry",
         "file": "Bob Marley.mp4",
-        "dir": "nowoman/video/"
+        "dir": "nowoman/video/",
+        "src": "yt",
+        "note": "Bob Marley & The Wailers, « Live At The Rainbow », 4 juin 1977, chaîne officielle de Bob Marley (2020)",
+        "url": "https://www.youtube.com/channel/UCAlTDckOOQ2jREOvuCShGbw"
       }
     ]
   },
@@ -756,16 +807,23 @@
       {
         "label": "The Cranberries — Zombie",
         "file": "The Cranberries Zombie.mp4",
-        "dir": "dolo/video/"
+        "dir": "dolo/video/",
+        "src": "yt",
+        "note": "The Cranberries, clip officiel de « Zombie » (réal. Samuel Bayer, 1994), mis en ligne en juin 2009",
+        "url": "https://www.youtube.com/watch?v=6Ejga4kJUts"
       },
       {
         "label": "Dolores O’Riordan",
         "file": "dolores.mp4",
-        "dir": "dolo/video/"
+        "dir": "dolo/video/",
+        "src": "web",
+        "note": "Extrait de concert vu sur le web, auteur non retrouvé",
+        "check": true
       }
     ]
   }
 ];
+      window.__GROUPS = GROUPS;
 
       var openBtn = document.getElementById('video-open');
       var modal = document.getElementById('vm');
@@ -834,6 +892,8 @@
         groupsEl.appendChild(sec);
       });
 
+      var SRC_NAME = { yt: 'YouTube', web: 'Web', tp: 'TP (l’auteur)' };
+      function srcSuffix(v) { return v.src ? '  ·  source : ' + SRC_NAME[v.src] : ''; }
       function showMenu() {
         player.pause();
         modal.classList.remove('ended');
@@ -862,7 +922,7 @@
           nameEl.textContent = bd + ' — ' + v.label + ' — vidéo introuvable pour le moment';
         });
         player.load();
-        nameEl.textContent = bd + ' — ' + v.label;
+        nameEl.textContent = bd + ' — ' + v.label + srcSuffix(v);
         barTitle.textContent = '▶ ' + v.label;
         modal.setAttribute('aria-label', 'Vidéo : ' + v.label);
         modal.classList.remove('ended');
@@ -962,7 +1022,7 @@
         <h3>📚 L’étagère (cette page)</h3>
         <ul>
           <li><b>Ouvrir une BD</b> : cliquez sur sa couverture. Au survol, elle se redresse et se soulève.</li>
-          <li><b>▶ Voir les vidéos</b> : la liste des vidéos des BD, regroupées par BD. Un clic lance la vidéo dans une <b>petite fenêtre flottante</b> que l’on peut déplacer (barre de titre), redimensionner (poignée en bas à droite) ou réduire (▁), pour continuer à parcourir l’étagère pendant la lecture. <b>🎧 Son seul</b> cache l’image et garde le son ; <b>⬇ Enregistrer la vidéo</b>, <b>↻ Revoir</b> et <b>☰ Autres vidéos</b> complètent la fenêtre.</li>
+          <li><b>▶ Voir les vidéos</b> : la liste des vidéos des BD, regroupées par BD. Un clic lance la vidéo dans une <b>petite fenêtre flottante</b> que l’on peut déplacer (barre de titre), redimensionner (poignée en bas à droite) ou réduire (▁), pour continuer à parcourir l’étagère pendant la lecture. <b>🎧 Son seul</b> cache l’image et garde le son ; <b>⬇ Enregistrer la vidéo</b>, <b>↻ Revoir</b> et <b>☰ Autres vidéos</b> complètent la fenêtre. <b>ⓘ Sources des vidéos</b> indique d’où vient chaque vidéo (YouTube, Web ou réalisation de l’auteur).</li>
           <li><b>💬 Le chat</b> (bouton rond en bas à droite) : chat public hébergé par Cbox, qui ne se charge qu’après votre accord. Aucun compte : un pseudo suffit.</li>
           <li><b>Crédits et liens</b> (bas de page) : la carte, l’outil de cryptage et les réseaux de l’auteur, avec le <b>QR code Linktree</b> à cliquer ou à scanner.</li>
           <li><b>👁 Compteur de vues</b> : sous chaque couverture, le nombre de fois où la BD a été ouverte. Le bandeau rouge <b>🔥 La plus lue de la semaine</b> signale la BD la plus ouverte ces 7 derniers jours (au moins 3 ouvertures).</li>
@@ -1001,7 +1061,7 @@
 
         <p class="note">Aide relue et mise à jour le 4 novembre 2026.</p>
       </div>
-      <div id="help-foot"><button type="button" id="help-close2">Fermer</button></div>
+      <div id="help-foot"><button type="button" id="help-sources" class="ghost">ⓘ Sources des vidéos</button><button type="button" id="help-close2">Fermer</button></div>
     </div>
   </div>
 
@@ -1014,6 +1074,75 @@
       openBtn.addEventListener('click', open);
       document.getElementById('help-close').addEventListener('click', close);
       document.getElementById('help-close2').addEventListener('click', close);
+      win.addEventListener('click', function (e) { if (e.target === win) close(); });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && win.classList.contains('visible')) { e.stopPropagation(); close(); } }, true);
+    })();
+  </script>
+  
+  <!-- ===== Fenêtre « Sources des vidéos » ===== -->
+  <style>
+    .vm__srcline { margin: 12px 0 2px; text-align: center; }
+    .vm__srcbtn { font: 500 0.85rem 'Karla', system-ui, sans-serif; color: var(--wood-3); background: none; border: 0; text-decoration: underline; cursor: pointer; padding: 6px 10px; }
+    #help-foot { gap: 10px; }
+    #help-foot button.ghost { background: transparent; color: var(--wood-3); }
+    #src-win { position: fixed; inset: 0; z-index: 1300; display: none; align-items: center; justify-content: center; padding: 14px; background: rgba(20,17,14,0.8); }
+    #src-win.visible { display: flex; }
+    #src-box { width: min(820px, 100%); max-height: 92vh; max-height: 92dvh; display: flex; flex-direction: column; background: var(--cream); color: #3a2a1c; border-radius: 12px; overflow: hidden; box-shadow: 0 14px 40px rgba(0,0,0,0.6); }
+    #src-head { display: flex; align-items: center; gap: 10px; padding: 12px 14px 12px 20px; background: #e8dcc3; border-bottom: 1px solid rgba(58,42,28,0.18); }
+    #src-head h2 { flex: 1; margin: 0; font: 600 1.5rem 'Cormorant Garamond', Georgia, serif; color: var(--wood-3); }
+    #src-close { font-size: 1.5rem; line-height: 1; color: #3a2a1c; background: none; border: 0; cursor: pointer; padding: 6px 12px; }
+    #src-main { padding: 12px 20px 6px; overflow-y: auto; font: 400 0.93rem/1.5 'Karla', system-ui, sans-serif; text-align: left; }
+    #src-legend { display: flex; flex-wrap: wrap; gap: 8px 16px; margin: 0 0 8px; font-size: 0.85rem; color: #5a4a3a; }
+    #src-main h3 { margin: 16px 0 4px; font: 600 1.15rem 'Cormorant Garamond', Georgia, serif; color: var(--wood-3); border-bottom: 1px solid rgba(58,42,28,0.2); padding-bottom: 2px; }
+    .src-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; padding: 7px 0; border-bottom: 1px dotted rgba(58,42,28,0.2); }
+    .src-title { font-weight: 600; min-width: 190px; }
+    .src-badge { display: inline-block; font-size: 0.72rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; padding: 1px 9px; border-radius: 10px; color: #fff; white-space: nowrap; }
+    .src-badge.yt { background: #c62828; } .src-badge.web { background: #1f5f8b; } .src-badge.tp { background: #2f6b3f; }
+    .src-note { flex: 1 1 260px; color: #4a3a2a; }
+    .src-note a { color: var(--wood-3); font-weight: 600; white-space: nowrap; }
+    .src-check { font-size: 0.78rem; color: #8a6d3b; font-style: italic; white-space: nowrap; }
+    #src-foot { padding: 10px 20px; border-top: 1px solid rgba(58,42,28,0.18); background: #e8dcc3; font-size: 0.8rem; color: #5a4a3a; display: flex; justify-content: space-between; gap: 10px; align-items: center; flex-wrap: wrap; }
+    #src-foot button { font: 600 0.9rem 'Karla', system-ui, sans-serif; padding: 8px 20px; border-radius: 22px; cursor: pointer; border: 2px solid var(--wood-3); background: var(--wood-3); color: var(--cream); }
+  </style>
+  <div id="src-win" role="dialog" aria-modal="true" aria-labelledby="src-title">
+    <div id="src-box">
+      <div id="src-head"><h2 id="src-title">ⓘ Sources des vidéos</h2><button type="button" id="src-close" aria-label="Fermer">×</button></div>
+      <div id="src-main">
+        <p id="src-legend">
+          <span><span class="src-badge yt">YouTube</span> publiée sur YouTube</span>
+          <span><span class="src-badge web">Web</span> trouvée sur internet, auteur non retrouvé</span>
+          <span><span class="src-badge tp">TP</span> réalisée par l’auteur</span>
+        </p>
+        <div id="src-list"></div>
+      </div>
+      <div id="src-foot"><span>Les vidéos « YouTube » et « Web » restent la propriété de leurs auteurs. « à confirmer » : origine déduite du contenu du fichier.</span><button type="button" id="src-close2">Fermer</button></div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      var win = document.getElementById('src-win'), list = document.getElementById('src-list'), built = false;
+      var LABEL = { yt: 'YouTube', web: 'Web', tp: 'TP' };
+      function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+      function build() {
+        if (built || !window.__GROUPS) return;
+        list.innerHTML = window.__GROUPS.map(function (g) {
+          return '<h3>' + esc(g.bd) + '</h3>' + g.videos.map(function (v) {
+            return '<div class="src-row"><span class="src-title">' + esc(v.label) + '</span><span class="src-badge ' + v.src + '">' + LABEL[v.src] + '</span>' +
+              '<span class="src-note">' + esc(v.note || '') + (v.url ? ' <a href="' + esc(v.url) + '" target="_blank" rel="noopener noreferrer">↗ voir l’original</a>' : '') + '</span>' +
+              (v.check ? '<span class="src-check">à confirmer</span>' : '') + '</div>';
+          }).join('');
+        }).join('');
+        built = true;
+      }
+      var last = null;
+      function open() { build(); last = document.activeElement; win.classList.add('visible'); document.getElementById('src-close2').focus(); }
+      function close() { win.classList.remove('visible'); if (last && last.focus) try { last.focus(); } catch (e) {} }
+      document.addEventListener('click', function (e) {
+        var t = e.target.closest && e.target.closest('#vm-sources, #help-sources');
+        if (t) open();
+      });
+      document.getElementById('src-close').addEventListener('click', close);
+      document.getElementById('src-close2').addEventListener('click', close);
       win.addEventListener('click', function (e) { if (e.target === win) close(); });
       document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && win.classList.contains('visible')) { e.stopPropagation(); close(); } }, true);
     })();
