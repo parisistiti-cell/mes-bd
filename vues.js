@@ -21,8 +21,9 @@
   var excluded = false;
   try { excluded = localStorage.getItem(NO_KEY) === '1'; } catch (e) {}
 
-  var seg = location.pathname.split('/').filter(Boolean)[0] || '';
-  if (/\.html?$/i.test(seg)) seg = '';
+ var seg = location.pathname.split('/').filter(Boolean)[0] || '';
+  // Si c'est un fichier html ou la page indexcompt, on considère que c'est l'accueil
+  if (/\.html?$/i.test(seg) || seg === 'indexcompt') seg = '';
   var slug = norm(seg), isShelf = slug === '';
 
   var css = document.createElement('style');
