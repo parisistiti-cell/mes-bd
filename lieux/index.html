@@ -159,6 +159,8 @@
       display: flex;
     }
   }
+  /* La planche s'adapte à la hauteur de l'écran (jamais besoin de
+     scroller ni de dézoomer, même si l'image est très haute) */
   .page img {
     display: block;
     width: auto;
@@ -188,6 +190,7 @@
     font-size: 0.8rem;
     border-top: 1px solid var(--rule);
   }
+  /* ---- Boutons vidéo (planches 61 et 77, bandeau) + lecteur ---- */
   .video-btn {
     position: absolute;
     left: 50%;
@@ -248,6 +251,7 @@
     width: 48px; height: 24px; cursor: nwse-resize; touch-action: none;
     background: linear-gradient(135deg, transparent 52%, rgba(242,234,217,.75) 52% 60%, transparent 60% 72%, rgba(242,234,217,.75) 72% 80%, transparent 80%);
   }
+  /* ---- Son seul ---- */
   .video-modal .video-audio { display: none; align-items: center; gap: 10px; padding: 10px; margin-top: 4px; background: #2a241e; border-radius: 8px; }
   .video-modal.audio-only .video-audio { display: flex; }
   .video-modal.audio-only video { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
@@ -325,6 +329,22 @@
     <a id="carte-btn" class="pdf-btn carte-btn" href="https://parisistiti-cell.github.io/Se-baigner-en-Dordogne/indexbdou.html" target="_blank" rel="noopener">🗺️ Carte</a>
   </div>
 
+  <!--
+    ===========================================================
+    AJOUTE TES PLANCHES ICI
+
+    Pour chaque planche : dépose l'image dans le dossier images/
+    puis ajoute un bloc comme celui-ci (en gardant le même ordre
+    que ton histoire). L'attribut id permet un lien direct vers
+    cette planche précise :
+
+    <div class="page" id="page-03">
+      <img decoding="async" fetchpriority="high" src="images/03.jpg" alt="Lieux — planche 3">
+    </div>
+
+    Lien vers cette planche : ton-site.pages.dev/lieux/#page-03
+    ===========================================================
+  -->
   <main class="reader">
 
     <div class="page" id="page-00">
@@ -343,6 +363,7 @@
       <img loading="lazy" decoding="async" src="images/01.jpg" alt="Lieux — planche 1">
     </div>
     
+
     <div class="page" id="page-03">
       <img loading="lazy" decoding="async" src="images/03.jpg" alt="Lieux — planche 3">
     </div>
@@ -398,6 +419,7 @@
       <img loading="lazy" decoding="async" src="images/16.jpg" alt="Lieux — planche 16">
     </div>
     
+
     <div class="page" id="page-17">
       <img loading="lazy" decoding="async" src="images/17.jpg" alt="Lieux — planche 17">
     </div>
@@ -447,7 +469,10 @@
     
     <div class="page" id="page-29">
       <img loading="lazy" decoding="async" src="images/29.jpg" alt="Lieux — planche 29">
+    </div>
    
+
+
     <div class="page" id="page-30">
       <img loading="lazy" decoding="async" src="images/30.jpg" alt="Lieux — planche 30">
     </div>
@@ -522,6 +547,8 @@
       <img loading="lazy" decoding="async" src="images/47.jpg" alt="Lieux — planche 47">
     </div>
    
+
+
     <div class="page" id="page-48">
       <img loading="lazy" decoding="async" src="images/48.jpg" alt="Lieux — planche 48">
       <button type="button" class="video-btn" data-file="cathares.mp4" aria-label="Lire la vidéo : Cathares">▶ Voir la vidéo</button>
@@ -573,6 +600,8 @@
       <button type="button" class="video-btn" data-file="cevennes.mp4" aria-label="Lire la vidéo : Cévennes">▶ Voir la vidéo</button>
     </div>
     
+    
+
     <div class="page" id="page-60">
       <img loading="lazy" decoding="async" src="images/60.jpg" alt="Lieux — planche 60">
     </div>
@@ -621,6 +650,7 @@
     <div class="page" id="page-71">
       <img loading="lazy" decoding="async" src="images/71.jpg" alt="Lieux — planche 71">
     </div>
+    
 
     <div class="page" id="page-72">
       <img loading="lazy" decoding="async" src="images/72.jpg" alt="Lieux — planche 72">
@@ -653,6 +683,8 @@
     <div class="page" id="page-79">
       <img loading="lazy" decoding="async" src="images/79.jpg" alt="Lieux — planche 79">
     </div>
+    
+    
 
     <div class="page" id="page-80">
       <img loading="lazy" decoding="async" src="images/80.jpg" alt="Lieux — planche 80">
@@ -700,47 +732,15 @@
     }
     window.__isolatePage = __isolatePage;
 
-    // Gestion unifiée de l'ancre (#page-x) avec verrouillage et du paramètre (?page-x) sans verrouillage
-    document.addEventListener('DOMContentLoaded', () => {
-      let targetId = null;
-      let isLocked = true;
-
-      // 1. Vérifier si on a une ancre bloquante (ex: #page-05)
-      if (window.location.hash) {
-        targetId = window.location.hash;
-        isLocked = true;
-      } 
-      // 2. Vérifier si on a un paramètre de type ?page-05 ou ?page-5
-      else if (window.location.search) {
-        const params = new URLSearchParams(window.location.search);
-        for (const [key, value] of params.entries()) {
-          if (key.startsWith('page-') || key === 'page') {
-            const pageNum = value || params.get(key);
-            targetId = '#page-' + String(pageNum).padStart(2, '0');
-            isLocked = false;
-            break;
-          }
-          if (key.match(/^page-\d+/)) {
-            targetId = '#' + key;
-            isLocked = false;
-            break;
-          }
-        }
-      }
-
-      if (targetId) {
-        if (isLocked) {
-          __isolatePage(targetId);
-        } else {
-          // Mode non verrouillé via paramètre d'URL : initialise le lecteur normal puis va à la page
-          setTimeout(() => {
-            if (window.__pager) {
-              window.__pager.goToId(targetId);
-            }
-          }, 50);
-        }
-      } else {
-        // Lecture normale : une planche à la fois, avec précédent/suivant.
+    if (window.location.hash) {
+      // Lien partagé vers une planche précise : reste verrouillé dessus,
+      // sans navigation possible.
+      document.addEventListener('DOMContentLoaded', () => __isolatePage(window.location.hash));
+    } else {
+      // Lecture normale : une planche à la fois, avec précédent/suivant.
+      // La couverture, le titre et le pied de page sont masqués pendant
+      // la lecture ; le bouton PDF est déplacé dans la barre du bas.
+      document.addEventListener('DOMContentLoaded', () => {
         const pages = Array.from(document.querySelectorAll('.reader .page'));
         if (pages.length === 0) return;
 
@@ -843,8 +843,8 @@
         };
 
         show(current);
-      }
-    });
+      });
+    }
   </script>
 
   <script>
@@ -925,6 +925,7 @@
           page.classList.remove('dragging');
         });
 
+        // Déplacement au doigt dans l'image zoomée
         page.addEventListener('touchstart', (e) => {
           dragged = false;
           if (!isZoomed() || e.touches.length !== 1) return;
@@ -960,7 +961,7 @@
       try {
         const { jsPDF } = window.jspdf;
         const images = Array.from(document.querySelectorAll('.hero img, .page img'));
-        images.forEach((im) => { im.loading = 'eager'; });
+        images.forEach((im) => { im.loading = 'eager'; }); // sinon les planches masquées (lazy) ne se chargent jamais
         let doc;
         for (let i = 0; i < images.length; i++) {
           const img = images[i];
@@ -1001,6 +1002,7 @@
     }
   </script>
 
+  <!-- ===== Chat public (Cbox) : fenêtre chargée à la première ouverture ===== -->
   <style>
     .topbar__actions { display: flex; align-items: center; gap: 14px; }
     #chat-btn {
@@ -1078,6 +1080,7 @@
     })();
   </script>
 
+  <!-- ===== Recherche de page + identification d'image (Google Lens) ===== -->
   <style>
     #tools-btn {
       border: 1px solid var(--accent-deep); border-radius: 18px;
@@ -1165,6 +1168,7 @@
     </div>
   </div>
 
+
   <script>
     (function () {
       var modal = document.getElementById('tools-modal');
@@ -1186,6 +1190,7 @@
       }
       function close() { modal.classList.remove('visible'); }
 
+      // ---- Indices par photo : fichier indices.txt (voir le fichier pour le format) ----
       var indMap = null, indLoad = null;
       var INDICE_FILE = 'indices.txt';
       function loadIndices() {
@@ -1197,7 +1202,7 @@
             t.replace(/^\uFEFF/, '').split(/\r?\n/).forEach(function (line) {
               var h = line.match(/^#\s*(\d+)\s*$/);
               if (h) { cur = parseInt(h[1], 10); map[cur] = []; return; }
-              if (cur === null || /^\s*(\/\/|;;)/.test(line)) return;
+              if (cur === null || /^\s*(\/\/|;;)/.test(line)) return; // commentaires ignorés
               map[cur].push(line);
             });
             Object.keys(map).forEach(function (k) {
@@ -1215,9 +1220,11 @@
           return '<a href="' + u + '" target="_blank" rel="noopener noreferrer">' + u + '</a>';
         });
       }
+      // utilisés par la fenêtre « Indice » de la bande de miniatures
       window.__indices = { load: loadIndices, linkify: linkify };
       function msg(el, text, err) { el.textContent = text || ''; el.classList.toggle('err', !!err); }
 
+      // ---- Aller à une page ----
       function goto() {
         var m = String(input.value).match(/\d+/);
         if (!m) { msg(gotoMsg, 'Entrez un numéro de page.', true); return; }
@@ -1230,18 +1237,20 @@
       }
       document.getElementById('page-go').addEventListener('click', goto);
       input.addEventListener('keydown', function (e) {
-        e.stopPropagation();
+        e.stopPropagation(); // évite de tourner les pages avec les flèches
         if (e.key === 'Enter') goto();
       });
 
+      // ---- Image à identifier ----
       var hintEl = document.getElementById('hint-input');
       var photoBtn = document.getElementById('photo-go');
       function resetHint() { hintEl.value = ''; photoBtn.disabled = true; }
       hintEl.addEventListener('input', function () { photoBtn.disabled = !hintEl.value.trim(); });
       hintEl.addEventListener('keydown', function (e) {
-        e.stopPropagation();
+        e.stopPropagation(); // pas de changement de page avec les flèches
         if (e.key === 'Enter') { e.preventDefault(); document.getElementById('lens-go').click(); }
       });
+      // Recherche d'images classique (photos réelles) à partir de l'indice
       photoBtn.addEventListener('click', function () {
         var h = hintEl.value.trim();
         if (!h) return;
@@ -1265,6 +1274,7 @@
         actions.style.display = 'flex';
         document.getElementById('dl-img').href = url;
         msg(lensMsg, 'Image prête.');
+        // PNG préparé en promesse : accepté directement par le presse-papiers
         currentPng = createImageBitmap(file).then(function (bmp) {
           return new Promise(function (resolve, reject) {
             var c = document.createElement('canvas');
@@ -1298,22 +1308,26 @@
       });
       zone.addEventListener('drop', function (e) { setImage(e.dataTransfer.files[0]); });
 
+      // Copie l'image PUIS ouvre Google Lens (ouvrir l'onglet d'abord ferait perdre
+      // le focus à cette page, et Firefox refuserait alors la copie)
       document.getElementById('lens-go').addEventListener('click', function () {
         if (!currentFile) return;
+        // Planche hébergée sur le site : Lens l'ouvre directement par son adresse, sans collage
         if (currentUrl) {
           var h = hintEl.value.trim();
           window.open('https://lens.google.com/uploadbyurl?url=' + encodeURIComponent(currentUrl) + '&hl=fr' + (h ? '&q=' + encodeURIComponent(h) : ''), '_blank');
-          msg(lensMsg, h ? "Google Lens est ouvert avec cette planche et votre indice." : "Google Lens est ouvert dans un nouvel onglet avec cette planche.");
+          msg(lensMsg, h ? "Google Lens est ouvert avec cette planche et votre indice. Pour des photos réelles, utilisez aussi « Chercher des photos »."
+                          : "Google Lens est ouvert dans un nouvel onglet avec cette planche.");
           return;
         }
         var link = document.getElementById('lens-link');
         function openLens() {
           var w = window.open('https://lens.google.com/', '_blank');
-          if (!w) link.style.display = 'inline-block';
+          if (!w) link.style.display = 'inline-block'; // fenêtre bloquée : lien manuel
         }
-        function done() { msg(lensMsg, "Image copiée. Dans l'onglet Google Lens, cliquez d'abord dans la zone en pointillés, puis Ctrl+V."); openLens(); }
+        function done() { msg(lensMsg, "Image copiée. Dans l'onglet Google Lens, cliquez d'abord dans la zone en pointillés, puis Ctrl+V. Si rien ne se colle : « Télécharger l'image », puis « importez un fichier » dans Lens."); openLens(); }
         function fail(e) {
-          msg(lensMsg, "Copie impossible : utilisez « Télécharger l'image », puis importez le fichier dans Google Lens.", true);
+          msg(lensMsg, "Copie impossible" + (e && e.name ? " (" + e.name + ")" : "") + " : utilisez « Télécharger l'image », puis importez le fichier dans Google Lens.", true);
           link.style.display = 'inline-block';
         }
         try {
@@ -1321,6 +1335,7 @@
         } catch (e) { fail(e); }
       });
 
+      // Copier la planche affichée dans le presse-papiers
       function copyCurrent() {
         var img = window.__pager ? window.__pager.currentImg()
           : (Array.from(document.querySelectorAll('.page')).find(function (p) { return p.style.display !== 'none'; }) || {}).querySelector('img');
@@ -1340,6 +1355,7 @@
       window.__identifyImg = function (img, num) {
         if (!img || !img.naturalWidth) { if (window.__toast) window.__toast('Aucune planche chargée.'); return; }
         var src = img.currentSrc || img.src;
+        // Planche en ligne : Lens la récupère par son adresse -> aucun encodage, ouverture immédiate
         if (isPublic(src)) {
           currentFile = { byUrl: true }; currentPng = null; currentUrl = src; resetHint();
           open(true);
@@ -1373,6 +1389,7 @@
     })();
   </script>
 
+  <!-- ===== Bande de miniatures (film) ===== -->
   <style>
     #film-btn {
       border: 1px solid var(--accent-deep); border-radius: 18px;
@@ -1441,6 +1458,7 @@
       var actions = document.querySelector('.topbar__actions');
       actions.insertBefore(btn, document.getElementById('chat-btn'));
 
+      // Lien direct vers une planche : navigation verrouillée, pas de bande
       if (!window.__pager) { btn.style.display = 'none'; return; }
 
       var track = document.getElementById('film-track');
@@ -1459,7 +1477,7 @@
           t.setAttribute('aria-label', label === 'Couv.' ? 'Couverture' : 'Planche ' + num);
           t.innerHTML = '<img loading="lazy" decoding="async" alt=""><b>' + label + '</b>';
           var ti = t.firstChild;
-          ti.onerror = function () { ti.onerror = null; ti.src = src; };
+          ti.onerror = function () { ti.onerror = null; ti.src = src; }; // repli si la miniature n'existe pas
           ti.src = src.replace(/^images\//, 'images/thumbs/');
           t.addEventListener('click', function () { window.__pager.goToId(p.id); });
           track.appendChild(t);
@@ -1471,7 +1489,7 @@
       var film = document.getElementById('film');
       function setFilmH() { document.documentElement.style.setProperty('--film-h', film.offsetHeight + 'px'); }
       window.addEventListener('resize', function () { if (document.body.classList.contains('film-open')) setFilmH(); });
-      var activeId = document.querySelector('.reader .page').id;
+      var activeId = document.querySelector('.reader .page').id; // la 1re planche est affichée au départ
       var previousHook = window.__onShow;
       function mark(id) {
         activeId = id;
@@ -1496,7 +1514,7 @@
         }
       }
       btn.addEventListener('click', function () { setOpen(!document.body.classList.contains('film-open')); });
-      setOpen(true);
+      setOpen(true); // visible par défaut
       window.addEventListener('load', function () { if (document.body.classList.contains('film-open')) setFilmH(); });
 
       document.getElementById('film-copy').addEventListener('click', function () { window.__copyCurrent(); });
@@ -1510,6 +1528,8 @@
     });
   </script>
 
+
+  <!-- ===== Photo source : fenêtre flottante (déplaçable, redimensionnable) ===== -->
   <style>
     #photo-win {
       display: none; position: fixed; z-index: 9000; left: 16px; top: 70px; width: 520px; height: 420px;
@@ -1546,6 +1566,7 @@
       content: ''; position: absolute; right: 4px; bottom: 4px; width: 10px; height: 10px;
       border-right: 2px solid #f2ead9; border-bottom: 2px solid #f2ead9; opacity: 0.8; pointer-events: none;
     }
+    #film-photo { }
     #film-photo[aria-pressed="true"] { background: #f2ead9 !important; color: var(--ink) !important; }
     @media (max-width: 520px) { #photo-head button { padding: 4px 9px; } }
   </style>
@@ -1571,8 +1592,9 @@
       var openBtn = document.getElementById('film-photo');
       if (!window.__pager) { openBtn.style.display = 'none'; return; }
 
+      // Dossier des photos, à côté de images/ (lieux/photos/) ; fichier = même numéro que la planche
       var PHOTO_DIR = 'photos/';
-      var EXTS = ['jpg', 'webp', 'jpeg', 'png'];
+      var EXTS = ['jpg', 'webp', 'jpeg', 'png']; // renommez vos fichiers en minuscules (.jpg) : GitHub Pages est sensible à la casse
       var found = {};
 
       var win = document.getElementById('photo-win');
@@ -1612,6 +1634,7 @@
         tryNext();
       }
 
+      // ---- ouverture / fermeture ----
       function place() {
         var vw = window.innerWidth, vh = window.innerHeight;
         var w = Math.min(vw - 16, 520), h = Math.min(Math.round(vh * 0.62), 560);
@@ -1629,18 +1652,21 @@
       openBtn.addEventListener('click', function () { setOpen(!win.classList.contains('visible')); });
       document.getElementById('photo-close').addEventListener('click', function () { setOpen(false); });
 
+      // Identifier : même processus que pour la planche (Google Lens)
       document.getElementById('photo-ident').addEventListener('click', function () {
         if (!img.getAttribute('src') || !img.naturalWidth) { if (window.__toast) window.__toast('Aucune photo chargée.'); return; }
         var n = parseInt(String(window.__pager.currentId()).replace('page-', ''), 10);
         window.__identifyImg(img, n);
       });
 
+      // La photo suit la planche affichée
       var prev = window.__onShow;
       window.__onShow = function (id) {
         if (win.classList.contains('visible')) load(id);
         if (prev) prev(id);
       };
 
+      // ---- déplacement ----
       function clamp() {
         var r = win.getBoundingClientRect(), vw = window.innerWidth, vh = window.innerHeight;
         var l = Math.min(Math.max(r.left, 60 - r.width), vw - 60);
@@ -1660,6 +1686,7 @@
         e.preventDefault();
       });
 
+      // ---- redimensionnement (bords et coins) ----
       Array.prototype.forEach.call(win.querySelectorAll('.ph-h'), function (h) {
         h.addEventListener('pointerdown', function (e) {
           var d = h.getAttribute('data-d'), r = win.getBoundingClientRect();
@@ -1688,6 +1715,7 @@
     });
   </script>
 
+  <!-- ===== Indice : petite fenêtre déplaçable (texte de indices.txt pour la photo affichée) ===== -->
   <style>
     #hint-win {
       display: none; position: fixed; z-index: 9001; left: 16px; top: 70px; width: 300px; max-width: calc(100vw - 16px);
@@ -1736,6 +1764,7 @@
 
       function currentNum() { return parseInt(String(window.__pager.currentId()).replace('page-', ''), 10); }
 
+      // Affiche l'indice de la planche dont la photo est affichée
       function refresh() {
         var num = currentNum(), my = ++token;
         title.textContent = '🔒 Indice — planche ' + num;
@@ -1746,6 +1775,7 @@
         });
       }
 
+      // Premier affichage : sous la fenêtre photo si elle est ouverte, sinon en haut à droite
       function place() {
         var vw = window.innerWidth, w = Math.min(300, vw - 16);
         win.style.width = w + 'px';
@@ -1762,6 +1792,7 @@
         win.classList.toggle('visible', on);
         btn.setAttribute('aria-pressed', on ? 'true' : 'false');
         if (!on) { token++; return; }
+        // pas de photo affichée : on commence par l'afficher, puis l'indice
         if (photoBtn && photoWin && !photoWin.classList.contains('visible')) photoBtn.click();
         if (!placed) { place(); placed = true; }
         refresh();
@@ -1770,12 +1801,14 @@
       document.getElementById('hint-close').addEventListener('click', function () { setOpen(false); });
       win.addEventListener('keydown', function (e) { if (e.key === 'Escape') setOpen(false); });
 
+      // L'indice suit la planche affichée
       var prev = window.__onShow;
       window.__onShow = function (id) {
         if (win.classList.contains('visible')) refresh();
         if (prev) prev(id);
       };
 
+      // ---- déplacement (souris, doigt, stylet) ----
       function clamp() {
         var r = win.getBoundingClientRect(), vw = window.innerWidth, vh = window.innerHeight;
         win.style.left = Math.min(Math.max(r.left, 60 - r.width), vw - 60) + 'px';
@@ -1797,6 +1830,7 @@
     });
   </script>
 
+  <!-- ===== Présentation guidée + aide (modèle : « Se baigner en Dordogne ») ===== -->
   <style>
     #tour-btn {
       border: 1px solid var(--accent-deep); border-radius: 18px; background: transparent; color: var(--accent-deep);
@@ -1893,24 +1927,46 @@
       <div id="help-main">
         <h3>📖 Lire la BD</h3>
         <ul>
-          <li><b>Changer de planche</b> : les boutons ‹ et › de la barre du bas, ou les flèches ← et → du clavier. Le compteur indique la position.</li>
+          <li><b>Changer de planche</b> : les boutons ‹ et › de la barre du bas, ou les flèches ← et → du clavier. Le compteur indique la position (par ex. 12 / 86).</li>
           <li><b>Zoomer</b> : un clic sur l’image zoome ; glissez pour la déplacer, cliquez de nouveau pour revenir.</li>
-          <li><b>Télécharger en PDF</b> : crée un PDF avec toutes les planches.</li>
-          <li><b>Toutes les BD</b> : retour à l’étagère.</li>
+          <li><b>Télécharger en PDF</b> : crée un PDF avec toutes les planches, à garder ou à imprimer.</li>
+          <li><b>Toutes les BD</b> (en haut à droite) : retour à l’étagère.</li>
+          <li><b>👁 Compteur de vues</b> près du titre : le nombre de fois où cette BD a été ouverte, avec <b>🔥</b> quand c’est la plus lue de la semaine.</li>
         </ul>
         <h3>🗺️ La carte</h3>
         <ul>
-          <li>Le bouton <b>🗺️ Carte</b> ouvre la carte interactive des lieux.</li>
+          <li>Le bouton <b>🗺️ Carte</b> ouvre la carte interactive des lieux dans un nouvel onglet.</li>
+          <li>Une fenêtre demande d’abord si vous cherchez un lieu particulier : <b>Oui</b>, tapez son nom puis « Lancer la carte » ; <b>Non</b>, la carte s’ouvre par défaut.</li>
         </ul>
         <h3>▶ Les vidéos</h3>
         <ul>
-          <li>Le bouton <b>▶ Vidéos</b> ouvre la liste des vidéos.</li>
+          <li>Le bouton <b>▶ Vidéos</b> ouvre la liste des vidéos de la BD, puis la vidéo choisie se lit dans une <b>petite fenêtre flottante</b>.</li>
+          <li>Vous pouvez la <b>déplacer</b> (barre de titre), la <b>redimensionner</b> (poignée en bas à droite) ou la <b>réduire</b> (▁, double clic sur la barre) pour continuer à lire la BD pendant la vidéo. Sur téléphone, elle se déplace au doigt.</li>
+          <li><b>🎧 Son seul</b> cache l’image et garde le son, avec des commandes simples (lecture, pause, position). <b>⬇ Enregistrer la vidéo</b>, <b>↻ Revoir</b> et <b>☰ Autres vidéos</b> complètent la fenêtre.</li>
         </ul>
         <h3>🎞️ La bande de miniatures</h3>
         <ul>
-          <li><b>Bande visible / masquée</b> affiche toutes les planches en petit.</li>
+          <li><b>Bande visible / masquée</b> (en haut) affiche toutes les planches en petit : cliquez sur une miniature pour y aller directement.</li>
+          <li><b>📋 Copier cette planche</b> : copie l’image dans le presse-papiers, pour la coller dans Google Lens ou Google Photos.</li>
+          <li><b>🔎 Identifier l’image affichée</b> : ouvre la fenêtre d’identification (voir plus bas).</li>
+          <li><b>📷 Photo source</b> : fenêtre flottante qui montre la photo réelle liée à la planche. Déplacez-la par sa barre, redimensionnez-la par les bords et les coins ; elle suit la planche affichée.</li>
+          <li><b>🔒 Indice</b> : petite fenêtre déplaçable avec l’indice correspondant à la photo affichée. Si aucune photo n’est ouverte, elle s’affiche d’abord, puis l’indice.</li>
         </ul>
-        <p class="note">Aide mise à jour le 4 novembre 2026.</p>
+        <h3>🔎 Identifier un lieu</h3>
+        <ul>
+          <li>La fenêtre « Essayer d’identifier la planche ! » permet de <b>copier l’image et ouvrir Google Lens</b>, d’ajouter un <b>indice facultatif</b> (lieu, pays, monument…), de <b>chercher des photos</b> et de <b>télécharger l’image</b>.</li>
+          <li>Le lien « Identifier une autre image » donne accès au mode complet : image collée (Ctrl+V), glissée ou choisie dans vos fichiers, et <b>saut direct vers une page</b>.</li>
+        </ul>
+        <h3>💬 Le chat</h3>
+        <ul>
+          <li>Chat public hébergé par Cbox (service tiers). Il ne se charge qu’après votre accord. Aucun compte requis : un pseudo suffit. Les messages sont visibles de tous : ne communiquez aucune information personnelle.</li>
+        </ul>
+        <h3>🔒 Confidentialité</h3>
+        <ul>
+          <li>Le compteur de vues ne garde que des totaux par BD et par jour : ni cookie, ni adresse IP, ni identité. Rien d’autre n’est envoyé pendant la lecture. Google Lens ne reçoit une image que lorsque vous l’ouvrez vous-même. Le chat Cbox peut déposer des cookies et reçoit votre adresse IP, mais seulement après votre accord.</li>
+        </ul>
+        <p class="note">Toutes les BD n’ont pas toutes ces fonctions : certaines sont communes à la plupart des BD, d’autres propres à quelques-unes. L’aide de la page d’accueil (bouton ? de l’étagère) indique lesquelles.</p>
+        <p class="note">Aide relue et mise à jour le 4 novembre 2026.</p>
       </div>
       <div id="help-foot">
         <button type="button" class="tour-b main" id="help-tour">▶ Lancer la présentation guidée</button>
@@ -1941,13 +1997,34 @@
 
       var NEED_FILM = function () { setFilm(true); };
       var STEPS = [
-        { sel: currentImg, t: '📖 Bienvenue dans la BD « Lieux »', h: '<p>Reconnaître des lieux, planche après planche.</p>' },
-        { sel: '.pager-controls', t: '‹ › Changer de planche', h: '<p>Passer d’une page à l’autre.</p>' },
-        { sel: '#pdf-btn', t: '📄 Télécharger en PDF', h: '<p>Créer un PDF complet.</p>' },
-        { sel: '#carte-btn', t: '🗺️ La carte', h: '<p>Ouvrir la carte interactive.</p>' },
-        { sel: '#video-btn', t: '▶ Les vidéos', h: '<p>Voir les vidéos associées.</p>' },
-        { sel: '#film-btn', t: '🎞️ Bande de miniatures', h: '<p>Afficher ou masquer les vignettes.</p>' },
-        { sel: '#help-btn', t: '❓ L’aide', h: '<p>Accéder à l’aide complète.</p>' }
+        { sel: currentImg, t: '📖 Bienvenue dans la BD « Lieux »',
+          h: '<p>Cette BD vous invite à <b>reconnaître des lieux</b>, planche après planche. Un clic sur l’image la <b>zoome</b> (glissez pour la déplacer, recliquez pour revenir).</p><p>Cette présentation vous fait faire le tour des menus.</p><p class="try">👆 La zone éclairée reste cliquable : vous pouvez essayer, la présentation reste là.</p>' },
+        { sel: '.pager-controls', t: '‹ › Changer de planche',
+          h: '<p>Les boutons <b>‹</b> et <b>›</b> passent à la planche précédente ou suivante, et le compteur indique la position (par exemple 12 / 86).</p><p>Au clavier, utilisez les flèches <b>←</b> et <b>→</b>.</p>' },
+        { sel: '#pdf-btn', t: '📄 Télécharger en PDF',
+          h: '<p>Crée un <b>PDF avec toutes les planches</b>, à garder ou à imprimer. Le bouton affiche « Préparation… » pendant la création.</p>' },
+        { sel: '#carte-btn', t: '🗺️ La carte',
+          h: '<p>Ouvre la <b>carte interactive des lieux</b> dans un nouvel onglet.</p><p>Une fenêtre demande d’abord si vous cherchez un lieu particulier : <b>Oui</b>, tapez son nom puis « Lancer la carte » ; <b>Non</b>, la carte par défaut s’ouvre.</p>' },
+        { sel: '#video-btn', t: '▶ Les vidéos',
+          h: '<p>Ouvre la <b>liste des vidéos</b> de la BD. La vidéo choisie se lit dans une <b>petite fenêtre</b> que vous pouvez déplacer, redimensionner (poignée en bas à droite) ou réduire (▁), pour <b>continuer à lire la BD</b> pendant la vidéo.</p><p><b>🎧 Son seul</b> cache l’image et garde le son.</p>' },
+        { sel: '#film-btn', t: '🎞️ Bande visible / masquée',
+          h: '<p>Affiche ou masque la <b>bande de miniatures</b> en bas de l’écran. Elle contient aussi les outils d’identification, la photo source et l’indice.</p>' },
+        { sel: '#film-track', before: NEED_FILM, t: '🖼️ Les miniatures',
+          h: '<p>Toutes les planches en petit. <b>Cliquez sur une miniature</b> pour aller directement à cette planche ; la planche en cours est encadrée. Faites défiler la bande pour les voir toutes.</p>' },
+        { sel: '#film-copy', before: NEED_FILM, t: '📋 Copier cette planche',
+          h: '<p>Copie la planche affichée dans le presse-papiers : vous pouvez ensuite la <b>coller (Ctrl+V)</b> dans Google Lens ou Google Photos.</p>' },
+        { sel: '#film-ident', before: NEED_FILM, t: '🔎 Identifier l’image affichée',
+          h: '<p>Ouvre la fenêtre « <b>Essayer d’identifier la planche !</b> » : copier l’image et ouvrir Google Lens, ajouter un indice facultatif (lieu, pays, monument…), chercher des photos, télécharger l’image.</p><p>Le lien « Identifier une autre image » en bas de cette fenêtre donne accès au mode complet : image collée ou choisie, et saut direct vers une page.</p>' },
+        { sel: '#film-photo', before: NEED_FILM, t: '📷 Photo source',
+          h: '<p>Affiche dans une <b>fenêtre flottante</b> la photo réelle liée à la planche. Déplacez-la par sa barre, redimensionnez-la par les bords et les coins : elle <b>suit la planche</b> affichée.</p><p>Son bouton « 🔎 Identifier » lance l’identification sur cette photo.</p>' },
+        { sel: '#film-hint', before: NEED_FILM, t: '🔒 Indice',
+          h: '<p>Ouvre une <b>petite fenêtre déplaçable</b> avec l’indice de la photo affichée.</p><p>Si aucune photo n’est ouverte, la photo s’affiche d’abord, puis l’indice.</p>' },
+        { sel: '#chat-btn', t: '💬 Le chat',
+          h: '<p>Chat public hébergé par Cbox. Il <b>ne se charge qu’après votre accord</b>. Aucun compte requis : un pseudo suffit.</p><p>Les messages sont visibles de tous : ne communiquez aucune information personnelle.</p>' },
+        { sel: '.topbar__home', t: '📚 Toutes les BD',
+          h: '<p>Retour à l’<b>étagère</b> avec toutes les BD.</p>' },
+        { sel: '#help-btn', t: '❓ L’aide, à tout moment',
+          h: '<p>Le <b>? rouge</b> ouvre l’<b>aide complète</b> de cette BD, quand vous voulez.</p><p>Le bouton <b>💡 Guide</b>, juste à côté, relance cette présentation.</p><p><a id="tour-help-link">❓ Ouvrir l’aide complète maintenant</a></p><p>Toutes les BD n’ont pas toutes ces fonctions : l’aide de la page d’accueil (bouton ? de l’étagère) indique lesquelles. Bonne lecture !</p>' }
       ];
 
       function visible(el) { if (!el) return false; var r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0; }
@@ -1970,6 +2047,7 @@
           box(shades.t, 0, 0, vw, vh); box(shades.b, 0, 0, 0, 0); box(shades.l, 0, 0, 0, 0); box(shades.r, 0, 0, 0, 0);
           ring.style.display = 'none';
         }
+        // carte d'explication : sous la zone, sinon au-dessus, sinon en bas de l'écran
         var cw = Math.min(360, vw - 16); card.style.width = cw + 'px';
         var ch = card.offsetHeight, left, top;
         if (!hole) { left = (vw - cw) / 2; top = Math.max(8, (vh - ch) / 2); }
@@ -1992,6 +2070,7 @@
         document.getElementById('tour-body').innerHTML = st.h;
         document.getElementById('tour-prev').disabled = idx === 0;
         var nx = document.getElementById('tour-next'); nx.textContent = idx === STEPS.length - 1 ? '✔ Terminer' : 'Suivant ▶';
+        var hl = document.getElementById('tour-help-link'); if (hl) hl.addEventListener('click', function () { end(); openHelp(); });
         quit.hidden = true;
         layout(); setTimeout(layout, 120); setTimeout(layout, 380);
       }
@@ -2008,8 +2087,16 @@
         if (!active) return;
         active = false; tour.hidden = true; quit.hidden = true;
         setFilm(filmWasOpen);
-        markSeen();
+        var first = !seen(); markSeen();
+        if (first) showTip();
         if (lastFocus && lastFocus.focus) try { lastFocus.focus(); } catch (e) {}
+      }
+      function showTip() {
+        var r = tourBtn.getBoundingClientRect();
+        tip.hidden = false;
+        tip.style.top = (r.bottom + 10) + 'px';
+        tip.style.left = Math.max(8, Math.min(r.right - 240, window.innerWidth - 248)) + 'px';
+        setTimeout(function () { tip.hidden = true; }, 7000);
       }
 
       document.getElementById('tour-next').addEventListener('click', function () { if (idx >= STEPS.length - 1) end(); else show(idx + 1); });
@@ -2020,17 +2107,35 @@
       document.getElementById('tq-restart').addEventListener('click', function () { show(0); });
       document.getElementById('tq-quit').addEventListener('click', end);
       tourBtn.addEventListener('click', function () { if (active) end(); else start(); });
+      tip.addEventListener('click', function () { tip.hidden = true; start(); });
 
+      // Clavier : pendant la présentation, les flèches changent d'étape (et non de planche)
+      document.addEventListener('keydown', function (e) {
+        if (!active) return;
+        if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); if (!quit.hidden) quit.hidden = true; else end(); }
+        else if (e.key === 'ArrowRight') { e.preventDefault(); e.stopPropagation(); document.getElementById('tour-next').click(); }
+        else if (e.key === 'ArrowLeft') { e.preventDefault(); e.stopPropagation(); if (idx > 0) show(idx - 1); }
+      }, true);
+      window.addEventListener('resize', layout);
+      window.addEventListener('scroll', layout, true);
+
+      // ---- Aide complète ----
       function openHelp() { help.classList.add('visible'); document.getElementById('help-close').focus(); }
       function closeHelp() { help.classList.remove('visible'); }
       document.getElementById('help-close').addEventListener('click', closeHelp);
       document.getElementById('help-close2').addEventListener('click', closeHelp);
       document.getElementById('help-tour').addEventListener('click', function () { closeHelp(); start(); });
       help.addEventListener('click', function (e) { if (e.target === help) closeHelp(); });
+      help.addEventListener('keydown', function (e) { if (e.key === 'Escape') { e.stopPropagation(); closeHelp(); } });
       document.getElementById('help-btn').addEventListener('click', function () { if (active) end(); if (help.classList.contains('visible')) closeHelp(); else openHelp(); });
+      window.__openGuide = start; window.__openHelp = openHelp;
+
+      // Première visite : la présentation démarre seule (pas si on arrive par un lien vers une planche précise)
+      if (!seen() && !/^#page-/.test(location.hash) && window.__pager) setTimeout(start, 1500);
     });
   </script>
 
+  <!-- ===== Adaptation smartphone ===== -->
   <style>
     .page { touch-action: manipulation; }
     .page.zoomed { touch-action: none; }
@@ -2056,6 +2161,7 @@
   </style>
 
   <script>
+    // Balayage gauche/droite sur la planche pour tourner les pages (planche non zoomée)
     (function () {
       var x0, y0, t0, ok = false;
       document.addEventListener('touchstart', function (e) {
@@ -2075,6 +2181,7 @@
     })();
   </script>
 
+  <!-- ===== Carte : demander un lieu particulier avant de l'ouvrir ===== -->
   <style>
     #carte-modal {
       display: none; position: fixed; inset: 0; z-index: 10000;
@@ -2116,7 +2223,7 @@
 
   <script>
     (function () {
-      var PARAM = 'recherche';
+      var PARAM = 'recherche'; // paramètre lu par la carte (?recherche=...) ; ne pas utiliser « lieu » : réservé aux identifiants de lieux
       var modal = document.getElementById('carte-modal');
       var choice = document.getElementById('carte-choice');
       var lieuRow = document.getElementById('carte-lieu-row');
@@ -2142,6 +2249,7 @@
         closeModal();
       }
 
+      // Délégation : le bouton Carte est déplacé dans la barre du bas par le lecteur
       document.addEventListener('click', function (e) {
         var a = e.target.closest && e.target.closest('#carte-btn');
         if (!a) return;
@@ -2157,7 +2265,7 @@
       });
       document.getElementById('carte-go').addEventListener('click', function () { launch(input.value.trim()); });
       input.addEventListener('keydown', function (e) {
-        e.stopPropagation();
+        e.stopPropagation(); // pas de changement de page avec les flèches
         if (e.key === 'Enter') { e.preventDefault(); launch(input.value.trim()); }
         if (e.key === 'Escape') closeModal();
       });
@@ -2166,7 +2274,6 @@
       document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
     })();
   </script>
-
   <div class="video-modal fl-br" id="video-modal" role="dialog" aria-label="Vidéos">
     <div class="video-modal__bar" id="video-bar">
       <span class="video-modal__grip" aria-hidden="true">⠿</span>
@@ -2206,6 +2313,7 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {
+      // ---- Fenêtre flottante : déplaçable, redimensionnable, réductible ----
       function makeFloat(panel, bar, grip, minBtn, opts) {
         var M = 8;
         var moved = false, mode = 'menu', videoW = 0;
@@ -2214,6 +2322,7 @@
         function phone() { return vw() < 700; }
         function defVideoW() { return phone() ? Math.max(220, Math.min(360, Math.round(vw() * 0.66))) : (vw() < 1100 ? 380 : 440); }
         function setW(w) { panel.style.width = Math.round(Math.max(220, Math.min(w, vw() - 2 * M))) + 'px'; }
+        // Passe de l'ancrage « coin » à des coordonnées libres dès le premier déplacement
         function materialize() {
           if (moved) return;
           var r = panel.getBoundingClientRect();
@@ -2242,6 +2351,7 @@
           minBtn.setAttribute('aria-label', on ? 'Agrandir la fenêtre' : 'Réduire la fenêtre');
           minBtn.textContent = on ? '▢' : '▁';
         }
+        // Déplacement : souris, doigt ou stylet (barre de titre)
         bar.addEventListener('pointerdown', function (e) {
           if (e.target.closest('button') || (e.button && e.button !== 0)) return;
           materialize();
@@ -2265,6 +2375,7 @@
           bar.addEventListener('pointercancel', up);
         });
         bar.addEventListener('dblclick', function (e) { if (!e.target.closest('button')) setMin(!panel.classList.contains('min')); });
+        // Redimensionnement : poignée en bas à droite
         grip.addEventListener('pointerdown', function (e) {
           if (e.button && e.button !== 0) return;
           e.preventDefault();
@@ -2317,7 +2428,7 @@
       if (!btn || !modal || !player) return;
       const barTitle = document.getElementById('video-bartitle');
       const FL = makeFloat(modal, document.getElementById('video-bar'), document.getElementById('video-resize'), document.getElementById('video-min'), { corner: 'br', bottomPhone: 76 });
-      
+      // ---- Son seul : on cache l'image, on garde le son et des commandes simples ----
       const audioBtn = document.getElementById('video-audiobtn');
       const apBtn = document.getElementById('video-ap');
       const barPlay = document.getElementById('video-bp');
@@ -2414,6 +2525,7 @@
         list.appendChild(b);
       });
 
+      // Boutons posés au centre des planches : lancent directement leur vidéo
       document.querySelectorAll('.video-btn').forEach(function (b) {
         b.addEventListener('click', function (e) {
           e.stopPropagation();
@@ -2474,6 +2586,7 @@
       saveBtn.addEventListener('click', save);
       player.addEventListener('ended', function () { modal.classList.add('ended'); });
       player.addEventListener('play', function () { modal.classList.remove('ended'); });
+      // Les touches restent dans la fenêtre vidéo (les flèches ne tournent plus les pages)
       modal.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') closeModal();
         e.stopPropagation();
@@ -2481,6 +2594,7 @@
     });
   </script>
   <script>
+    // Précharge la planche suivante pendant la lecture de l'actuelle
     (function () {
       var prev = window.__onShow;
       window.__onShow = function (id) {
