@@ -103,6 +103,7 @@
   <section class="library-tools" id="collection" aria-label="Explorer la collection">
     <div><p class="section-kicker">LA COLLECTION</p><h2>Choisissez votre prochaine lecture</h2></div>
     <label class="search-box"><span aria-hidden="true">⌕</span><span class="sr-only">Rechercher une bande dessinée</span><input id="book-search" type="search" placeholder="Titre, voyage, idée…" autocomplete="off"><kbd>/</kbd></label>
+    <label class="select-box"><span class="sr-only">Choisir une BD par titre</span><select id="book-select"><option value="">Toutes les BD — A à Z</option></select><span aria-hidden="true">⌄</span></label>
     <p class="result-count" id="result-count" aria-live="polite"></p>
   </section>
   <main class="table" id="table" aria-label="Toutes les bandes dessinées">
@@ -278,26 +279,33 @@
   <script>
     (function () {
       var input = document.getElementById('book-search');
+      var select = document.getElementById('book-select');
       var table = document.getElementById('table');
       var count = document.getElementById('result-count');
       var empty = document.getElementById('empty-state');
       if (!input || !table) return;
       var books = Array.prototype.filter.call(table.children, function (el) { return el.matches('a.book'); });
       function normalise(value) { return (value || '').toLocaleLowerCase('fr').normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
+      books.map(function (book) { var label = book.querySelector('.sr-only'); return label ? label.textContent.trim() : ''; })
+        .filter(Boolean).sort(function (a, b) { return a.localeCompare(b, 'fr', { sensitivity:'base' }); })
+        .forEach(function (title) { var option = document.createElement('option'); option.value = title; option.textContent = title; select.appendChild(option); });
       function filterBooks() {
         var query = normalise(input.value.trim());
+        var selected = normalise(select.value);
         var visible = 0;
         books.forEach(function (book) {
           var name = book.querySelector('.sr-only');
-          var haystack = normalise([name && name.textContent, book.getAttribute('title'), book.querySelector('img') && book.querySelector('img').alt].join(' '));
-          var match = !query || haystack.indexOf(query) !== -1;
+          var title = normalise(name && name.textContent);
+          var haystack = normalise([title, book.getAttribute('title'), book.querySelector('img') && book.querySelector('img').alt].join(' '));
+          var match = (!query || haystack.indexOf(query) !== -1) && (!selected || title === selected);
           book.hidden = !match;
           if (match) visible++;
         });
         count.textContent = visible + (visible > 1 ? ' histoires à découvrir' : ' histoire à découvrir');
         empty.hidden = visible !== 0;
       }
-      input.addEventListener('input', filterBooks);
+      input.addEventListener('input', function () { select.value = ''; filterBooks(); });
+      select.addEventListener('change', filterBooks);
       document.addEventListener('keydown', function (event) {
         if (event.key === '/' && document.activeElement !== input && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) {
           event.preventDefault(); input.focus();
@@ -1256,7 +1264,7 @@
   .hero__art { position:relative; margin:0; padding:10px; background:#fffdf7; border:1px solid var(--line); box-shadow:16px 18px 0 #e9e2d6; transform:rotate(1.2deg); }
   .hero__art::before { content:'DES HISTOIRES, PARTOUT'; position:absolute; z-index:1; top:20px; right:-12px; padding:8px 12px; color:white; background:var(--accent); font-size:.62rem; font-weight:700; letter-spacing:.12em; }
   .hero__art img { display:block; width:100%; height:clamp(240px,32vw,390px); object-fit:cover; object-position:center; }
-  .library-tools { width:min(1180px,100%); margin:0 auto; padding:28px 28px 10px; display:grid; grid-template-columns:1fr minmax(230px,330px); gap:10px 30px; align-items:end; border-top:1px solid var(--line); }
+  .library-tools { width:min(1180px,100%); margin:0 auto; padding:28px 28px 10px; display:grid; grid-template-columns:minmax(250px,1fr) minmax(210px,260px) minmax(230px,300px); gap:10px 18px; align-items:end; border-top:1px solid var(--line); }
   .section-kicker { margin-bottom:7px; font-size:.65rem; }
   .library-tools h2 { margin:0; color:var(--ink); font:500 clamp(1.8rem,3.4vw,2.65rem)/1.05 'Cormorant Garamond',Georgia,serif; }
   .search-box { display:flex; align-items:center; gap:10px; min-height:48px; padding:0 13px; border:1px solid #d8d1c5; border-radius:4px; background:#fffdf8; color:#66716a; }
@@ -1264,6 +1272,10 @@
   .search-box input { width:100%; padding:12px 0; border:0; outline:0; color:var(--ink); background:transparent; font:400 .9rem 'Karla',sans-serif; }
   .search-box:focus-within { border-color:var(--wood-3); box-shadow:0 0 0 3px rgba(24,59,55,.1); }
   .search-box kbd { padding:2px 7px; border:1px solid #e2ddd4; border-radius:3px; background:#f6f2eb; font:500 .72rem 'Karla',sans-serif; }
+  .select-box { display:flex; align-items:center; min-height:48px; padding:0 12px; border:1px solid #d8d1c5; border-radius:4px; background:#fffdf8; color:#66716a; }
+  .select-box:focus-within { border-color:var(--wood-3); box-shadow:0 0 0 3px rgba(24,59,55,.1); }
+  .select-box select { width:100%; min-width:0; height:46px; appearance:none; border:0; outline:0; color:var(--ink); background:transparent; font:400 .86rem 'Karla',sans-serif; cursor:pointer; }
+  .select-box>span:last-child { color:var(--accent); pointer-events:none; }
   .result-count { grid-column:1/-1; margin:5px 0 0; color:#788079; font-size:.77rem; }
   .table { width:min(1180px,100%); max-width:none; margin:0 auto; padding:22px 28px 80px; display:grid; grid-template-columns:repeat(auto-fill,minmax(152px,1fr)); align-items:start; gap:28px 18px; }
   .book { width:auto; min-width:0; transform:none; color:var(--ink); }
@@ -1282,7 +1294,8 @@
   .credits a { color:var(--ink)!important; background:#ebe5d9!important; }
   .credits a:hover,.credits a:focus-visible { color:white!important; background:var(--wood-3)!important; }
   .credits__qr { color:var(--ink)!important; }
-  @media(max-width:760px) { .hero { grid-template-columns:1fr; padding-top:48px; gap:34px; } .hero__copy { max-width:620px; } .hero__art { width:min(560px,88%); justify-self:center; } .hero__art img { height:clamp(220px,55vw,340px); } .library-tools { grid-template-columns:1fr; gap:18px; } .result-count { grid-column:auto; } }
+  @media(max-width:900px) { .library-tools { grid-template-columns:minmax(240px,1fr) minmax(210px,270px); } .library-tools>div:first-child { grid-column:1/-1; } }
+  @media(max-width:760px) { .hero { grid-template-columns:1fr; padding-top:48px; gap:34px; } .hero__copy { max-width:620px; } .hero__art { width:min(560px,88%); justify-self:center; } .hero__art img { height:clamp(220px,55vw,340px); } .library-tools { grid-template-columns:1fr; gap:12px; } .library-tools>div:first-child { grid-column:auto; margin-bottom:5px; } .result-count { grid-column:auto; } }
   @media(max-width:480px) { .hero { padding:38px 20px 54px; } .hero h1 { font-size:clamp(3.4rem,17vw,5rem); } .hero__art { width:94%; } .library-tools { padding:24px 20px 10px; } .table { padding:18px 20px 56px; grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px 14px; } .book>.sr-only { font-size:.88rem; } }
   @media(prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } .book,.book__cover,.video-open { transition:none; } }
 </style>
