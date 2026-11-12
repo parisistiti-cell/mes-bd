@@ -3,7 +3,7 @@
 const SLUGS = new Set([
   "enncre", "ardeche-2026", "conf", "entre-deux-vies", "lieux", "moto", "avance", "laffaire-de-la-souris",
   "hotel", "eusk", "leym", "code", "bloi", "ia", "tranche-de-vie", "sola", "clis", "meca", "jard",
-  "corezlot", "opti", "phrases", "irla", "dolo", "tp", "reseaux", "venus", "drone", "bre", "catha", "nowoman","choco"
+  "corezlot", "opti", "phrases", "irla", "dolo", "tp", "reseaux", "venus", "drone", "bre", "catha", "nowoman", "choco"
 ]);
 const ALIAS = { ardeche: "ardeche-2026" };
 const BOTS = /bot|crawl|spider|slurp|preview|headless|monitor|curl|wget|python|httpclient|facebookexternalhit/i;
