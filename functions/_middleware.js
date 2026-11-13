@@ -131,7 +131,7 @@ function renderForm(pathname, wrong) {
       const height = Math.min(860, Math.max(540, screen.availHeight - 100));
       const left = Math.max(0, Math.round((screen.availWidth - width) / 2));
       const top = Math.max(0, Math.round((screen.availHeight - height) / 2));
-      const features = `popup=yes,width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`;
+      const features = 'popup=yes,width=' + width + ',height=' + height + ',left=' + left + ',top=' + top + ',resizable=yes,scrollbars=yes';
       const popup = window.open(generateCodeLink.href, 'generateur-code-bd', features);
       if (popup) popup.focus();
       else window.open(generateCodeLink.href, '_blank', 'noopener,noreferrer');
