@@ -105,7 +105,7 @@
     <img src="apercu.jpg" alt="Mosaïque de planches et de couvertures des bandes dessinées">
   </dialog>
   <section class="library-tools" id="collection" aria-label="Explorer la collection">
-    <div><p class="section-kicker">LA COLLECTION</p><h2>Reportages divers:</h2></div>
+    <div><p class="section-kicker">LA COLLECTION (Les articles peuvent évoluer.)</p><h2>Reportages divers:</h2></div>
     <label class="search-box"><span aria-hidden="true">⌕</span><span class="sr-only">Rechercher une bande dessinée</span><input id="book-search" type="search" placeholder="Titre, voyage, idée…" autocomplete="off"><kbd>/</kbd></label>
     <label class="select-box"><span class="sr-only">Choisir une BD par titre</span><select id="book-select"><option value="">Toutes les BD — A à Z</option></select><span aria-hidden="true">⌄</span></label>
     <p class="result-count" id="result-count" aria-live="polite"></p>
@@ -305,7 +305,7 @@
           book.hidden = !match;
           if (match) visible++;
         });
-        count.textContent = visible + (visible > 1 ? ' histoires à découvrir' : ' histoire à découvrir');
+        count.textContent = visible + (visible > 1 ? ' histoires à découvrir (certaines en cours de rédaction.)' : ' histoire à découvrir (certaines en cours de rédaction.)');
         empty.hidden = visible !== 0;
       }
       input.addEventListener('input', function () { select.value = ''; filterBooks(); });
