@@ -301,6 +301,28 @@
     margin: 0 0 10px; text-align: center; font-family: 'Karla', sans-serif;
     font-size: 0.95rem; font-weight: 600; color: var(--cream);
   }
+  .video-choices {
+  position: absolute;
+  z-index: 6;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  width: max-content;
+  max-width: calc(100% - 16px);
+}
+
+.video-choices .video-btn {
+  position: static;
+  transform: none;
+  font-size: 0.85rem;
+}
+
+.video-choices .video-btn:hover {
+  transform: scale(1.04);
+}
 </style>
 </head>
 <body>
