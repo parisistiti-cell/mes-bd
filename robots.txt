@@ -2,3 +2,8 @@ User-agent: *
 Allow: /
 
 Sitemap: https://mes-bd.pages.dev/sitemap.xml
+User-agent: GPTBot
+Disallow: /
+
+User-agent: *
+Disallow: /*/images/*/images/
