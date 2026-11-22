@@ -1,1 +1,17 @@
-
+{
+  "version": 1,
+  "include": [
+    "/api/*",
+    "/entre-deux-vies", "/entre-deux-vies/*",
+    "/entre-deux-vies-solo", "/entre-deux-vies-solo/*",
+    "/Tranche-de-vie", "/Tranche-de-vie/*",
+    "/Tranche-de-vie-solo", "/Tranche-de-vie-solo/*",
+    "/venus", "/venus/*",
+    "/venus-solo", "/venus-solo/*",
+    "/tp", "/tp/*",
+    "/tp-solo", "/tp-solo/*",
+    "/avance", "/avance/*",
+    "/avance-solo", "/avance-solo/*"
+  ],
+  "exclude": []
+}
