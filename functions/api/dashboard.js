@@ -61,7 +61,10 @@ async function gql(env, query, variables) {
     throw new ApiError("Pas de connexion à Cloudflare (" + e.message + ").");
   }
   if ([400, 401, 403].includes(res.status)) {
-    throw new ApiError("Jeton refusé par Cloudflare (code " + res.status + "). Vérifie CF_API_TOKEN et son droit « Account Analytics : Read ».");
+    let detail = "";
+    try { const b = await res.json(); detail = (b.errors && b.errors[0] && b.errors[0].message) || ""; } catch (e) { /* corps vide */ }
+    throw new ApiError("Jeton refusé par Cloudflare (code " + res.status + (detail ? " : " + detail : "") +
+      "). Vérifie CF_API_TOKEN (le jeton seul, sans guillemets) et son droit « Account Analytics : Read ».");
   }
   try { body = await res.json(); } catch (e) { throw new ApiError("Réponse illisible de Cloudflare (HTTP " + res.status + ")."); }
   if (body.errors && body.errors.length) throw new ApiError("Cloudflare : " + (body.errors[0].message || "erreur inconnue"), true);
@@ -137,9 +140,12 @@ export async function onRequestGet(context) {
   const { request } = context;
   const url = new URL(request.url);
   // Les valeurs collées dans Cloudflare contiennent parfois un retour à la ligne ou une espace invisible.
+  // Le jeton collé avec ses guillemets, une virgule ou « "token": » devant est aussi nettoyé.
+  const rawToken = String(context.env.CF_API_TOKEN || "");
+  const rawAccount = String(context.env.ACCOUNT_ID || "");
   const env = {
-    CF_API_TOKEN: String(context.env.CF_API_TOKEN || "").trim(),
-    ACCOUNT_ID: String(context.env.ACCOUNT_ID || "").trim(),
+    CF_API_TOKEN: (rawToken.match(/[A-Za-z0-9_-]{30,}/) || [rawToken.trim()])[0],
+    ACCOUNT_ID: (rawAccount.match(/[0-9a-fA-F]{32}/) || [rawAccount.trim()])[0],
     DASHBOARD_KEY: String(context.env.DASHBOARD_KEY || "").trim(),
   };
   if (!env.CF_API_TOKEN || !env.ACCOUNT_ID || !env.DASHBOARD_KEY) {
