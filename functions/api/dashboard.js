@@ -63,8 +63,10 @@ async function gql(env, query, variables) {
   if ([400, 401, 403].includes(res.status)) {
     let detail = "";
     try { const b = await res.json(); detail = (b.errors && b.errors[0] && b.errors[0].message) || ""; } catch (e) { /* corps vide */ }
+    const tok = String(env.CF_API_TOKEN || "");
     throw new ApiError("Jeton refusé par Cloudflare (code " + res.status + (detail ? " : " + detail : "") +
-      "). Vérifie CF_API_TOKEN (le jeton seul, sans guillemets) et son droit « Account Analytics : Read ».");
+      "). Jeton lu par le serveur : " + tok.length + " caractères, commence par « " + tok.slice(0, 4) + " ». " +
+      "Vérifie CF_API_TOKEN (le jeton seul, sans guillemets) et son droit « Account Analytics : Read ».");
   }
   try { body = await res.json(); } catch (e) { throw new ApiError("Réponse illisible de Cloudflare (HTTP " + res.status + ")."); }
   if (body.errors && body.errors.length) throw new ApiError("Cloudflare : " + (body.errors[0].message || "erreur inconnue"), true);
