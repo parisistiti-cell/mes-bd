@@ -134,12 +134,18 @@ async function fetchDays(env, days, nowMs) {
 }
 
 export async function onRequestGet(context) {
-  const { request, env } = context;
+  const { request } = context;
   const url = new URL(request.url);
+  // Les valeurs collées dans Cloudflare contiennent parfois un retour à la ligne ou une espace invisible.
+  const env = {
+    CF_API_TOKEN: String(context.env.CF_API_TOKEN || "").trim(),
+    ACCOUNT_ID: String(context.env.ACCOUNT_ID || "").trim(),
+    DASHBOARD_KEY: String(context.env.DASHBOARD_KEY || "").trim(),
+  };
   if (!env.CF_API_TOKEN || !env.ACCOUNT_ID || !env.DASHBOARD_KEY) {
     return json({ error: "Configuration incomplète : il manque CF_API_TOKEN, ACCOUNT_ID ou DASHBOARD_KEY dans les variables du projet Pages." }, 500);
   }
-  if (!sameKey(request.headers.get("X-Access-Key") || "", env.DASHBOARD_KEY)) {
+  if (!sameKey((request.headers.get("X-Access-Key") || "").trim(), env.DASHBOARD_KEY)) {
     await new Promise((r) => setTimeout(r, 500));          // ralentit les essais de clés au hasard
     return json({ error: "Clé d'accès refusée" }, 401);
   }
@@ -154,4 +160,3 @@ export async function onRequestGet(context) {
     return json({ error: e.message || String(e) }, e.status || 502);
   }
 }
-
