@@ -1526,7 +1526,7 @@
         fetch(API + '?days=' + daysToFetch(), { headers: { 'X-Access-Key': key }, cache: 'no-store' })
           .then(function (r) {
             if (r.status === 401) { var e = new Error('Clé d’accès refusée'); e.auth = true; throw e; }
-            return r.json().then(function (j) { if (!r.ok) throw new Error(j.error || ('Erreur ' + r.status)); return j; });
+            return r.json().then(function (j) { if (!r.ok) { var e2 = new Error(j.error || ('Erreur ' + r.status)); e2.fromServer = true; throw e2; } return j; });
           })
           .then(function (j) {
             $('vz-login').hidden = true; lastError = '';
@@ -1545,6 +1545,7 @@
           .catch(function (e) {
             lastError = e.message || String(e);
             if (e.auth) { lsDel(LS.key); showLogin(lastError); lastError = ''; }
+            else if (e.fromServer) { $('vz-login').hidden = true; }      // le serveur a répondu : la clé est acceptée
           })
           .then(function () { busy = false; render(); });
       }
