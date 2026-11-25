@@ -1142,7 +1142,7 @@
           <li><b>💬 Le chat</b> (bouton rond en bas à droite) : chat public hébergé par Cbox, qui ne se charge qu’après votre accord. Aucun compte : un pseudo suffit.</li>
           <li><b>Crédits et liens</b> (bas de page) : la carte, l’outil de cryptage et les réseaux de l’auteur, avec le <b>QR code Linktree</b> à cliquer ou à scanner.</li>
           <li><b>👁 Compteur de vues</b> : sous chaque couverture, le nombre de fois où la BD a été ouverte. Le bandeau rouge <b>🔥 La plus lue de la semaine</b> signale la BD la plus ouverte ces 7 derniers jours (au moins 3 ouvertures).</li>
-          <li><b>📊 Visites</b> (en haut) : tableau de bord réservé à l’auteur (visites des sites, quota Cloudflare du jour), protégé par une clé d’accès.</li>
+          <li><b>📊 Visites</b> (en haut) : tableau de bord réservé à l’auteur (visites des sites, quota Cloudflare du jour), protégé par une clé d’accès. Les visites peuvent être remises à zéro (bouton « ↺ Zéro » d’un site, ou en bas de la fenêtre pour tous) sans rien supprimer chez Cloudflare ; « Annuler » les rétablit.</li>
           <li><b>? rouge</b> (en haut) : cette aide, à tout moment.</li>
         </ul>
 
@@ -1278,9 +1278,14 @@
     #vz-body { padding: 12px 18px 6px; overflow-y: auto; font: 400 0.95rem/1.5 'Karla', system-ui, sans-serif; text-align: left; }
     #vz-body .vz-muted { color: #6b5744; }
     #vz-body .vz-small { font-size: 0.8rem; }
-    #vz-foot { display: flex; justify-content: flex-end; padding: 12px 18px; border-top: 1px solid rgba(58,42,28,0.18); background: #e8dcc3; }
+    #vz-foot { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; padding: 12px 18px; border-top: 1px solid rgba(58,42,28,0.18); background: #e8dcc3; }
     #vz-foot button { font: 600 0.9rem 'Karla', system-ui, sans-serif; padding: 9px 22px; border-radius: 22px; cursor: pointer; border: 2px solid var(--wood-3); background: var(--wood-3); color: var(--cream); }
     #vz-foot button:hover { filter: brightness(1.2); }
+    #vz-foot button.vz-secondary { background: transparent; color: var(--wood-3); }
+    .vz-sitehead { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+    .vz-zero { font: 600 0.74rem 'Karla', system-ui, sans-serif; padding: 3px 10px; border-radius: 14px; border: 1px solid rgba(58,42,28,0.35); background: #fbf6ea; color: #6b5744; cursor: pointer; white-space: nowrap; }
+    .vz-zero:hover, .vz-zero:focus-visible { border-color: var(--wood-3); color: var(--wood-3); }
+    .vz-link { background: none; border: 0; padding: 0; font: inherit; color: var(--wood-3); text-decoration: underline; cursor: pointer; }
     .vz-card { background: #fbf6ea; border: 1px solid rgba(58,42,28,0.18); border-radius: 12px; padding: 14px; }
     .vz-big { font: 700 2.4rem/1.1 'Karla', system-ui, sans-serif; }
     .vz-bar { height: 14px; background: rgba(58,42,28,0.15); border-radius: 7px; overflow: hidden; margin: 10px 0 8px; }
@@ -1323,7 +1328,7 @@
         <div id="vz-status" class="vz-muted vz-small"></div>
         <p class="vz-muted vz-small">Visites : jours en heure UTC ; les chiffres apparaissent quelques minutes après les visites ; les robots qui n’exécutent pas JavaScript ne sont pas comptés. Le tableau se rafraîchit toutes les minutes tant que cette fenêtre est ouverte.</p>
       </div>
-      <div id="vz-foot"><button type="button" id="vz-close2">Fermer</button></div>
+      <div id="vz-foot"><button type="button" id="vz-reset-all" class="vz-secondary">↺ Remettre les visites à zéro</button><button type="button" id="vz-close2">Fermer</button></div>
     </div>
   </div>
   <script>
@@ -1332,7 +1337,7 @@
       var openBtn = document.getElementById('vz-open'), win = document.getElementById('vz-win');
       if (!openBtn || !win) return;
       var LS = { key: 'vz_key', store: 'vz_store', sites: 'vz_sites', q: 'vz_q', qday: 'vz_qday', alerts: 'vz_alerts',
-                 metric: 'vz_metric', mode: 'vz_mode', limit: 'vz_limit', quota: 'vz_quota', flags: 'vz_flags' };
+                 metric: 'vz_metric', mode: 'vz_mode', limit: 'vz_limit', quota: 'vz_quota', flags: 'vz_flags', base: 'vz_base' };
       var MONTHS = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'];
       var COLORS = ['#2f6f9f', '#7b4fb0', '#2e7d4f', '#b86e00'];
       var API = '/api/dashboard';
@@ -1350,6 +1355,7 @@
       var limit = lsGet(LS.limit, 100000);
       var quota = lsGet(LS.quota, null);
       var flags = lsGet(LS.flags, { hasVisits: true, botsExcluded: true });
+      var baseline = lsGet(LS.base, {});          // { site: { at, days: { 'AAAA-MM-JJ': {p, v} } } } : point zéro choisi par l’utilisateur
       var metric = lsGet(LS.metric, 'v'), mode = lsGet(LS.mode, 'jours');
       var busy = false, lastRefresh = 0, lastOk = null, lastError = '', timer = null;
 
@@ -1369,8 +1375,13 @@
 
       // ---------- agrégation
       function total(site, d0, d1, k) {
-        var days = store[site] || {}, s = 0, d = d0;
-        while (d <= d1) { var c = days[d]; if (c) s += c[k] || 0; d = addDays(d, 1); }
+        // chiffres Cloudflare moins le point zéro éventuel (jamais négatif)
+        var days = store[site] || {}, base = (baseline[site] && baseline[site].days) || {}, s = 0, d = d0;
+        while (d <= d1) {
+          var c = days[d];
+          if (c) { var b = base[d]; s += Math.max(0, (c[k] || 0) - (b ? (b[k] || 0) : 0)); }
+          d = addDays(d, 1);
+        }
         return s;
       }
       function dailySeries(site, t, n, k) {
@@ -1487,9 +1498,14 @@
                  '</div><div class="o">' + fmt(total(s.key, r[1], r[2], other)) + ' ' + on + '</div></div>';
         }).join('');
         var series = mode === 'jours' ? dailySeries(s.key, t, 30, metric) : mode === 'semaines' ? weeklySeries(s.key, t, 12, metric) : monthlySeries(s.key, t, 6, metric);
-        return '<div class="vz-card" data-site="' + esc(s.key) + '"><div><strong>' + esc(s.label) + '</strong></div><div class="vz-muted vz-small">' + esc(s.host + s.prefix) +
-               '</div><div class="vz-grid">' + stats + '</div>' + chart(series, color) + '</div>';
+        var zero = baseline[s.key]
+          ? '<div class="vz-muted vz-small">Remis à zéro le ' + stamp(baseline[s.key].at) + ' · <button type="button" class="vz-link" data-undo="' + esc(s.key) + '">Annuler</button></div>' : '';
+        return '<div class="vz-card" data-site="' + esc(s.key) + '"><div class="vz-sitehead"><strong>' + esc(s.label) + '</strong>' +
+               '<button type="button" class="vz-zero" data-reset="' + esc(s.key) + '" title="Repartir de zéro pour ce site">↺ Zéro</button></div>' +
+               '<div class="vz-muted vz-small">' + esc(s.host + s.prefix) + '</div>' + zero +
+               '<div class="vz-grid">' + stats + '</div>' + chart(series, color) + '</div>';
       }
+      function stamp(iso) { var d = new Date(iso); return pad(d.getDate()) + '/' + pad(d.getMonth() + 1) + ' à ' + pad(d.getHours()) + ':' + pad(d.getMinutes()); }
       function segment(id, items, cur) {
         return '<div class="vz-seg" id="' + id + '">' + items.map(function (it) {
           return '<button type="button" data-v="' + it[0] + '" class="' + (it[0] === cur ? 'on' : '') + '">' + it[1] + '</button>';
@@ -1516,7 +1532,9 @@
       function showLogin(msg) { $('vz-login').hidden = false; $('vz-login-err').textContent = msg || ''; $('vz-key-input').focus(); }
 
       // ---------- récupération (uniquement fenêtre ouverte)
-      function refresh(force) {
+      var pending = [];
+      function refresh(force, cb) {
+        if (cb) pending.push(cb);
         if (busy) return;
         var key = lsGet(LS.key, '');
         if (!key) { showLogin(); return; }
@@ -1547,7 +1565,22 @@
             if (e.auth) { lsDel(LS.key); showLogin(lastError); lastError = ''; }
             else if (e.fromServer) { $('vz-login').hidden = true; }      // le serveur a répondu : la clé est acceptée
           })
-          .then(function () { busy = false; render(); });
+          .then(function () { busy = false; render(); var f = pending; pending = []; f.forEach(function (x) { x(); }); });
+      }
+
+      // ---------- remise à zéro
+      function resetSites(keys, label) {
+        if (!window.confirm('Remettre à zéro les visites de ' + label + ' ?\n\nLes chiffres affichés repartiront de 0 à partir de maintenant. Rien n’est supprimé chez Cloudflare, et tu peux annuler à tout moment. Valable sur cet appareil uniquement.')) return;
+        $('vz-status').textContent = 'Remise à zéro…';
+        refresh(true, function () {                      // on repart des chiffres les plus récents
+          var now = new Date().toISOString();
+          keys.forEach(function (k) {
+            var snap = {}, days = store[k] || {};
+            Object.keys(days).forEach(function (d) { snap[d] = { p: days[d].p || 0, v: days[d].v || 0 }; });
+            baseline[k] = { at: now, days: snap };
+          });
+          lsSet(LS.base, baseline); render();
+        });
       }
 
       // ---------- ouverture / fermeture
@@ -1576,7 +1609,20 @@
         lsSet(LS.key, v); $('vz-key-input').value = ''; refresh(true);
       });
       $('vz-key-input').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('vz-key-ok').click(); });
+      $('vz-reset-all').addEventListener('click', function () {
+        resetSites(sites.map(function (s) { return s.key; }), 'tous les sites');
+      });
       win.addEventListener('click', function (ev) {
+        var z = ev.target.closest ? ev.target.closest('[data-reset], [data-undo]') : null;
+        if (z) {
+          if (z.hasAttribute('data-reset')) {
+            var key = z.getAttribute('data-reset'), s = sites.filter(function (x) { return x.key === key; })[0];
+            resetSites([key], '« ' + (s ? s.label : key) + ' »');
+          } else {
+            delete baseline[z.getAttribute('data-undo')]; lsSet(LS.base, baseline); render();
+          }
+          return;
+        }
         var b = ev.target.closest ? ev.target.closest('#vz-seg-metric button, #vz-seg-mode button') : null;
         if (!b) return;
         if (b.parentNode.id === 'vz-seg-metric') { metric = b.getAttribute('data-v'); lsSet(LS.metric, metric); }
